@@ -30,7 +30,7 @@ const SignUpCard = ({ onSignUp }: SignUpCardProps) =>{
       <h2 className="text-2xl  text-center justify-center font-bold text-gray-800 mb-6">Sign Up Form</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-lg font-medium">Username</label>
+          <label className="block text-sm md:text-lg font-medium">Username</label>
           <input
             type="text"
             name="username"
@@ -42,7 +42,7 @@ const SignUpCard = ({ onSignUp }: SignUpCardProps) =>{
           />
         </div>
         <div>
-          <label className="block text-lg font-medium">Email</label>
+          <label className="block text-sm md:text-lg font-medium">Email</label>
           <input
             type="email"
             name="email"
@@ -55,14 +55,14 @@ const SignUpCard = ({ onSignUp }: SignUpCardProps) =>{
 
         </div>
         <div>
-          <label className="block text-lg font-medium">Password</label>
+          <label className="block text-sm md:text-lg font-medium">Password</label>
           <PasswordInput 
             value={form.password}
             onChange={handleChange}
           />
         </div>
         <div>
-          <label className="block text-lg font-medium">Role</label>
+          <label className="block text-sm md:text-lg font-medium">Role</label>
           <select
             name="role"
             value={form.role}
@@ -82,7 +82,7 @@ const SignUpCard = ({ onSignUp }: SignUpCardProps) =>{
           Sign Up
         </button>
       </form>
-      <p className="text-lg text-gray-600 mt-4">
+      <p className="text-sm md:text-lg text-gray-600 mt-4">
         Already have an account?{" "}
         <a href="/login" className="text-blue-600 hover:underline">
           Login
