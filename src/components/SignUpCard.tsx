@@ -3,9 +3,10 @@ import PasswordInput from "./PasswordInput";
 
 interface SignUpCardProps {
   onSignUp?: (data: { username: string; email: string; password: string; role: string}) =>void;
+  onSwitch?: () => void;
 }
 
-const SignUpCard = ({ onSignUp }: SignUpCardProps) =>{
+const SignUpCard = ({ onSignUp, onSwitch }: SignUpCardProps) =>{
   const [form, setForm] = useState({
     username: "",
     email: "",
@@ -26,48 +27,48 @@ const SignUpCard = ({ onSignUp }: SignUpCardProps) =>{
 
 
   return (
-    <div className="w-full max-w-md bg-gray-50 shadow-lg rounded-2xl p-6">
-      <h2 className="text-2xl  text-center justify-center font-bold text-gray-800 mb-6">Sign Up Form</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
+    <div className="p-6">
+      <h2 className="text-xl text-center font-semibold text-gray-700 dark:text-gray-100 mb-6">Sign Up Form</h2>
+      <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6 ">
+        <div className="text-gray-900 dark:text-gray-100">
           <label className="block text-sm md:text-lg font-medium">Username</label>
           <input
             type="text"
             name="username"
             value={form.username}
             onChange={handleChange}
-            className="mt-1 w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-brand-light dark:focus:ring-brand-dark"
+            className="mt-1 w-full border border-gray-300 bg-surface-light dark:bg-surface-dark rounded-lg p-2 focus:ring-2 focus:ring-brand-light dark:focus:ring-brand-dark"
             required
             placeholder="enter username"
           />
         </div>
-        <div>
+        <div className="text-gray-900 dark:text-gray-100">
           <label className="block text-sm md:text-lg font-medium">Email</label>
           <input
             type="email"
             name="email"
             value={form.email}
             onChange={handleChange}
-            className="mt-1 w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-brand-light dark:focus:ring-brand-dark"
+            className="mt-1 w-full border border-gray-300 bg-surface-light dark:bg-surface-dark rounded-lg p-2 focus:ring-2 focus:ring-brand-light dark:focus:ring-brand-dark"
             required
             placeholder="example@gmail.com"
           />
 
         </div>
-        <div>
-          <label className="block text-sm md:text-lg font-medium">Password</label>
+        <div className="text-gray-900 dark:text-gray-100">
+          <label className="block text-sm md:text-lg font-medium ">Password</label>
           <PasswordInput 
             value={form.password}
             onChange={handleChange}
           />
         </div>
-        <div>
-          <label className="block text-sm md:text-lg font-medium">Role</label>
+        <div className="text-gray-900 dark:text-gray-100">
+          <label className="block text-sm  md:text-lg font-medium">Role</label>
           <select
             name="role"
             value={form.role}
             onChange={handleChange}
-            className="mt-1 w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-brand-light dark:focus:ring-brand-dark"
+            className="mt-1 w-full border border-gray-300 bg-surface-light dark:bg-surface-dark rounded-lg p-2 focus:ring-2 focus:ring-brand-light dark:focus:ring-brand-dark"
           >
             <option value="builder">Builder</option>
             <option value="technician">Technician</option>
@@ -77,16 +78,16 @@ const SignUpCard = ({ onSignUp }: SignUpCardProps) =>{
         </div>
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+          className="w-full bg-blue-600 text-white dark:text-gray-100 py-2 rounded-lg hover:bg-blue-700 transition"
         >
           Sign Up
         </button>
       </form>
-      <p className="text-sm md:text-lg text-gray-600 mt-4">
+      <p className="text-sm md:text-lg text-gray-600 dark:text-gray-300 mt-4">
         Already have an account?{" "}
-        <a href="/login" className="text-blue-600 hover:underline">
+        <button type="button" className="text-blue-600 hover:underline" onClick={onSwitch}>
           Login
-        </a>
+        </button>
       </p>
     </div>
   );

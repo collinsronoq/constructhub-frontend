@@ -1,12 +1,17 @@
 import { useState, useEffect } from "react"
 
 
+interface NavBarProps{
+  sidebarOpen: boolean;
+  setSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  isLogged: boolean;
 
-const NavBar = () =>{
-  const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
+}
+
+const NavBar = ({ sidebarOpen, setSidebarOpen, isLogged }: NavBarProps) => {
   const [isDark, setIsDark ] = useState<boolean>(false);
 
-  const isLogged:boolean = false;
+  
 
   useEffect(() => {
     setIsDark(document.documentElement.classList.toggle("dark"));
@@ -21,7 +26,7 @@ const NavBar = () =>{
   
   return(
     
-    <header className="flex items-center justify-between h-16 px-4 bg-background-light dark:bg-background-dark shadow-md">
+    <header className="flex items-center justify-between h-16 px-4 bg-surface-light dark:bg-surface-dark shadow-md">
       
 
       <div className="flex flex-row space-x-2">

@@ -21,12 +21,12 @@ const PasswordInput = ({
         value={value}
         onChange={onChange}
         placeholder={placeholder}
-        className="mt-1 w-full border border-gray-300 rounded-lg p-2 pr-10 focus:ring-2 focus:ring-blue-500"
+        className="mt-1 w-full text-gray-900 dark:text-gray-100 border border-gray-300 bg-surface-light dark:bg-surface-dark rounded-lg p-2 pr-10 focus:ring-2 focus:ring-blue-500"
       />
       <button
         type="button"
         onClick={() => setShowPassword(!showPassword)}
-        className="absolute inset-y-0 right-2 flex items-center text-gray-500 hover:text-gray-700"
+        className="absolute inset-y-0 right-2 flex items-center text-gray-500 dark:text-gray-300 hover:text-gray-700"
       >
         {showPassword ? (
           // Eye Open SVG

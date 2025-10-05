@@ -3,11 +3,13 @@ import PasswordInput from "./PasswordInput";
 
 interface LoginCardProps {
   onLogin?: (data: { email: string; password: string}) => void;
+  onSwitch?: () => void;
 }
 
-const LoginCard = ({ onLogin }: LoginCardProps) => {
+const LoginCard = ({ onLogin, onSwitch }: LoginCardProps) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  
 
 
   const handleSubmit = (e: React.FormEvent) =>{
@@ -18,35 +20,39 @@ const LoginCard = ({ onLogin }: LoginCardProps) => {
   };
 
   return (
-    <div className="w-full max-w-md bg-gray-50 shadow-lg rounded-2xl p-6">
-      <h2 className="text-2xl text-center justify-center font-bold text-gray-800 mb-6">Login Form</h2>
+    <div className="p-4">
+      
+      <h2 className="text-xl text-center font-bold text-gray-700 dark:text-gray-100 mb-4">Login Form</h2>
+      
+      
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block text-sm md:text-lg   font-medium">Email</label>
+        <div className="text-gray-900 dark:text-gray-100">
+          <label className="block text-sm md:text-lg font-medium">Email</label>
           <input
             type="email"
             required
             value={email}
             onChange={(e) =>setEmail(e.target.value) }
-            className="mt-1 w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500"
+            className="mt-1 w-full border text-gray-900 dark:text-gray-100 border-gray-300 bg-surface-light dark:bg-surface-dark rounded-lg p-2 focus:ring-2 focus:ring-blue-500"
             placeholder="example@gmail.com"
           />
         </div>
-        <div>
+        <div className="text-gray-900 dark:text-gray-100">
           <label className="block text-sm md:text-lg  font-medium">Password</label>
           <PasswordInput 
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}/>
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
         </div>
-        <button type="submit" className="w-full text-sm md:text-lg   bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition">
+        <button type="submit" className="w-full text-sm md:text-lg bg-blue-600 text-white dark:text-gray-100 py-2 rounded-lg hover:bg-blue-700 transition">
           Login
         </button>
       </form>
-      <p className="text-sm md:text-lg   text-gray-600 mt-4">
+      <p className="text-sm md:text-lg text-gray-600 dark:text-gray-300 mt-4">
         Don’t have an account?{" "}
-        <a href="/signup" className="text-blue-600 hover:underline">
+        <button type="button" className="text-blue-500 hover:underline" onClick={onSwitch}>
           Sign up
-        </a>
+        </button>
       </p>
     </div>
   );

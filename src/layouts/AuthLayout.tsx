@@ -35,11 +35,12 @@ interface AuthLayoutProps {
 
 const AuthLayout = ({ description }: AuthLayoutProps) => {
   const [activeModal, setActiveModal] = useState<"login" | "signup" | null>(null);
+  const isLogged: boolean = false;
 
   return (
     <>
-      <NavBar />
-      <div className="grid grid-cols-1 md:grid-cols-2  min-h-screen  bg-surface-light dark:bg-surface-dark">
+      <NavBar sidebarOpen={false} setSidebarOpen={() => {}} isLogged={isLogged}/>
+      <div className="grid grid-cols-1 md:grid-cols-2  min-h-screen  bg-background-light dark:bg-background-dark">
         <div className="px-4 py-4">
           <div className="p-2">
 
@@ -82,25 +83,44 @@ const AuthLayout = ({ description }: AuthLayoutProps) => {
 
           {/* Modal Overlay */}
           {activeModal && (
-            <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center p-4 z-50">
-              <div className="bg-white w-full max-w-md rounded-xl shadow-lg p-6 relative">
+            <div className="fixed inset-0 bg-surface-light bg-opacity-20  flex items-center justify-center p-4 z-50">
+              <div className="bg-surface-light dark:bg-surface-dark  p-4 relative rounded-xl shadow-lg">
                 {/* Close Button */}
                 <button
                   onClick={() => setActiveModal(null)}
-                  className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
+                  className="absolute top-3 right-3 text-gray-800 dark:text-gray-100 dark:hover:text-white hover:text-gray-900"
                 >
-                  ✕
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-x-icon lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
                 </button>
 
                 {/* Show card */}
-                {activeModal === "login" && <LoginCard />}
-                {activeModal === "signup" && <SignUpCard />}
+                {activeModal === "login" && (
+                  <LoginCard onSwitch={() => setActiveModal("signup")}/>)}
+                {activeModal === "signup" && (
+                  <SignUpCard onSwitch={() => setActiveModal("login")}/>)}
               </div>
             </div>
           )}
         </div>
-        <div className="h-screen m-0 pt-4 overflow-hidden">
-          <img src="src/assets/image_1.jpg" className="inset-0"></img>
+        <div 
+          style={{
+            backgroundImage: "url('src/assets/image_1.jpg')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
+            height: "100vh",
+            width: "100%",
+          }}
+        >
+          {/* <div className="grid grid-cols-1 md:grid-cols-2">
+            <div>
+              <h1 className="text-xl md:text-4xl font-extrabold text-brand-light dark:text-brand-dark mb-4">ConstructHub... Your Construction Companion</h1>
+              <h4 className="text-white text-xl md:text-2xl">Get Started</h4>
+
+
+            </div>
+          </div> */}
+          {/* <img src="src/assets/image_1.jpg" className="inset-0"></img> */}
         </div>
       </div>
     </>
