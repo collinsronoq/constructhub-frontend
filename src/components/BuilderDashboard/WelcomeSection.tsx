@@ -1,15 +1,43 @@
 
-const WelcomeSection = () => {
-  return (
-    <section>
-      <h2>Welcome, [Builder Name]</h2>
-      <p>Ready to plan your next construction project?</p>
+interface WelcomeSectionProps {
+  builderName?: string;
+}
 
-      <div>
-        <button>Start Estimation</button>
-        <button>Ask AI Assistant</button>
-        <button>Find Vendors</button>
-        <button>Hire Technicians</button>
+const WelcomeSection = ({ builderName = "Collins" }: WelcomeSectionProps) => {
+  return (
+    <section className="bg-surface-light dark:bg-surface-dark rounded-2xl shadow-md p-6 md:p-8 mb-8">
+      {/* Greeting and intro */}
+      <div className="mb-6">
+        <div className="inline-flex gap-x-4 text-center">
+          <h2 className="text-2xl md:text-3xl font-bold text-blue-600">
+            Welcome back, {builderName}
+          </h2>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-hard-hat-icon lucide-hard-hat w-5 h-5 md:w-8 md:h-8"><path d="M10 10V5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v5"/><path d="M14 6a6 6 0 0 1 6 6v3"/><path d="M4 15v-3a6 6 0 0 1 6-6"/><rect x="2" y="15" width="20" height="4" rx="1"/></svg>
+        </div>
+        {/* 👷 */}
+        <p className="text-gray-700 dark:text-gray-300 mt-2 text-base md:text-lg">
+          Ready to plan your next construction project? Start with an estimate,
+          consult the AI assistant, or explore verified vendors and technicians.
+        </p>
+      </div>
+
+      {/* Quick action buttons */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <button className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition">
+          Start Estimation
+        </button>
+        {/* bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white font-medium py-3 px-4 rounded-lg transition */}
+        <button className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition">
+          Ask AI Assistant
+        </button>
+
+        <button className="bg-white border border-blue-600 text-blue-600  hover:bg-blue-100 font-medium py-3 px-4 rounded-lg transition">
+          Find Vendors
+        </button>
+
+        <button className="bg-white border border-blue-600 text-blue-600 hover:bg-blue-100 font-medium py-3 px-4 rounded-lg transition">
+          Hire Technicians
+        </button>
       </div>
     </section>
   );
