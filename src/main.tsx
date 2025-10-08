@@ -4,7 +4,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
 import "./index.css"
 
 import DashboardLayout from "./layouts/DashboardLayout"
-import Dashboard from "./pages/Dashboard"
+import Dashboard from "./pages/BuilderDashboard"
 import Vendors from "./pages/Vendors"
 import Projects from "./pages/Projects"
 import AIChat from "./pages/AIChat"

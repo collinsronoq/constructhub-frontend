@@ -113,7 +113,7 @@ const DashboardLayout = () => {
 
   return (
     <>
-      {/* <NavBar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} isLogged={isLogged}/> */}
+      
       <div className="min-h-screen bg-background-light dark:bg-background-dark text-gray-900 dark:text-gray-100">
         {/* NAVBAR - normal document flow (not fixed) */}
         <NavBar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} isLogged={isLogged} />
