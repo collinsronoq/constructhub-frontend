@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { Link, Outlet, useLocation } from "react-router-dom"
 import NavBar from "../components/NavBar"
+import AIChatModal   from "../components/AIAssistantPanel";
 
 type SideBarProps = {
   onLinkClick?: ()=> void;
@@ -15,7 +16,7 @@ const SideBar = ({onLinkClick}: SideBarProps) => {
   
   return(
     <aside
-      className="w-64 bg-surface-light dark:bg-surface-dark border-l-2  h-full relative rounded-lg md:rounded-none"
+      className="w-64 bg-surface-light dark:bg-surface-dark border-l-2 h-full relative rounded-lg md:rounded-none"
     >
       <div className="flex items-center border-b border-slate-200 dark:border-slate-200/10 px-4 py-2 h-16 sm:text-xl font-bold text-brand-light dark:text-brand-dark">
         MENU
@@ -109,30 +110,46 @@ const SideBar = ({onLinkClick}: SideBarProps) => {
 
 const DashboardLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isAIOpen, setAIOpen] = useState(false);
   const [isLogged] = useState(true);
 
   return (
     <>
       
-      <div className="min-h-screen bg-background-light dark:bg-background-dark text-gray-900 dark:text-gray-100">
+      <div className="min-h-screen bg-background-light dark:bg-background-dark text-gray-900 dark:text-gray-100 ">
         {/* NAVBAR - normal document flow (not fixed) */}
-        <NavBar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} isLogged={isLogged} />
+        <div className="">
+          <NavBar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} isLogged={isLogged}  onToggleAI={() => setAIOpen((prev) => !prev)}/>
+        </div>
+        
 
         {/* CONTENT AREA
             We use min-h-[calc(100vh-4rem)] so the area below the header fills remaining viewport.
             Header uses h-16 (4rem). This avoids any overlap while keeping header in flow.
         */}
-        <div className="flex min-h-[calc(100vh-4rem)]">
-          {/* Desktop Sidebar: visible md+ */}
+        <div className="flex min-h-[calc(100vh-4rem)] relative">
+          {/* Sidebar */}
           <div className="hidden md:block">
             <SideBar />
           </div>
 
           {/* Main content */}
-          <main className="flex-1 overflow-auto p-6">
+          <main
+            className={`flex-1 overflow-auto p-6 transition-all duration-300 ${
+              isAIOpen ? "md:mr-96" : ""
+            }`}
+          >
             <Outlet />
           </main>
+
+          {/* AI Assistant Side Panel */}
+          {isAIOpen && (
+            <div className="fixed right-0 top-16 bottom-0 w-96 bg-white dark:bg-gray-900 border-l border-gray-200 dark:border-gray-700 shadow-lg z-40">
+              <AIChatModal onClose={() => setAIOpen(false)} />
+            </div>
+          )}
         </div>
+
 
         {/* Mobile off-canvas sidebar overlay (md:hidden) */}
         {sidebarOpen && (

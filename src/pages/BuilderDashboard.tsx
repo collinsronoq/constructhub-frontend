@@ -1,6 +1,9 @@
+
+import { useState } from "react"
 import WelcomeSection from "../components/BuilderDashboard/WelcomeSection";
 import Estimations from "../components/BuilderDashboard/Estimations";
 import AIAssistantWidget from "../components/BuilderDashboard/AIAssistantWidget";
+import AIChatModal from "../components/AIAssistantPanel";
 import Recommendations from "../components/BuilderDashboard/Recommendations";
 import LearningTips from "../components/BuilderDashboard/LearningTips";
 
@@ -32,6 +35,8 @@ const BuilderDashboard = () => {
       location: "Rafiki",
     },
   ]
+
+  const [isChatOpen, setIsChatOpen ] = useState(false)
   return (
     <div>
       {/* Welcome & Quick Actions */}
@@ -41,8 +46,9 @@ const BuilderDashboard = () => {
       <Estimations estimates={sampleEstimates} />
 
       {/* AI Assistant Overview */}
-      <AIAssistantWidget />
+      <AIAssistantWidget onOpenChat={() => setIsChatOpen(true)} />
 
+       <AIChatModal isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
       {/* Recommended Vendors & Technicians */}
       <Recommendations />
 
