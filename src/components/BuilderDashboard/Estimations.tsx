@@ -37,7 +37,7 @@ const Estimations: React.FC<EstimationSummaryProps> = ({ estimates, onViewAll })
           estimates.map((estimate) => (
             <div
               key={estimate.id}
-              className="p-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-blue-50 dark:bg-gray-800 shadow hover:shadow-md transition"
+              className="p-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-blue-50 dark:bg-background-dark shadow hover:shadow-md transition"
             >
               <div className="flex items-center space-x-2 text-base md:text-lg font-semibold text-gray-800 dark:text-gray-100 ml-2 my-2">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="size-4 md:size-5">
@@ -102,7 +102,7 @@ const Estimations: React.FC<EstimationSummaryProps> = ({ estimates, onViewAll })
               <div className="mt-4 ">
                 <Link
                   to={`/estimation/${estimate.id}`}
-                  className="inline-block px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition"
+                  className="inline-block px-4 py-2 bg-blue-600 text-white text-xs md:text-sm rounded-lg hover:bg-blue-700 transition"
                 >
                   View Details
                 </Link>

@@ -50,7 +50,7 @@ const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({
       </div>
 
       {/* AI Suggestions */}
-      <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 shadow-inner mb-6">
+      <div className="bg-white dark:bg-background-dark p-4 rounded-lg border border-gray-200 dark:border-gray-700 shadow-inner mb-6">
         <p className="text-sm md:text-base font-medium text-gray-700 dark:text-gray-200 mb-3">
           Try asking:
         </p>

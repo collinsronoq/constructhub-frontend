@@ -3,9 +3,10 @@ import { useState } from "react"
 import WelcomeSection from "../components/BuilderDashboard/WelcomeSection";
 import Estimations from "../components/BuilderDashboard/Estimations";
 import AIAssistantWidget from "../components/BuilderDashboard/AIAssistantWidget";
-import AIChatModal from "../components/AIAssistantPanel";
+import AIAssistantPanel from "../components/AIAssistantPanel";
 import Recommendations from "../components/BuilderDashboard/Recommendations";
 import LearningTips from "../components/BuilderDashboard/LearningTips";
+
 
 
 const BuilderDashboard = () => {
@@ -48,7 +49,7 @@ const BuilderDashboard = () => {
       {/* AI Assistant Overview */}
       <AIAssistantWidget onOpenChat={() => setIsChatOpen(true)} />
 
-       <AIChatModal isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
+      { isChatOpen && <AIAssistantPanel  onClose={() => setIsChatOpen(false)} />}
       {/* Recommended Vendors & Technicians */}
       <Recommendations />
 

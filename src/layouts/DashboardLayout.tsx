@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { Link, Outlet, useLocation } from "react-router-dom"
 import NavBar from "../components/NavBar"
-import AIChatModal   from "../components/AIAssistantPanel";
+import AIAssistantPanel from "../components/AIAssistantPanel"
 
 type SideBarProps = {
   onLinkClick?: ()=> void;
@@ -145,7 +145,7 @@ const DashboardLayout = () => {
           {/* AI Assistant Side Panel */}
           {isAIOpen && (
             <div className="fixed right-0 top-16 bottom-0 w-96 bg-white dark:bg-gray-900 border-l border-gray-200 dark:border-gray-700 shadow-lg z-40">
-              <AIChatModal onClose={() => setAIOpen(false)} />
+              <AIAssistantPanel onClose={() => setAIOpen(false)} />
             </div>
           )}
         </div>
