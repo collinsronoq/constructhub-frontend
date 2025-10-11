@@ -1,9 +1,11 @@
 
 interface WelcomeSectionProps {
   builderName?: string;
+  onOpenChat?: () => void;
 }
 
-const WelcomeSection = ({ builderName = "Collins" }: WelcomeSectionProps) => {
+
+const WelcomeSection = ({ builderName = "Collins", onOpenChat }: WelcomeSectionProps) => {
   return (
     <section className="bg-surface-light dark:bg-surface-dark rounded-2xl shadow-md p-6 md:p-8 mb-8">
       {/* Greeting and intro */}
@@ -27,7 +29,7 @@ const WelcomeSection = ({ builderName = "Collins" }: WelcomeSectionProps) => {
           Start Estimation
         </button>
         {/* bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white font-medium py-3 px-4 rounded-lg transition */}
-        <button className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition">
+        <button onClick={onOpenChat} className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition">
           Ask AI Assistant
         </button>
 

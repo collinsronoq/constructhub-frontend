@@ -1,9 +1,10 @@
 
-import { useState } from "react"
+// import { useState } from "react"
+import { useOutletContext } from "react-router-dom";
 import WelcomeSection from "../components/BuilderDashboard/WelcomeSection";
 import Estimations from "../components/BuilderDashboard/Estimations";
 import AIAssistantWidget from "../components/BuilderDashboard/AIAssistantWidget";
-import AIAssistantPanel from "../components/AIAssistantPanel";
+// import AIAssistantPanel from "../components/AIAssistantPanel";
 import Recommendations from "../components/BuilderDashboard/Recommendations";
 import LearningTips from "../components/BuilderDashboard/LearningTips";
 
@@ -37,19 +38,19 @@ const BuilderDashboard = () => {
     },
   ]
 
-  const [isChatOpen, setIsChatOpen ] = useState(false)
+  const { onToggleOpenAI } = useOutletContext<{ onToggleOpenAI: () => void }>();
   return (
     <div>
       {/* Welcome & Quick Actions */}
-      <WelcomeSection />
+      <WelcomeSection onOpenChat={ onToggleOpenAI } />
 
       {/* Estimation Summary */}
       <Estimations estimates={sampleEstimates} />
 
       {/* AI Assistant Overview */}
-      <AIAssistantWidget onOpenChat={() => setIsChatOpen(true)} />
+      <AIAssistantWidget onOpenChat={ onToggleOpenAI } />
 
-      { isChatOpen && <AIAssistantPanel  onClose={() => setIsChatOpen(false)} />}
+      
       {/* Recommended Vendors & Technicians */}
       <Recommendations />
 

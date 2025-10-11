@@ -62,6 +62,7 @@ const Recommendations = ({
       experience: "5 years",
       rating: 4.5,
       contact: "+254 712 345 678",
+      verified: false
     },
     {
       id: "2",
@@ -71,6 +72,7 @@ const Recommendations = ({
       experience: "5 years",
       rating: 4.5,
       contact: "+254 712 345 678",
+      verified: false
     },
     {
       id: "3",
@@ -80,6 +82,7 @@ const Recommendations = ({
       experience: "5 years",
       rating: 4.5,
       contact: "+254 712 345 678",
+      verified: true
     },
     {
       id: "4",
@@ -89,40 +92,66 @@ const Recommendations = ({
       experience: "5 years",
       rating: 4.5,
       contact: "+254 712 345 678",
+      verified: true
     },
   ],
   onViewAll,} : RecommendationsProps) => {
   return (
     <section className="p-6 bg-surface-light dark:bg-surface-dark rounded-xl shadow-sm my-8">
-      {/* Header */}
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-          Recommended Vendors & Technicians
-        </h2>
+      {/* Section Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-3">
+        <div>
+          <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+            Recommended Vendors & Technicians
+          </h2>
+          <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
+            Based on your project locations and previous estimations
+          </p>
+        </div>
         {onViewAll && (
           <button
             onClick={onViewAll}
-            className="text-blue-600 dark:text-blue-400 text-sm hover:underline"
+            className="text-blue-600 dark:text-blue-400 text-sm font-medium hover:underline"
           >
             View All
           </button>
         )}
       </div>
-      
-      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 my-4 border-b">Recommended Vendors</h3>
-      {/* Vendor Cards Grid */}
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-6">
-        {vendors.map((vendor) => (
-          <VendorCard key={vendor.id} {...vendor} />
-        ))}
+
+      {/* Vendors Section */}
+      <div className="mb-10">
+        <div className="flex flex-col md:flex-row justify-between items-center border-b border-slate-200 dark:border-slate-200/10 pb-2 mb-4">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+            Recommended Vendors
+          </h3>
+          <span className="text-sm text-gray-500 dark:text-gray-400 py-4 md:py-0">
+            Verified material suppliers
+          </span>
+        </div>
+
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {vendors.map((vendor) => (
+            <VendorCard key={vendor.id} {...vendor} />
+          ))}
+        </div>
       </div>
 
-      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mt-8 mb-6 border-b">Recommended Technicians</h3>
-      {/* Technicinas Cards Grid */}
-      <div className="grid gap-x-6 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
-        {technicians.map((technician) => (
-          <TechnicianCard key={technician.id} {...technician} />
-        ))}
+      {/* Technicians Section */}
+      <div>
+        <div className="flex flex-col md:flex-row justify-between items-center border-b border-slate-200 dark:border-slate-200/10 pb-2 mb-4">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+            Recommended Technicians
+          </h3>
+          <span className="text-sm text-gray-500 dark:text-gray-400 py-4 md:py-0">
+            Skilled professionals near your projects
+          </span>
+        </div>
+
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {technicians.map((technician) => (
+            <TechnicianCard key={technician.id} {...technician} />
+          ))}
+        </div>
       </div>
     </section>
   )
