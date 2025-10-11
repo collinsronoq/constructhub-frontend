@@ -11,6 +11,7 @@ import TechnicianDirectory from "./pages/TechnicianDirectory"
 import AIChat from "./pages/AIChat"
 import Login from "./pages/Login"
 import SignUp from "./pages/SignUp"
+import TechnicianProfile from "./pages/TechnicianProfile"
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
@@ -26,6 +27,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           <Route path="/vendors" element={<Vendors />} />
           <Route path="/technicians" element={<TechnicianDirectory />} />
           <Route path="/ai" element={<AIChat />} />
+          <Route path="/technician/profile" element = {<TechnicianProfile />} />
           
           {/* <Route path="/settings" element={<div>Settings Page</div>} /> */}
         </Route>
