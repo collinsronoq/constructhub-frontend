@@ -12,9 +12,10 @@ const TechnicianProfile = () => {
     location: "Nakuru, Kenya",
     experience: "5 years",
     verified: false,
-    rating: 4.6,
+    rating: 4,
     imageUrl: "src/assets/image_4.jpg",
     contact: "+254 712 345 678",
+    email: "electrician@gmail.com",
     bio: "A dedicated electrical technician with over five years of experience in residential and commercial installations, wiring, and power systems. Passionate about delivering quality and ensuring safety in every project.",
     skills: ["Wiring", "Lighting Installation", "Solar Systems", "Safety Compliance"],
     certifications: ["Electrical Safety Certification", "Solar Energy Technician Certificate"],
@@ -27,14 +28,14 @@ const TechnicianProfile = () => {
    return (
     <section className="p-6 bg-surface-light dark:bg-surface-dark rounded-xl shadow-md space-y-6">
       {/* Verification Notice */}
-      {!technician.verified && (
+      {/* {!technician.verified && (
         <div className="p-4 bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-700 rounded-lg text-sm text-yellow-800 dark:text-yellow-300">
           ⚠️ This technician has not yet been verified by ConstructHub. 
           <span className="block text-xs mt-1">
             Verification helps technicians gain visibility and trust.
           </span>
         </div>
-      )}
+      )} */}
 
       {/* Header Section (with Contact actions included) */}
       <TechnicianHeader
@@ -45,6 +46,7 @@ const TechnicianProfile = () => {
         rating={technician.rating}
         contact={technician.contact}
         verified={technician.verified}
+        email={technician.email}
       />
 
       {/* Bio Section */}

@@ -36,7 +36,7 @@ const TechnicianAbout: React.FC<TechnicianAboutProps> = ({
 
       {/* Skills Section */}
       <div>
-        <h4 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+        <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
           Key Skills
         </h4>
         {skills.length > 0 ? (
@@ -44,7 +44,7 @@ const TechnicianAbout: React.FC<TechnicianAboutProps> = ({
             {skills.map((skill, index) => (
               <li
                 key={index}
-                className="px-3 py-1 bg-blue-100 dark:bg-blue-800 text-blue-700 dark:text-blue-300 text-sm rounded-full"
+                className="px-3 py-1 bg-blue-100 dark:bg-blue-800 text-gray-900 dark:text-gray-100 text-sm rounded-full"
               >
                 {skill}
               </li>
@@ -60,7 +60,7 @@ const TechnicianAbout: React.FC<TechnicianAboutProps> = ({
       {/* Specialization Highlight */}
       {specialization && (
         <div className="mt-6">
-          <h4 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+          <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
             Specialization
           </h4>
           <p className="text-gray-700 dark:text-gray-300">
@@ -68,6 +68,8 @@ const TechnicianAbout: React.FC<TechnicianAboutProps> = ({
           </p>
         </div>
       )}
+
+
     </section>
   )
 }
