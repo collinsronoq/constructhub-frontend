@@ -19,10 +19,36 @@ const TechnicianProfile = () => {
     bio: "A dedicated electrical technician with over five years of experience in residential and commercial installations, wiring, and power systems. Passionate about delivering quality and ensuring safety in every project.",
     skills: ["Wiring", "Lighting Installation", "Solar Systems", "Safety Compliance"],
     certifications: ["Electrical Safety Certification", "Solar Energy Technician Certificate"],
+    // reviews: [
+    //   { id: 1, reviewer: "John Doe", comment: "Professional and punctual!", rating: 5, date: "2025-10-11"},
+    //   { id: 2, reviewer: "Jane Wambui", comment: "Very skilled and easy to work with.", rating: 4.5, date: "2025-10-11" },
+    // ],
     reviews: [
-      { id: 1, reviewer: "John Doe", comment: "Professional and punctual!", rating: 5, date: "2025-10-11"},
-      { id: 2, reviewer: "Jane Wambui", comment: "Very skilled and easy to work with.", rating: 4.5, date: "2025-10-11" },
-    ],
+    {
+      id: "1",
+      reviewerName: "John Mwangi",
+      reviewerRole: "Builder",
+      rating: 5,
+      date: "Oct 5, 2025",
+      review: "Very professional and punctual. The wiring was done perfectly!",
+    },
+    {
+      id: "2",
+      reviewerName: "Sarah Otieno",
+      reviewerRole: "Contractor",
+      rating: 4,
+      date: "Oct 3, 2025",
+      review: "Good work overall. Slight delay on completion but well executed.",
+    },
+    {
+      id: "3",
+      reviewerName: "James Kariuki",
+      reviewerRole: "Builder",
+      rating: 5,
+      date: "Sep 29, 2025",
+      review: "Reliable and skilled technician. Definitely recommend!",
+    },
+  ],
   };
 
    return (
