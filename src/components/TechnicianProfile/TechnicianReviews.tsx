@@ -165,7 +165,7 @@ const TechnicianReviews: React.FC<TechnicianReviewsProps> = ({
   }
 
   return (
-    <section className="p-6 bg-white dark:bg-gray-900 rounded-xl shadow-sm my-8">
+    <section className="p-6 bg-background-light dark:bg-gray-900 rounded-xl shadow-sm my-8">
       <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
         Technician Reviews
       </h2>

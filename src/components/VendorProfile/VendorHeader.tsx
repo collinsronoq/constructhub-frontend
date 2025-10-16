@@ -86,7 +86,7 @@ const VendorHeader: React.FC<VendorHeaderProps> = ({
           
           <div className="text-center sm:text-left">
             <div className="flex items-center justify-center sm:justify-start gap-2 flex-nowrap">
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-600 md:text-white">
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-600 dark:text-brand-dark md:text-white">
                 {name}
               </h1>
               {verified ? (
@@ -106,7 +106,7 @@ const VendorHeader: React.FC<VendorHeaderProps> = ({
               {categories.map((cat) => (
                 <span
                   key={cat}
-                  className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-2.5 py-0.5 rounded-md text-xs font-medium"
+                  className="bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-300 px-2.5 py-0.5 rounded-full text-xs font-medium"
                 >
                   {cat}
                 </span>

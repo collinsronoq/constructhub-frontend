@@ -2,6 +2,7 @@ import VendorHeader from "../components/VendorProfile/VendorHeader"
 import image2 from "../assets/image_2.jpg"
 import image5 from "../assets/image_5.jpg"
 import VendorAbout from "../components/VendorProfile/VendorAbout"
+import VendorShowcase from "../components/VendorProfile/VendorShowcase/VendorShowcase"
 
 const VendorProfile = () =>{
 
@@ -35,6 +36,57 @@ const VendorProfile = () =>{
         
       />
       <VendorAbout />
+
+      <VendorShowcase
+        items={[
+          {
+            id: "1",
+            name: "Cement 50kg Bag",
+            category: "Building Materials",
+            unit: "bag",
+            price: 800,
+            available: true,
+            imageUrl: image5,
+          },
+          {
+            id: "2",
+            name: "Cement 50kg Bag",
+            category: "Building Materials",
+            unit: "bag",
+            price: 800,
+            available: true,
+            imageUrl: image5,
+          },
+          {
+            id: "3",
+            name: "Cement 50kg Bag",
+            category: "Plumbing",
+            unit: "bag",
+            price: 800,
+            available: true,
+            imageUrl: image5,
+          },
+          {
+            id: "4",
+            name: "Cement 50kg Bag",
+            category: "Roofing",
+            unit: "bag",
+            price: 800,
+            available: true,
+            imageUrl: image5,
+          },
+          {
+            id: "5",
+            name: "Gloss Paint",
+            category: "Paints",
+            unit: "litre",
+            price: 550,
+            available: false,
+            imageUrl: image2,
+          },
+        ]}
+      />
+
 
     </>
     

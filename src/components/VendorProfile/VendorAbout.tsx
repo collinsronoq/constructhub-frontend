@@ -1,4 +1,5 @@
 import React from "react"
+import { Contact, Phone, Mail } from "lucide-react"
 
 interface VendorAboutProps {
   description?: string
@@ -11,6 +12,10 @@ interface VendorAboutProps {
     close: string
     days: string
   }
+  contact?: {
+    phone: string
+    email: string
+  },
 }
 
 const VendorAbout: React.FC<VendorAboutProps> = ({
@@ -23,6 +28,10 @@ const VendorAbout: React.FC<VendorAboutProps> = ({
     open: "8:00 AM",
     close: "6:00 PM",
     days: "Mon - Sat",
+  },
+  contact = {
+    phone: "254 712 345 678",
+    email: "vendor2gmail.com"
   },
 }) => {
   return (
@@ -39,7 +48,7 @@ const VendorAbout: React.FC<VendorAboutProps> = ({
 
       {/* Info Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-        <div className="flex items-center gap-3 p-4 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+        <div className="flex items-center gap-3 p-4 rounded-lg bg-background-light dark:bg-background-dark border border-gray-200 dark:border-gray-700">
           <span className="text-blue-600 dark:text-blue-400 text-xl">🏗️</span>
           <div>
             <p className="text-sm text-gray-500 dark:text-gray-400">Years in Business</p>
@@ -49,7 +58,7 @@ const VendorAbout: React.FC<VendorAboutProps> = ({
           </div>
         </div>
 
-        <div className="flex items-center gap-3 p-4 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+        <div className="flex items-center gap-3 p-4 rounded-lg bg-background-light dark:bg-background-dark border border-gray-200 dark:border-gray-700">
           <span className="text-blue-600 dark:text-blue-400 text-xl">🧰</span>
           <div>
             <p className="text-sm text-gray-500 dark:text-gray-400">Specialty</p>
@@ -59,13 +68,29 @@ const VendorAbout: React.FC<VendorAboutProps> = ({
           </div>
         </div>
 
-        <div className="flex items-center gap-3 p-4 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+        <div className="flex items-center gap-3 p-4 rounded-lg bg-background-light dark:bg-background-dark border border-gray-200 dark:border-gray-700">
           <span className="text-blue-600 dark:text-blue-400 text-xl">🚚</span>
           <div>
             <p className="text-sm text-gray-500 dark:text-gray-400">Delivery Support</p>
             <p className="text-base font-semibold text-gray-900 dark:text-gray-100">
               {deliverySupport ? "Available" : "Not available"}
             </p>
+          </div>
+        </div>
+
+        <div className="bg-background-light dark:bg-background-dark p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+          <span className="inline-flex items-center gap-x-3 text-gray-500 dark:text-gray-400 font-semibold pb-4 text-base md:text-lg "><Contact className="w-4 h-4 md:w-6 md:h-6" /> Contact</span>
+          <div className="flex flex-col gap-y-2">
+            {contact?.phone && (
+              <div className="flex items-center gap-x-4">
+                <Phone className="w-4 h-4" /> +{contact.phone}
+              </div>
+            )}
+            {contact?.email && (
+              <div className="flex items-center gap-x-4">
+                <Mail className="w-4 h-4" /> {contact.email}
+              </div>
+            )}
           </div>
         </div>
 
@@ -81,14 +106,14 @@ const VendorAbout: React.FC<VendorAboutProps> = ({
       </div>
 
       {/* Operating Hours */}
-      <div className="p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 flex flex-col sm:flex-row items-start sm:items-center justify-between">
+      <div className="p-4 rounded-lg bg-background-light dark:bg-background-dark border border-blue-200 dark:border-blue-700 flex flex-col sm:flex-row items-start sm:items-center justify-between">
         <div>
           <p className="text-sm text-gray-600 dark:text-gray-400">Operating Hours</p>
-          <p className="text-base font-semibold text-gray-900 dark:text-gray-100">
+          <p className="text-sm md:text-base font-semibold text-gray-900 dark:text-gray-100">
             {operatingHours.days}: {operatingHours.open} – {operatingHours.close}
           </p>
         </div>
-        <span className="mt-3 sm:mt-0 inline-block px-3 py-1 text-sm rounded-full bg-green-100 dark:bg-green-800 text-green-700 dark:text-green-300 font-medium">
+        <span className="mt-3 sm:mt-0 inline-block px-3 py-1 text-xs md:text-sm rounded-full bg-green-100 dark:bg-green-800 text-green-700 dark:text-green-300 font-medium">
           Open Now
         </span>
       </div>
