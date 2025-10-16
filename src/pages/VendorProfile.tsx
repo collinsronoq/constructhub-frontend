@@ -3,6 +3,7 @@ import image2 from "../assets/image_2.jpg"
 import image5 from "../assets/image_5.jpg"
 import VendorAbout from "../components/VendorProfile/VendorAbout"
 import VendorShowcase from "../components/VendorProfile/VendorShowcase/VendorShowcase"
+import VendorReviews from "../components/VendorProfile/VendorReviews"
 
 const VendorProfile = () =>{
 
@@ -20,6 +21,32 @@ const VendorProfile = () =>{
     averageRating: 4,
     isVendorView: true,  // determines visibility of edit/verify buttons
     availability: "Open",
+    reviews: [
+      {
+        id: "1",
+        reviewerName: "John Mwangi",
+        reviewerRole: "Builder",
+        rating: 5,
+        date: "Oct 5, 2025",
+        review: "Very professional and punctual. The wiring was done perfectly!",
+      },
+      {
+        id: "2",
+        reviewerName: "Sarah Otieno",
+        reviewerRole: "Contractor",
+        rating: 4,
+        date: "Oct 3, 2025",
+        review: "Good work overall. Slight delay on completion but well executed.",
+      },
+      {
+        id: "3",
+        reviewerName: "James Kariuki",
+        reviewerRole: "Builder",
+        rating: 5,
+        date: "Sep 29, 2025",
+        review: "Reliable and skilled technician. Definitely recommend!",
+      },
+    ],
   }
   return (
     <>
@@ -86,6 +113,8 @@ const VendorProfile = () =>{
           },
         ]}
       />
+
+      <VendorReviews reviews={VendorInfo.reviews} verified={VendorInfo.verified}/>
 
 
     </>

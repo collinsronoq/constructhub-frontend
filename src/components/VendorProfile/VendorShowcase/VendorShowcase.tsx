@@ -63,6 +63,29 @@ const VendorShowcase: React.FC<VendorShowcaseProps> = ({ items }) => {
 
     return visibleItems;
   }, [items, activeCategory, searchQuery, sortBy]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [items, setItems] = useState<VendorItemCardProps[]>(initialItems);
+
+  const handleAddItem = (newItem: VendorItemCardProps) => {
+    setItems((prev) => [...prev, newItem]);
+  };
+
+  {isVendorView && (
+    <button
+      onClick={() => setIsModalOpen(true)}
+      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+    >
+      + Add New Item
+    </button>
+  )}
+
+  {isModalOpen && (
+    <VendorItemForm
+      onAddItem={handleAddItem}
+      onClose={() => setIsModalOpen(false)}
+    />
+  )}
+
 
   // Pagination Logic
   const totalPages = Math.ceil(filteredAndSortedItems.length / ITEMS_PER_PAGE);
