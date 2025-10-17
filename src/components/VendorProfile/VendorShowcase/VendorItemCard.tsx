@@ -10,9 +10,11 @@ export interface VendorItemCardProps {
   description?: string;
   available: boolean;
   imageUrl: string;
+  onViewDetails?: (itemId: string) => void; // 🆕 callback prop
 }
 
 const VendorItemCard: React.FC<VendorItemCardProps> = ({
+  id,
   name,
   category,
   subcategory,
@@ -20,6 +22,7 @@ const VendorItemCard: React.FC<VendorItemCardProps> = ({
   price,
   available,
   imageUrl,
+  onViewDetails,
 }) => {
   return (
     <div className="bg-white dark:bg-gray-900 rounded-xl shadow-md hover:shadow-lg transition p-4 flex flex-col justify-between border border-gray-200 dark:border-gray-700">
@@ -58,7 +61,10 @@ const VendorItemCard: React.FC<VendorItemCardProps> = ({
           {unit && <span className="text-sm text-gray-500">/ {unit}</span>}
         </p>
 
-        <button className="text-sm px-3 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition w-fit">
+        <button
+          onClick={() => onViewDetails?.(id)}
+          className="text-sm px-3 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition w-fit"
+        >
           View Details
         </button>
       </div>

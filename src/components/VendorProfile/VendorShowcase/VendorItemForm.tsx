@@ -1,13 +1,20 @@
-import React, { useState } from "react";
-import type { ChangeEvent } from "react"
+import React, { useState, useEffect } from "react";
+import type { ChangeEvent } from "react";
 import type { VendorItemCardProps } from "./VendorItemCard";
 
 interface VendorItemFormProps {
-  onAddItem: (item: VendorItemCardProps) => void;
+  isOpen: boolean;
   onClose: () => void;
+  onSave: (item: VendorItemCardProps) => void;
+  initialData?: VendorItemCardProps | null;
 }
 
-const VendorItemForm: React.FC<VendorItemFormProps> = ({ onAddItem, onClose }) => {
+const VendorItemForm: React.FC<VendorItemFormProps> = ({
+  isOpen,
+  onClose,
+  onSave,
+  initialData,
+}) => {
   const [formData, setFormData] = useState<Omit<VendorItemCardProps, "id">>({
     name: "",
     category: "",
@@ -20,7 +27,21 @@ const VendorItemForm: React.FC<VendorItemFormProps> = ({ onAddItem, onClose }) =
   });
 
   const [imagePreview, setImagePreview] = useState<string>("");
+  const [isEditMode, setIsEditMode] = useState<boolean>(!initialData); // if no data => Add mode
 
+  /** Prefill form when editing or viewing an item */
+  useEffect(() => {
+    if (initialData) {
+      const { id, ...rest } = initialData;
+      setFormData(rest);
+      setImagePreview(initialData.imageUrl);
+      setIsEditMode(false); // start in view-only mode
+    }
+  }, [initialData]);
+
+  if (!isOpen) return null;
+
+  /** Handlers */
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
@@ -53,12 +74,11 @@ const VendorItemForm: React.FC<VendorItemFormProps> = ({ onAddItem, onClose }) =
     }
 
     const newItem: VendorItemCardProps = {
-      id: Date.now().toString(),
+      id: initialData ? initialData.id : Date.now().toString(),
       ...formData,
     };
 
-    onAddItem(newItem);
-    onClose();
+    onSave(newItem);
   };
 
   return (
@@ -67,18 +87,34 @@ const VendorItemForm: React.FC<VendorItemFormProps> = ({ onAddItem, onClose }) =
         {/* Header */}
         <div className="flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-            Add New Product / Material
+            {initialData
+              ? isEditMode
+                ? "Edit Product / Material"
+                : "Product / Material Details"
+              : "Add New Product / Material"}
           </h2>
-          <button
-            onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-          >
-            ✕
-          </button>
+
+          <div className="flex items-center gap-2">
+            {initialData && !isEditMode && (
+              <button
+                onClick={() => setIsEditMode(true)}
+                className="text-sm px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              >
+                Edit
+              </button>
+            )}
+            <button
+              onClick={onClose}
+              className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+            >
+              ✕
+            </button>
+          </div>
         </div>
 
         {/* Form Body */}
         <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Name */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
               Item Name *
@@ -88,11 +124,13 @@ const VendorItemForm: React.FC<VendorItemFormProps> = ({ onAddItem, onClose }) =
               name="name"
               value={formData.name}
               onChange={handleChange}
-              className="w-full mt-1 p-2 border rounded-lg dark:bg-gray-800 dark:border-gray-700"
+              disabled={!isEditMode}
+              className="w-full mt-1 p-2 border rounded-lg dark:bg-gray-800 dark:border-gray-700 disabled:opacity-60"
               placeholder="e.g. River Sand"
             />
           </div>
 
+          {/* Category */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
               Category *
@@ -102,11 +140,13 @@ const VendorItemForm: React.FC<VendorItemFormProps> = ({ onAddItem, onClose }) =
               name="category"
               value={formData.category}
               onChange={handleChange}
-              className="w-full mt-1 p-2 border rounded-lg dark:bg-gray-800 dark:border-gray-700"
+              disabled={!isEditMode}
+              className="w-full mt-1 p-2 border rounded-lg dark:bg-gray-800 dark:border-gray-700 disabled:opacity-60"
               placeholder="e.g. Aggregates"
             />
           </div>
 
+          {/* Subcategory */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
               Subcategory
@@ -116,11 +156,13 @@ const VendorItemForm: React.FC<VendorItemFormProps> = ({ onAddItem, onClose }) =
               name="subcategory"
               value={formData.subcategory}
               onChange={handleChange}
-              className="w-full mt-1 p-2 border rounded-lg dark:bg-gray-800 dark:border-gray-700"
+              disabled={!isEditMode}
+              className="w-full mt-1 p-2 border rounded-lg dark:bg-gray-800 dark:border-gray-700 disabled:opacity-60"
               placeholder="e.g. Sand"
             />
           </div>
 
+          {/* Unit */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
               Unit *
@@ -130,11 +172,13 @@ const VendorItemForm: React.FC<VendorItemFormProps> = ({ onAddItem, onClose }) =
               name="unit"
               value={formData.unit}
               onChange={handleChange}
-              className="w-full mt-1 p-2 border rounded-lg dark:bg-gray-800 dark:border-gray-700"
+              disabled={!isEditMode}
+              className="w-full mt-1 p-2 border rounded-lg dark:bg-gray-800 dark:border-gray-700 disabled:opacity-60"
               placeholder="e.g. ton, bag, piece"
             />
           </div>
 
+          {/* Price */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
               Price (KSh) *
@@ -144,11 +188,13 @@ const VendorItemForm: React.FC<VendorItemFormProps> = ({ onAddItem, onClose }) =
               name="price"
               value={formData.price}
               onChange={handleChange}
-              className="w-full mt-1 p-2 border rounded-lg dark:bg-gray-800 dark:border-gray-700"
+              disabled={!isEditMode}
+              className="w-full mt-1 p-2 border rounded-lg dark:bg-gray-800 dark:border-gray-700 disabled:opacity-60"
               placeholder="e.g. 1200"
             />
           </div>
 
+          {/* Availability */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
               Availability
@@ -156,16 +202,18 @@ const VendorItemForm: React.FC<VendorItemFormProps> = ({ onAddItem, onClose }) =
             <button
               type="button"
               onClick={handleToggleAvailability}
+              disabled={!isEditMode}
               className={`mt-1 w-full py-2 rounded-lg text-sm font-medium transition ${
                 formData.available
                   ? "bg-green-600 text-white"
                   : "bg-red-600 text-white"
-              }`}
+              } disabled:opacity-60`}
             >
               {formData.available ? "In Stock" : "Out of Stock"}
             </button>
           </div>
 
+          {/* Description */}
           <div className="md:col-span-2">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
               Description
@@ -174,22 +222,26 @@ const VendorItemForm: React.FC<VendorItemFormProps> = ({ onAddItem, onClose }) =
               name="description"
               value={formData.description}
               onChange={handleChange}
+              disabled={!isEditMode}
               rows={3}
-              className="w-full mt-1 p-2 border rounded-lg dark:bg-gray-800 dark:border-gray-700"
+              className="w-full mt-1 p-2 border rounded-lg dark:bg-gray-800 dark:border-gray-700 disabled:opacity-60"
               placeholder="e.g. High-quality river sand suitable for construction..."
             />
           </div>
 
+          {/* Image Upload */}
           <div className="md:col-span-2">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
               Upload Image *
             </label>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleImageUpload}
-              className="mt-2 text-sm"
-            />
+            {isEditMode && (
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="mt-2 text-sm"
+              />
+            )}
             {imagePreview && (
               <img
                 src={imagePreview}
@@ -206,14 +258,17 @@ const VendorItemForm: React.FC<VendorItemFormProps> = ({ onAddItem, onClose }) =
             onClick={onClose}
             className="px-4 py-2 rounded-lg text-sm font-medium bg-gray-300 dark:bg-gray-700 text-gray-800 dark:text-gray-100 hover:bg-gray-400 dark:hover:bg-gray-600 transition"
           >
-            Cancel
+            Close
           </button>
-          <button
-            onClick={handleSubmit}
-            className="px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 transition"
-          >
-            Save Item
-          </button>
+
+          {isEditMode && (
+            <button
+              onClick={handleSubmit}
+              className="px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 transition"
+            >
+              Save Item
+            </button>
+          )}
         </div>
       </div>
     </div>
