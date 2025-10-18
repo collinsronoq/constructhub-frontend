@@ -4,10 +4,16 @@ import image5 from "../assets/image_5.jpg"
 import VendorAbout from "../components/VendorProfile/VendorAbout"
 import VendorShowcase from "../components/VendorProfile/VendorShowcase/VendorShowcase"
 import VendorReviews from "../components/VendorProfile/VendorReviews"
+import { useVendorProfile } from "../hooks/useVendorProfile"
+import { useVendorItems } from "../hooks/useVendorItems"
 
 const VendorProfile = () =>{
 
-  const VendorInfo = {
+  const vendorId = "vendor_001";
+  const { vendor, loading: profileLoading } = useVendorProfile(vendorId);
+  const { items, loading: itemsLoading } = useVendorItems(vendorId)
+
+  const FakeVendorInfo = {
     name: "Ronok Hardware",
     categories: ["roofing materials", "electrical materilas"],
     location: "Rafiki, Nakuru",
@@ -48,6 +54,62 @@ const VendorProfile = () =>{
       },
     ],
   }
+
+  const initialItems = [
+    {
+      id: "1",
+      name: "Cement 50kg Bag",
+      category: "Building Materials",
+      unit: "bag",
+      price: 800,
+      available: true,
+      imageUrl: image5,
+    },
+    {
+      id: "2",
+      name: "Cement 50kg Bag",
+      category: "Building Materials",
+      unit: "bag",
+      price: 800,
+      available: true,
+      imageUrl: image5,
+    },
+    {
+      id: "3",
+      name: "Cement 50kg Bag",
+      category: "Plumbing",
+      unit: "bag",
+      price: 800,
+      available: true,
+      imageUrl: image5,
+    },
+    {
+      id: "4",
+      name: "Cement 50kg Bag",
+      category: "Roofing",
+      unit: "bag",
+      price: 800,
+      available: true,
+      imageUrl: image5,
+    },
+    {
+      id: "5",
+      name: "Gloss Paint",
+      category: "Paints",
+      unit: "litre",
+      price: 550,
+      available: false,
+      imageUrl: image2,
+    },
+        
+  ]
+
+  const VendorInfo = vendor || FakeVendorInfo;
+  const VendorItems = items.length ? items : initialItems;
+
+  if(profileLoading || itemsLoading)
+    return <p className="text-center py-8">Loading vendor details..</p>
+
   return (
     <>
       <VendorHeader 
@@ -64,55 +126,7 @@ const VendorProfile = () =>{
       />
       <VendorAbout />
 
-      <VendorShowcase
-        items={[
-          {
-            id: "1",
-            name: "Cement 50kg Bag",
-            category: "Building Materials",
-            unit: "bag",
-            price: 800,
-            available: true,
-            imageUrl: image5,
-          },
-          {
-            id: "2",
-            name: "Cement 50kg Bag",
-            category: "Building Materials",
-            unit: "bag",
-            price: 800,
-            available: true,
-            imageUrl: image5,
-          },
-          {
-            id: "3",
-            name: "Cement 50kg Bag",
-            category: "Plumbing",
-            unit: "bag",
-            price: 800,
-            available: true,
-            imageUrl: image5,
-          },
-          {
-            id: "4",
-            name: "Cement 50kg Bag",
-            category: "Roofing",
-            unit: "bag",
-            price: 800,
-            available: true,
-            imageUrl: image5,
-          },
-          {
-            id: "5",
-            name: "Gloss Paint",
-            category: "Paints",
-            unit: "litre",
-            price: 550,
-            available: false,
-            imageUrl: image2,
-          },
-        ]}
-      />
+      <VendorShowcase initialItems={VendorItems} isVendorView = {true}/>
 
       <VendorReviews reviews={VendorInfo.reviews} verified={VendorInfo.verified}/>
 
