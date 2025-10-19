@@ -6,6 +6,7 @@ import VendorSearchBar from "./VendorSearchBar";
 import VendorSort from "./VendorSort";
 import VendorPagination from "./VendorPagination";
 import VendorItemForm from "./VendorItemForm"; 
+import { useAddVendorItem } from "../../../hooks/useAddVendorItem";
 
 interface VendorShowcaseProps {
   initialItems: VendorItemCardProps[];
@@ -23,6 +24,8 @@ const VendorShowcase: React.FC<VendorShowcaseProps> = ({ initialItems, isVendorV
   const [currentPage, setCurrentPage] = useState<number>(1);
 
   isVendorView = true
+
+  const { addItem, loading: addingItem, error } = useAddVendorItem("vendor_001", setItems);
 
   // For Add/Edit Modal
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -79,7 +82,7 @@ const VendorShowcase: React.FC<VendorShowcaseProps> = ({ initialItems, isVendorV
   }, [activeCategory, searchQuery, sortBy]);
 
   /** ➕ Add/Edit Item Logic */
-  const handleSaveItem = (newItem: VendorItemCardProps) => {
+  const handleSaveItem = async (newItem: VendorItemCardProps) => {
     if (selectedItem) {
       // Editing existing
       setItems((prev) =>
@@ -87,8 +90,11 @@ const VendorShowcase: React.FC<VendorShowcaseProps> = ({ initialItems, isVendorV
       );
     } else {
       // Adding new
-      const newId = (items.length + 1).toString();
-      setItems((prev) => [...prev, { ...newItem, id: newId }]);
+      // const newId = (items.length + 1).toString();
+      // setItems((prev) => [...prev, { ...newItem, id: newId }]);
+
+      // adding using th ehook
+      await addItem(newItem)
     }
     setIsModalOpen(false);
     setSelectedItem(null);
