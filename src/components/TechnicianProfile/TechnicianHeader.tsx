@@ -133,7 +133,7 @@ interface TechnicianHeaderProps {
   contact?: string;
   email?: string;
   verified?: boolean;
-  availability?: "Available" | "Busy" | "Away";
+  availability?: string;
   imageUrl?: string;
   isTechnicianView?: boolean; // true if logged-in user is the technician
   onEditProfile?: () => void;
@@ -150,18 +150,18 @@ const TechnicianHeader: React.FC<TechnicianHeaderProps> = ({
   contact,
   email,
   verified,
-  availability = "Available",
+  availability,
   imageUrl,
   isTechnicianView = true,
   onEditProfile,
-  onVerify,
+  // onVerify,
   onChangeAvailability,
 }) => {
   return (
     <header className="relative bg-gradient-to-br from-blue-50 via-white to-blue-100 dark:from-gray-800 dark:via-gray-900 dark:to-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden mb-8">
 
       {/* Verification Notice (Visible only to technician) */}
-      {isTechnicianView && !verified && (
+      {/* {isTechnicianView && !verified && (
         <div className="text-xs md:text-sm bg-yellow-50 dark:bg-yellow-900/40 border-b border-yellow-300 dark:border-yellow-700 text-yellow-800 dark:text-yellow-200 px-4 py-3 flex flex-col sm:flex-row justify-between items-center gap-2">
           <span>
             Your account is currently <strong>unverified</strong>. Verify now to gain more visibility to builders.
@@ -173,7 +173,7 @@ const TechnicianHeader: React.FC<TechnicianHeaderProps> = ({
             Verify Now
           </button>
         </div>
-      )}
+      )} */}
 
       {/* bagde either verified or unverified */}
       <div className="absolute top-30 right-1 p-2 pt-3 text-xs">
@@ -278,14 +278,14 @@ const TechnicianHeader: React.FC<TechnicianHeaderProps> = ({
         <div className="flex flex-col items-right justify-center gap-3">
           <h4 className="text-gray-700 dark:text-gray-300 font-semibold items-center">Contact</h4>
           {contact && (
-            <div className="flex flex-row space-x-4 items-center">
-              <div className="flex flex-row justify-between space-x-4 items-center">
-                <Phone className="w-5 h-5 "/> 
+            <div className="flex flex-row space-x-4 items-center text-xs md:text-base">
+              <div className="flex flex-row justify-between space-x-4 items-center text-xs md:text-base">
+                <Phone className="w-4 h-4 md:w-5 md:h-5"/> 
                 <h5>Number: </h5>
               </div>
               <a
                 href={`tel:${contact}`}
-                className=" px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 transition"
+                className=" px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-md font-medium hover:bg-blue-700 transition"
               >
                 {contact}
               </a>
@@ -293,16 +293,16 @@ const TechnicianHeader: React.FC<TechnicianHeaderProps> = ({
           )}
           {email && (
             
-            <div className="flex flex-row  pb-4 space-x-4 items-center">
+            <div className="flex flex-row  pb-4 space-x-4 items-center text-xs md:text-base">
               <div className="flex flex-row justify-between space-x-4 items-center">
-                <Mail className="w-5 h-5 "/> 
+                <Mail className="w-4 h-4 md:w-5 md:h-5"/> 
                 <h5>Email: </h5>
               </div>
               <a
                 href={`mailto:${email}`}
-                className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-md text-sm font-medium hover:bg-gray-300 dark:hover:bg-gray-600 transition"
+                className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-md font-medium hover:bg-gray-300 dark:hover:bg-gray-600 transition"
               >
-                ✉️ {email}
+                {email}
               </a>
             </div>
           )}
