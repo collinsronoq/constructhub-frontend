@@ -12,6 +12,7 @@ import AIChat from "./pages/AIChat"
 import Login from "./pages/Login"
 import SignUp from "./pages/SignUp"
 import TechnicianProfile from "./pages/TechnicianProfile"
+import Marketplace from "./pages/MarketPlace"
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
@@ -24,6 +25,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/estimates" element={<Estimates />} />
+          <Route path="/marketplace" element={<Marketplace />} />
           <Route path="/technicians" element={<TechnicianDirectory />} />
           <Route path="/ai" element={<AIChat />} />
           <Route path="/vendor/profile" element={<VendorProfile />} />

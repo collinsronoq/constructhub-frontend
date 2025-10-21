@@ -11,6 +11,7 @@ export interface TechnicianCardProps {
   contact: string;
   verified: boolean;
   imageUrl?: string;
+  onViewProfile: (id: string) => void;
 }
 
 const TechnicianCard: React.FC<TechnicianCardProps> = ({
@@ -23,6 +24,7 @@ const TechnicianCard: React.FC<TechnicianCardProps> = ({
   rating,
   contact,
   imageUrl,
+  onViewProfile,
 }) => {
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-transform relative transform hover:scale-[1.02] flex flex-col justify-between overflow-hidden">
@@ -76,12 +78,18 @@ const TechnicianCard: React.FC<TechnicianCardProps> = ({
 
       {/* Bottom Button */}
       <div className="mt-auto">
-        <Link
+        {/* <Link
           to={`/technicians/${id}`}
           className="block w-full text-center text-xs md:text-sm bg-brand-light hover:bg-blue-900 text-white font-medium py-2 transition"
         >
           View Profile
-        </Link>
+        </Link> */}
+        <button
+          onClick={() => onViewProfile(id)}
+          className="block w-full text-center text-xs md:text-sm bg-brand-light hover:bg-blue-900 text-white font-medium py-2 transition"
+        >
+          View Profile
+        </button>
       </div>
     </div>
   );
