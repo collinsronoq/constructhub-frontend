@@ -5,13 +5,6 @@ import SideBar from "../components/SideBar"
 import AIAssistantPanel from "../components/AIAssistantPanel"
 
 
-
-
-
-
-
-
-
 const DashboardLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isAIOpen, setAIOpen] = useState(false);
@@ -19,7 +12,7 @@ const DashboardLayout = () => {
 
   return (
     <div className="min-h-screen bg-background-light dark:bg-background-dark text-gray-900 dark:text-gray-100 flex flex-col">
-      {/* ✅ NAVBAR — Fixed at top */}
+      {/*  NAVBAR — Fixed at top */}
       <div className="fixed top-0 left-0 right-0 z-40 bg-background-light dark:bg-background-dark shadow-md">
         <NavBar
           sidebarOpen={sidebarOpen}
@@ -29,14 +22,14 @@ const DashboardLayout = () => {
         />
       </div>
 
-      {/* ✅ MAIN CONTENT AREA */}
+      {/*  MAIN CONTENT AREA */}
       <div className="flex flex-1 pt-16 relative overflow-hidden">
-        {/* ✅ SIDEBAR — Fixed on the left */}
+        {/* SIDEBAR — Fixed on the left */}
         <div className="hidden md:flex fixed top-16 bottom-0 left-0 w-64 bg-surface-light dark:bg-surface-dark border-r border-gray-200 dark:border-gray-700 z-30">
           <SideBar />
         </div>
 
-        {/* ✅ SCROLLABLE MAIN CONTENT */}
+        {/* SCROLLABLE MAIN CONTENT */}
         <main
           className={`flex-1 overflow-auto p-6 transition-all duration-300 md:ml-64 ${
             isAIOpen ? "md:mr-96" : ""
@@ -45,7 +38,7 @@ const DashboardLayout = () => {
           <Outlet context={{ onToggleOpenAI: ()=> setAIOpen(prev => !prev) }}/>
         </main>
 
-        {/* ✅ AI ASSISTANT PANEL */}
+        {/*  AI ASSISTANT PANEL */}
         {isAIOpen && (
           <div className="fixed right-0 top-16 bottom-0 w-96 bg-white dark:bg-gray-900 border-l border-gray-200 dark:border-gray-700 shadow-lg z-40">
             <AIAssistantPanel onClose={() => setAIOpen(false)} />
@@ -53,7 +46,7 @@ const DashboardLayout = () => {
         )}
       </div>
 
-      {/* ✅ MOBILE SIDEBAR (Drawer) */}
+      {/* MOBILE SIDEBAR (Drawer) */}
       {sidebarOpen && (
         <div className="fixed inset-0 z-50 md:hidden transform ease-in-out">
           {/* backdrop */}
@@ -68,7 +61,7 @@ const DashboardLayout = () => {
           </div>
         </div>
       )}
-      {/* ✅ Floating AI Assistant Button */}
+      {/* Floating AI Assistant Button */}
       {!isAIOpen && (
         <div className="fixed bottom-36 right-6 z-50">
           <button

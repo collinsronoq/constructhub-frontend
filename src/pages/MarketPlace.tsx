@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMarketplaceItems } from "../hooks/MarketPlace/useMarketPlaceItems"
-import MarketplaceSearchBar from "../components/MarketPlace/MarketPlaceSearchBar";
+import MarketplaceSearchBar from "../components/MarketPlace/MarketplaceSearchBar";
 import MarketplaceFilters from "../components/MarketPlace/MarketplaceFilters";
 import MarketplaceItemCard from "../components/MarketPlace/MarketplaceItemCard";
 

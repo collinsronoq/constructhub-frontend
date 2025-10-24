@@ -1,5 +1,3 @@
-
-// import { useState } from "react"
 import { useOutletContext } from "react-router-dom";
 import WelcomeSection from "../components/BuilderDashboard/WelcomeSection";
 import Estimations from "../components/BuilderDashboard/Estimations";
@@ -38,7 +36,10 @@ const BuilderDashboard = () => {
     },
   ]
 
+  
   const { onToggleOpenAI } = useOutletContext<{ onToggleOpenAI: () => void }>();
+
+  
   return (
     <div>
       {/* Welcome & Quick Actions */}

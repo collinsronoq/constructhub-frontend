@@ -1,6 +1,8 @@
+import EstimatorWizard from "../components/Estimator/EstimatorWizard"
+
 const Estimates = () =>{
   return (
-    <p className="text-3xl"> Estimates where the user estimates would be placed</p>
+    <EstimatorWizard />
   )
 }
 

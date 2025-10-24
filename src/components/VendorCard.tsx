@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom"
+
 
 export interface VendorCardProps {
   id: string
@@ -8,10 +8,11 @@ export interface VendorCardProps {
   rating?: number
   imageUrl?: string
   contact?: string
+  onViewProfile?: (id: string) => void;
 }
 
 
-const VendorCard : React.FC<VendorCardProps> =({ id, name, category, location, imageUrl, contact}) => {
+const VendorCard : React.FC<VendorCardProps> =({ id, name, category, location, imageUrl, contact, onViewProfile}) => {
   return (
     <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-md hover:shadow-lg transition overflow-hidden flex flex-col">
       {/* Vendor Image */}
@@ -69,12 +70,12 @@ const VendorCard : React.FC<VendorCardProps> =({ id, name, category, location, i
       </div>
 
       {/* View Profile Button */}
-      <Link
-        to={`/vendors/${id}`}
-        className="block text-center w-full bg-blue-600 hover:bg-blue-700 text-white py-2 text-sm font-medium transition rounded-b-lg"
+      <button
+        onClick={() => onViewProfile?.(id)}
+        className="block w-full text-center text-xs md:text-sm bg-brand-light hover:bg-blue-900 text-white font-medium py-2 transition"
       >
         View Profile
-      </Link>
+      </button>
     </div>
   )
 }

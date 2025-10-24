@@ -10,7 +10,7 @@ export interface TechnicianCardProps {
   rating: number;
   verified: boolean;
   imageUrl: string;
-  onViewProfile: (id: string) => void;
+  onViewProfile?: (id: string) => void;
 }
 
 const TechnicianCard: React.FC<TechnicianCardProps> = ({
@@ -73,7 +73,7 @@ const TechnicianCard: React.FC<TechnicianCardProps> = ({
 
       {/* View Profile Button */}
       <button
-        onClick={() => onViewProfile(id)}
+        onClick={() => onViewProfile?.(id)}
         className="mt-4 px-3 py-2 text-sm font-medium bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
       >
         View Profile
