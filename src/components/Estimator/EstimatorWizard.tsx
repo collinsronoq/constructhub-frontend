@@ -144,163 +144,10 @@
 
 // export default EstimatorWizard;
 
-import React, { useState } from "react";
-import ProjectDetailsResidentialStep from "./EstimatorForms/EstimatorProjectDetails";
-import MaterialSelectionStep from "./EstimatorMaterialList";
-import LabourEstimateStep from "./EstimatorLaborList";
-import EstimateSummary from "./EstimatorSummary";
-import EstimateBreakdown from "./EstimatorBreakdown";
-
-export type WizardStep =
-  | "projectDetails"
-  | "materialSelection"
-  | "labourEstimate"
-  | "summary"
-  | "breakdown";
-
-const EstimatorWizard: React.FC = () => {
-  /** 🧠 Step Management */
-  const [currentStep, setCurrentStep] = useState<WizardStep>("projectDetails");
-
-  /** 📦 Data States */
-  const [projectDetails, setProjectDetails] = useState<any>({});
-  const [selectedMaterials, setSelectedMaterials] = useState<any[]>([]);
-  const [labourData, setLabourData] = useState<any>({});
-  const [estimateData, setEstimateData] = useState<any>(null);
-
-  /** 🚀 Handlers for navigation */
-  const goToNextStep = () => {
-    setCurrentStep((prev) => {
-      if (prev === "projectDetails") return "materialSelection";
-      if (prev === "materialSelection") return "labourEstimate";
-      if (prev === "labourEstimate") return "summary";
-      return prev;
-    });
-  };
-
-  const goToPreviousStep = () => {
-    setCurrentStep((prev) => {
-      if (prev === "materialSelection") return "projectDetails";
-      if (prev === "labourEstimate") return "materialSelection";
-      if (prev === "summary") return "labourEstimate";
-      if (prev === "breakdown") return "summary";
-      return prev;
-    });
-  };
-
-  const handleGenerateEstimate = () => {
-    // Simulate API or calculation logic
-    const dummyEstimate = {
-      total: 193000,
-      breakdown: [
-        {
-          name: "Foundation",
-          materials: [
-            { material: "Cement", quantity: 50, unit: "bags", unitCost: 700, totalCost: 35000, vendor: "ABC Hardware" },
-            { material: "Sand", quantity: 10, unit: "tons", unitCost: 1800, totalCost: 18000, vendor: "Njoro Quarry" },
-          ],
-          laborCost: 45000,
-          subtotal: 98000,
-        },
-        {
-          name: "Roofing",
-          materials: [
-            { material: "Roof Sheets", quantity: 30, unit: "pcs", unitCost: 1500, totalCost: 45000, vendor: "BuildMart" },
-            { material: "Timber", quantity: 50, unit: "pcs", unitCost: 400, totalCost: 20000, vendor: "Timba Ltd" },
-          ],
-          laborCost: 30000,
-          subtotal: 95000,
-        },
-      ],
-    };
-    setEstimateData(dummyEstimate);
-    setCurrentStep("summary");
-  };
-
-  return (
-    <div className="max-w-5xl mx-auto my-8 p-6 bg-surface-light dark:bg-surface-dark rounded-xl shadow-sm space-y-6">
-      {currentStep === "projectDetails" && (
-        <ProjectDetailsResidentialStep
-          initialData={projectDetails}
-          onNext={(data) => {
-            setProjectDetails(data);
-            goToNextStep();
-          }}
-        />
-      )}
-
-      {currentStep === "materialSelection" && (
-        <MaterialSelectionStep
-          onMaterialsSelected={(selected) => {
-            setSelectedMaterials(selected);
-            goToNextStep();
-          }}
-        />
-      )}
-
-      {currentStep === "labourEstimate" && (
-        <LabourEstimateStep
-          projectDetails={{
-            structureType: projectDetails.structure?.type || "Bungalow",
-            floorArea: Number(projectDetails.land?.size || 100),
-            quality: projectDetails.finishing || "Standard",
-          }}
-          onBack={goToPreviousStep}
-          onNext={(labourData) => {
-            setLabourData(labourData);
-            goToNextStep();
-          }}
-        />
-      )}
-
-
-      {currentStep === "summary" && estimateData && (
-        <EstimateSummary
-          data={{
-            projectName: projectDetails.projectName || "Unnamed Project",
-            projectType: projectDetails.structure?.type || "Residential",
-            location: `${projectDetails.location?.county || "N/A"}${
-              projectDetails.location?.area ? ` - ${projectDetails.location.area}` : ""
-            }`,
-            totalCost: estimateData.total || 0,
-            duration:
-              estimateData.total > 1000000
-                ? "6–8 months"
-                : estimateData.total > 500000
-                ? "4–6 months"
-                : "2–4 months",
-            categories: estimateData.breakdown.map((b: any) => ({
-              name: b.name,
-              cost: b.subtotal,
-            })),
-          }}
-          onViewBreakdown={() => setCurrentStep("breakdown")}
-          onEdit={() => setCurrentStep("projectDetails")}
-          onDownload={() => alert("PDF download will be available soon")}
-        />
-      )}
-
-
-      {currentStep === "breakdown" && estimateData && (
-        <EstimateBreakdown
-          breakdown={estimateData.breakdown}
-          total={estimateData.total}
-          onBackToSummary={() => setCurrentStep("summary")}
-        />
-      )}
-
-      
-    </div>
-  );
-};
-
-export default EstimatorWizard;
-
-// import React, { useState, useEffect } from "react";
-// import { motion, AnimatePresence } from "framer-motion";
+// import React, { useState } from "react";
 // import ProjectDetailsResidentialStep from "./EstimatorForms/EstimatorProjectDetails";
 // import MaterialSelectionStep from "./EstimatorMaterialList";
-// import LabourCostStep from "./EstimatorLaborList";
+// import LabourEstimateStep from "./EstimatorLaborList";
 // import EstimateSummary from "./EstimatorSummary";
 // import EstimateBreakdown from "./EstimatorBreakdown";
 
@@ -311,49 +158,38 @@ export default EstimatorWizard;
 //   | "summary"
 //   | "breakdown";
 
-// interface ProjectDetailsData {
-//   projectName?: string;
-//   location?: { county?: string; area?: string };
-//   land?: { size?: number };
-//   structure?: { type?: string };
-//   finishing?: string;
-// }
-
-// const steps: { id: WizardStep; label: string }[] = [
-//   { id: "projectDetails", label: "Project Details" },
-//   { id: "materialSelection", label: "Materials" },
-//   { id: "labourEstimate", label: "Labour" },
-//   { id: "summary", label: "Summary" },
-//   { id: "breakdown", label: "Breakdown" },
-// ];
-
 // const EstimatorWizard: React.FC = () => {
+//   /** 🧠 Step Management */
 //   const [currentStep, setCurrentStep] = useState<WizardStep>("projectDetails");
 
-//   // 📦 State storage for all sections
-//   const [projectDetails, setProjectDetails] = useState<ProjectDetailsData>({});
+//   /** 📦 Data States */
+//   const [projectDetails, setProjectDetails] = useState<any>({});
 //   const [selectedMaterials, setSelectedMaterials] = useState<any[]>([]);
 //   const [labourData, setLabourData] = useState<any>({});
 //   const [estimateData, setEstimateData] = useState<any>(null);
 
-//   /** Scroll to top whenever step changes */
-//   useEffect(() => {
-//     window.scrollTo({ top: 0, behavior: "smooth" });
-//   }, [currentStep]);
-
-//   /** Navigation handlers */
+//   /** 🚀 Handlers for navigation */
 //   const goToNextStep = () => {
-//     const currentIndex = steps.findIndex((s) => s.id === currentStep);
-//     if (currentIndex < steps.length - 1) setCurrentStep(steps[currentIndex + 1].id);
+//     setCurrentStep((prev) => {
+//       if (prev === "projectDetails") return "materialSelection";
+//       if (prev === "materialSelection") return "labourEstimate";
+//       if (prev === "labourEstimate") return "summary";
+//       return prev;
+//     });
 //   };
 
 //   const goToPreviousStep = () => {
-//     const currentIndex = steps.findIndex((s) => s.id === currentStep);
-//     if (currentIndex > 0) setCurrentStep(steps[currentIndex - 1].id);
+//     setCurrentStep((prev) => {
+//       if (prev === "materialSelection") return "projectDetails";
+//       if (prev === "labourEstimate") return "materialSelection";
+//       if (prev === "summary") return "labourEstimate";
+//       if (prev === "breakdown") return "summary";
+//       return prev;
+//     });
 //   };
 
-//   /** Dummy backend calculation for MVP */
 //   const handleGenerateEstimate = () => {
+//     // Simulate API or calculation logic
 //     const dummyEstimate = {
 //       total: 193000,
 //       breakdown: [
@@ -381,144 +217,308 @@ export default EstimatorWizard;
 //     setCurrentStep("summary");
 //   };
 
-//   /** Step content */
-//   const renderStepContent = () => {
-//     switch (currentStep) {
-//       case "projectDetails":
-//         return (
-//           <ProjectDetailsResidentialStep
-//             initialData={projectDetails}
-//             onNext={(data) => {
-//               setProjectDetails(data);
-//               goToNextStep();
-//             }}
-//         />
-//         );
-//       case "materialSelection":
-//         return (
-//           <MaterialSelectionStep
-//             onMaterialsSelected={(selected) => {
-//               setSelectedMaterials(selected);
-//               goToNextStep();
-//             }}
-//           />
-//         );
-//       case "labourEstimate":
-//         return (
-//           <LabourCostStep
-//             projectDetails={{
-//               structureType: projectDetails.structure?.type || "Bungalow",
-//               floorArea: Number(projectDetails.land?.size || 100),
-//               quality: projectDetails.finishing || "Standard",
-//             }}
-//             onBack={goToPreviousStep}
-//             onNext={(data) => {
-//               setLabourData(data);
-//               handleGenerateEstimate();
-//             }}
-//           />
-//         );
-//       case "summary":
-//         return (
-//           estimateData && (
-//             <EstimateSummary
-//               data={{
-//                 projectName: projectDetails.projectName || "Unnamed Project",
-//                 projectType: projectDetails.structure?.type || "Residential",
-//                 location: `${projectDetails.location?.county || "N/A"}${
-//                   projectDetails.location?.area ? ` - ${projectDetails.location.area}` : ""
-//                 }`,
-//                 totalCost: estimateData.total,
-//                 duration:
-//                   estimateData.total > 1000000
-//                     ? "6–8 months"
-//                     : estimateData.total > 500000
-//                     ? "4–6 months"
-//                     : "2–4 months",
-//                 categories: estimateData.breakdown.map((b: any) => ({
-//                   name: b.name,
-//                   cost: b.subtotal,
-//                 })),
-//               }}
-//               onViewBreakdown={() => setCurrentStep("breakdown")}
-//               onEdit={() => setCurrentStep("projectDetails")}
-//               onDownload={() => alert("PDF export coming soon")}
-//             />
-//           )
-//         );
-//       case "breakdown":
-//         return (
-//           estimateData && (
-//             <EstimateBreakdown
-//               breakdown={estimateData.breakdown}
-//               total={estimateData.total}
-//               onBackToSummary={() => setCurrentStep("summary")}
-//             />
-//           )
-//         );
-//       default:
-//         return null;
-//     }
-//   };
-
 //   return (
-//     <div className="max-w-5xl mx-auto my-8 p-6 bg-surface-light dark:bg-surface-dark rounded-xl shadow-md space-y-6">
+//     <div className="max-w-5xl mx-auto my-8 p-6 bg-surface-light dark:bg-surface-dark rounded-xl shadow-sm space-y-6">
+//       {currentStep === "projectDetails" && (
+//         <ProjectDetailsResidentialStep
+//           initialData={projectDetails}
+//           onNext={(data) => {
+//             setProjectDetails(data);
+//             goToNextStep();
+//           }}
+//         />
+//       )}
 
-//       {/* 🧭 Stepper Progress Bar */}
-//       <div className="relative flex items-center justify-between mb-8">
-//         {steps.map((step, index) => {
-//           const isActive = step.id === currentStep;
-//           const isCompleted = steps.findIndex((s) => s.id === currentStep) > index;
-//           return (
-//             <div key={step.id} className="flex flex-col items-center relative w-full">
-//               {/* Line */}
-//               {index < steps.length - 1 && (
-//                 <div
-//                   className={`absolute top-3 left-1/2 w-full h-1 ${
-//                     isCompleted ? "bg-blue-600" : "bg-gray-300 dark:bg-gray-700"
-//                   }`}
-//                   style={{ zIndex: 0 }}
-//                 />
-//               )}
-//               {/* Step Circle */}
-//               <div
-//                 className={`z-10 flex items-center justify-center w-6 h-6 rounded-full border-2 ${
-//                   isActive
-//                     ? "border-blue-600 bg-blue-600 text-white"
-//                     : isCompleted
-//                     ? "border-blue-600 bg-blue-500 text-white"
-//                     : "border-gray-300 dark:border-gray-600 text-gray-400"
-//                 }`}
-//               >
-//                 {index + 1}
-//               </div>
-//               <span
-//                 className={`mt-2 text-xs font-medium ${
-//                   isActive ? "text-blue-600" : "text-gray-500 dark:text-gray-400"
-//                 }`}
-//               >
-//                 {step.label}
-//               </span>
-//             </div>
-//           );
-//         })}
-//       </div>
+//       {currentStep === "materialSelection" && (
+//         <MaterialSelectionStep
+//           onMaterialsSelected={(selected) => {
+//             setSelectedMaterials(selected);
+//             goToNextStep();
+//           }}
+//         />
+//       )}
 
-//       {/* 🪶 Step Content with Animation */}
-//       <AnimatePresence mode="wait">
-//         <motion.div
-//           key={currentStep}
-//           initial={{ opacity: 0, y: 15 }}
-//           animate={{ opacity: 1, y: 0 }}
-//           exit={{ opacity: 0, y: -15 }}
-//           transition={{ duration: 0.3 }}
-//         >
-//           {renderStepContent()}
-//         </motion.div>
-//       </AnimatePresence>
+//       {currentStep === "labourEstimate" && (
+//         <LabourEstimateStep
+//           projectDetails={{
+//             structureType: projectDetails.structure?.type || "Bungalow",
+//             floorArea: Number(projectDetails.land?.size || 100),
+//             quality: projectDetails.finishing || "Standard",
+//           }}
+//           onBack={goToPreviousStep}
+//           onNext={(labourData) => {
+//             setLabourData(labourData);
+//             goToNextStep();
+//           }}
+//         />
+//       )}
+
+
+//       {currentStep === "summary" && estimateData && (
+//         <EstimateSummary
+//           data={{
+//             projectName: projectDetails.projectName || "Unnamed Project",
+//             projectType: projectDetails.structure?.type || "Residential",
+//             location: `${projectDetails.location?.county || "N/A"}${
+//               projectDetails.location?.area ? ` - ${projectDetails.location.area}` : ""
+//             }`,
+//             totalCost: estimateData.total || 0,
+//             duration:
+//               estimateData.total > 1000000
+//                 ? "6–8 months"
+//                 : estimateData.total > 500000
+//                 ? "4–6 months"
+//                 : "2–4 months",
+//             categories: estimateData.breakdown.map((b: any) => ({
+//               name: b.name,
+//               cost: b.subtotal,
+//             })),
+//           }}
+//           onViewBreakdown={() => setCurrentStep("breakdown")}
+//           onEdit={() => setCurrentStep("projectDetails")}
+//           onDownload={() => alert("PDF download will be available soon")}
+//         />
+//       )}
+
+
+//       {currentStep === "breakdown" && estimateData && (
+//         <EstimateBreakdown
+//           breakdown={estimateData.breakdown}
+//           total={estimateData.total}
+//           onBackToSummary={() => setCurrentStep("summary")}
+//         />
+//       )}
+
+      
 //     </div>
 //   );
 // };
 
 // export default EstimatorWizard;
+
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import ProjectDetailsResidentialStep from "./EstimatorForms/EstimatorProjectDetails";
+import MaterialSelectionStep from "./EstimatorMaterialList";
+import LabourCostStep from "./EstimatorLaborList";
+import EstimateSummary from "./EstimatorSummary";
+import EstimateBreakdown from "./EstimatorBreakdown";
+
+export type WizardStep =
+  | "projectDetails"
+  | "materialSelection"
+  | "labourEstimate"
+  | "summary"
+  | "breakdown";
+
+interface ProjectDetailsData {
+  projectName?: string;
+  location?: { county?: string; area?: string };
+  land?: { size?: number };
+  structure?: { type?: string };
+  finishing?: string;
+}
+
+const steps: { id: WizardStep; label: string }[] = [
+  { id: "projectDetails", label: "Project Details" },
+  { id: "materialSelection", label: "Materials" },
+  { id: "labourEstimate", label: "Labour" },
+  { id: "summary", label: "Summary" },
+  { id: "breakdown", label: "Breakdown" },
+];
+
+const EstimatorWizard: React.FC = () => {
+  const [currentStep, setCurrentStep] = useState<WizardStep>("projectDetails");
+
+  // 📦 State storage for all sections
+  const [projectDetails, setProjectDetails] = useState<ProjectDetailsData>({});
+  const [selectedMaterials, setSelectedMaterials] = useState<any[]>([]);
+  const [labourData, setLabourData] = useState<any>({});
+  const [estimateData, setEstimateData] = useState<any>(null);
+
+  /** Scroll to top whenever step changes */
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [currentStep]);
+
+  /** Navigation handlers */
+  const goToNextStep = () => {
+    const currentIndex = steps.findIndex((s) => s.id === currentStep);
+    if (currentIndex < steps.length - 1) setCurrentStep(steps[currentIndex + 1].id);
+  };
+
+  const goToPreviousStep = () => {
+    const currentIndex = steps.findIndex((s) => s.id === currentStep);
+    if (currentIndex > 0) setCurrentStep(steps[currentIndex - 1].id);
+  };
+
+  /** Dummy backend calculation for MVP */
+  const handleGenerateEstimate = () => {
+    const dummyEstimate = {
+      total: 193000,
+      breakdown: [
+        {
+          name: "Foundation",
+          materials: [
+            { material: "Cement", quantity: 50, unit: "bags", unitCost: 700, totalCost: 35000, vendor: "ABC Hardware" },
+            { material: "Sand", quantity: 10, unit: "tons", unitCost: 1800, totalCost: 18000, vendor: "Njoro Quarry" },
+          ],
+          laborCost: 45000,
+          subtotal: 98000,
+        },
+        {
+          name: "Roofing",
+          materials: [
+            { material: "Roof Sheets", quantity: 30, unit: "pcs", unitCost: 1500, totalCost: 45000, vendor: "BuildMart" },
+            { material: "Timber", quantity: 50, unit: "pcs", unitCost: 400, totalCost: 20000, vendor: "Timba Ltd" },
+          ],
+          laborCost: 30000,
+          subtotal: 95000,
+        },
+      ],
+    };
+    setEstimateData(dummyEstimate);
+    setCurrentStep("summary");
+  };
+
+  /** Step content */
+  const renderStepContent = () => {
+    switch (currentStep) {
+      case "projectDetails":
+        return (
+          <ProjectDetailsResidentialStep
+            initialData={projectDetails}
+            onNext={(data) => {
+              setProjectDetails(data);
+              goToNextStep();
+            }}
+        />
+        );
+      case "materialSelection":
+        return (
+          <MaterialSelectionStep
+            onMaterialsSelected={(selected) => {
+              setSelectedMaterials(selected);
+              goToNextStep();
+            }}
+          />
+        );
+      case "labourEstimate":
+        return (
+          <LabourCostStep
+            projectDetails={{
+              structureType: projectDetails.structure?.type || "Bungalow",
+              floorArea: Number(projectDetails.land?.size || 100),
+              quality: projectDetails.finishing || "Standard",
+            }}
+            onBack={goToPreviousStep}
+            onNext={(data) => {
+              setLabourData(data);
+              handleGenerateEstimate();
+            }}
+          />
+        );
+      case "summary":
+        return (
+          estimateData && (
+            <EstimateSummary
+              data={{
+                projectName: projectDetails.projectName || "Unnamed Project",
+                projectType: projectDetails.structure?.type || "Residential",
+                location: `${projectDetails.location?.county || "N/A"}${
+                  projectDetails.location?.area ? ` - ${projectDetails.location.area}` : ""
+                }`,
+                totalCost: estimateData.total,
+                duration:
+                  estimateData.total > 1000000
+                    ? "6–8 months"
+                    : estimateData.total > 500000
+                    ? "4–6 months"
+                    : "2–4 months",
+                categories: estimateData.breakdown.map((b: any) => ({
+                  name: b.name,
+                  cost: b.subtotal,
+                })),
+              }}
+              onViewBreakdown={() => setCurrentStep("breakdown")}
+              onEdit={() => setCurrentStep("projectDetails")}
+              onDownload={() => alert("PDF export coming soon")}
+            />
+          )
+        );
+      case "breakdown":
+        return (
+          estimateData && (
+            <EstimateBreakdown
+              breakdown={estimateData.breakdown}
+              total={estimateData.total}
+              onBackToSummary={() => setCurrentStep("summary")}
+            />
+          )
+        );
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className="max-w-5xl mx-auto my-8 p-6 bg-surface-light dark:bg-surface-dark rounded-xl shadow-md space-y-6">
+
+      {/* 🧭 Stepper Progress Bar */}
+      <div className="relative flex items-center justify-between mb-8">
+        {steps.map((step, index) => {
+          const isActive = step.id === currentStep;
+          const isCompleted = steps.findIndex((s) => s.id === currentStep) > index;
+          return (
+            <div key={step.id} className="flex flex-col items-center relative w-full">
+              {/* Line */}
+              {index < steps.length - 1 && (
+                <div
+                  className={`absolute top-3 left-1/2 w-full h-1 ${
+                    isCompleted ? "bg-blue-600" : "bg-gray-300 dark:bg-gray-700"
+                  }`}
+                  style={{ zIndex: 0 }}
+                />
+              )}
+              {/* Step Circle */}
+              <div
+                className={`z-10 flex items-center justify-center w-6 h-6 rounded-full border-2 ${
+                  isActive
+                    ? "border-blue-600 bg-blue-600 text-white"
+                    : isCompleted
+                    ? "border-blue-600 bg-blue-500 text-white"
+                    : "border-gray-300 dark:border-gray-600 text-gray-400"
+                }`}
+              >
+                {index + 1}
+              </div>
+              <span
+                className={`mt-2 text-xs font-medium ${
+                  isActive ? "text-blue-600" : "text-gray-500 dark:text-gray-400"
+                }`}
+              >
+                {step.label}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* 🪶 Step Content with Animation */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={currentStep}
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -15 }}
+          transition={{ duration: 0.3 }}
+        >
+          {renderStepContent()}
+        </motion.div>
+      </AnimatePresence>
+    </div>
+  );
+};
+
+export default EstimatorWizard;
 
