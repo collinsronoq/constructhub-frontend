@@ -296,7 +296,7 @@
 
 // export default EstimatorWizard;
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import ProjectDetailsResidentialStep from "./EstimatorForms/EstimatorProjectDetails";
 import MaterialSelectionStep from "./EstimatorMaterialList";
@@ -311,12 +311,36 @@ export type WizardStep =
   | "summary"
   | "breakdown";
 
+
+
 interface ProjectDetailsData {
   projectName?: string;
-  location?: { county?: string; area?: string };
-  land?: { size?: number };
-  structure?: { type?: string };
+  location?: { county?: string; area?: string; coordinates?: string };
+  land?: { size?: number; soilType?: string };
+  structure?: {
+      type?: 'bungalow' | '1.5-storey' | '2-storey' | '3-storey';
+      bedrooms?: number;
+      bathrooms?: number;
+      rooms?: string[];  // e.g., ['kitchen', 'pantry']
+    };
+    sewage?: {
+      type?: 'sewer' | 'septic';
+      septicSize?: number;  // Optional
+    };
+    waterSupply?: 'municipal' | 'borehole' | 'rainwater';  // New
+    
+    security?: { wallHeight?: number; includeGate?: boolean; wallSecurity?: 'wiremesh' | 'electric-wire' };  // Extend existing
+    perimeterWall?: { include?: boolean; height?: number };
+  // structure?: {
+  //   type?: 'bungalow' | '1.5-storey' | '2-storey' | '3-storey';
+  //   bedrooms?: number;
+  //   bathrooms?: number;
+  //   optionalRooms?: string[];
+  // };
+  foundation?: string;
+  roofing?: string;
   finishing?: string;
+  // perimeterWall?: boolean;
 }
 
 const steps: { id: WizardStep; label: string }[] = [
@@ -381,8 +405,7 @@ const EstimatorWizard: React.FC = () => {
     setCurrentStep("summary");
   };
 
-  /** Step content */
-  const renderStepContent = () => {
+  const stepContent = useMemo(() => {
     switch (currentStep) {
       case "projectDetails":
         return (
@@ -392,7 +415,7 @@ const EstimatorWizard: React.FC = () => {
               setProjectDetails(data);
               goToNextStep();
             }}
-        />
+          />
         );
       case "materialSelection":
         return (
@@ -459,10 +482,10 @@ const EstimatorWizard: React.FC = () => {
       default:
         return null;
     }
-  };
+  }, [currentStep, projectDetails, selectedMaterials, labourData, estimateData]);
 
   return (
-    <div className="max-w-5xl mx-auto my-8 p-6 bg-surface-light dark:bg-surface-dark rounded-xl shadow-md space-y-6">
+    <div className="max-w-5xl mx-auto mb-8 mt-4 p-6 bg-surface-light dark:bg-surface-dark rounded-xl shadow-md space-y-6">
 
       {/* 🧭 Stepper Progress Bar */}
       <div className="relative flex items-center justify-between mb-8">
@@ -482,7 +505,7 @@ const EstimatorWizard: React.FC = () => {
               )}
               {/* Step Circle */}
               <div
-                className={`z-10 flex items-center justify-center w-6 h-6 rounded-full border-2 ${
+                className={`z-10 flex items-center justify-center md:w-6 md:h-6 w-4 h-4 rounded-full text-xs md:text-base border-2 ${
                   isActive
                     ? "border-blue-600 bg-blue-600 text-white"
                     : isCompleted
@@ -513,7 +536,7 @@ const EstimatorWizard: React.FC = () => {
           exit={{ opacity: 0, y: -15 }}
           transition={{ duration: 0.3 }}
         >
-          {renderStepContent()}
+          {stepContent}
         </motion.div>
       </AnimatePresence>
     </div>
