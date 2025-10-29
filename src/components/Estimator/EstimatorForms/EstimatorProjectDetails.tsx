@@ -195,6 +195,7 @@ interface ProjectDetailsResidentialStepProps {
   
     foundation?: string;
     roofing?: string;
+    roofStyle?: 'pitched' | 'flat';
     finishing?: string;
     perimeterWall?: { include?: boolean; height?: number; wallSecurity?: string };
   };
@@ -461,6 +462,7 @@ const ProjectDetailsResidentialStep: React.FC<ProjectDetailsResidentialStepProps
           </div>
         </div>
       </AccordionSection>
+
       {/* Foundation */}
       <AccordionSection title="Foundation Details" id="foundation">
         <div>
@@ -468,7 +470,7 @@ const ProjectDetailsResidentialStep: React.FC<ProjectDetailsResidentialStepProps
           <select
             value={localData.foundation || ""}
             onChange={(e) => handleChange("foundation", e.target.value)}
-            className="w-full border rounded-lg p-2 text-xs md:text-base dark:bg-gray-800 dark:border-gray-700"
+            className="w-full border rounded-lg p-2 text-xs md:text-base dark:bg-background-dark dark:border-gray-700"
           >
             <option value="">Select Foundation</option>
             <option value="Strip">Strip Foundation</option>
@@ -479,6 +481,43 @@ const ProjectDetailsResidentialStep: React.FC<ProjectDetailsResidentialStepProps
       </AccordionSection>
 
       {/* Roofing */}
+      <AccordionSection title="Roofing Preferences" id="roofing">
+        <p className="text-xs md:text-sm text-gray-500 mb-2">choose your roofing style</p>
+        <div>
+          <label className="block text-xs md:text-base font-medium mb-1">Roof Style</label>
+          <select
+            value={localData.roofStyle || ""}
+            onChange={(e) => handleChange("roofStyle", e.target.value)}
+            className="w-full border rounded-lg p-2 text-xs md:text-base dark:bg-background-dark dark:border-gray-700"
+          >
+            <option value="">Select Style</option>
+            <option value="pitched">Pitched (Gable/Hip)</option>
+            <option value="flat">Flat (Slab)</option>
+          </select>
+        </div>
+      </AccordionSection>
+        
+        {/* move this to the material sections */}
+        {/* {localData.roofStyle === 'pitched' && (
+          <div>
+            <label>Material</label>
+            <select onChange={(e) => handleChange("roofing.material", e.target.value)}>
+              <option>Iron Sheets (Mabati)</option>
+              <option>Clay Tiles</option>
+              <option>Stone-Coated</option>
+            </select>
+          </div>
+        )}
+        {localData.roofStyle === 'flat' && (
+          <div>
+            <label>Waterproofing Type</label>
+            <select onChange={(e) => handleChange("roofing.waterproofing", e.target.value)}>
+              <option>Bitumen Membrane</option>
+              <option>Concrete Slab with Sealant</option>
+            </select>
+          </div>
+        )}
+      
       <AccordionSection title="Roofing" id="roofing">
         <div>
           <label className="block text-xs md:text-base font-medium mb-1">Roofing Type</label>
@@ -493,7 +532,7 @@ const ProjectDetailsResidentialStep: React.FC<ProjectDetailsResidentialStepProps
             <option value="Shingles">Shingles</option>
           </select>
         </div>
-      </AccordionSection>
+      </AccordionSection> */}
 
       {/* Finishing */}
       <AccordionSection title="Finishing" id="finishing">

@@ -340,6 +340,7 @@ interface ProjectDetailsData {
   foundation?: string;
   roofing?: string;
   finishing?: string;
+  roofStyle?: 'pitched' | 'flat';
   // perimeterWall?: boolean;
 }
 
