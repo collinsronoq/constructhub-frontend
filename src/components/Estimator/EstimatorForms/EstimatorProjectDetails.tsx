@@ -176,7 +176,7 @@ interface ProjectDetailsResidentialStepProps {
   initialData: {
     projectName?: string;
     location?: { county?: string; area?: string; coordinates?: string };
-    land?: { size?: number; soilType?: string };
+    land?: { size?: number; soilType?:'clay' | 'sandy' | 'rocky' | 'murram' };
     
     structure?: {
       type?: 'bungalow' | '1.5-storey' | '2-storey' | '3-storey';
@@ -497,42 +497,7 @@ const ProjectDetailsResidentialStep: React.FC<ProjectDetailsResidentialStepProps
         </div>
       </AccordionSection>
         
-        {/* move this to the material sections */}
-        {/* {localData.roofStyle === 'pitched' && (
-          <div>
-            <label>Material</label>
-            <select onChange={(e) => handleChange("roofing.material", e.target.value)}>
-              <option>Iron Sheets (Mabati)</option>
-              <option>Clay Tiles</option>
-              <option>Stone-Coated</option>
-            </select>
-          </div>
-        )}
-        {localData.roofStyle === 'flat' && (
-          <div>
-            <label>Waterproofing Type</label>
-            <select onChange={(e) => handleChange("roofing.waterproofing", e.target.value)}>
-              <option>Bitumen Membrane</option>
-              <option>Concrete Slab with Sealant</option>
-            </select>
-          </div>
-        )}
       
-      <AccordionSection title="Roofing" id="roofing">
-        <div>
-          <label className="block text-xs md:text-base font-medium mb-1">Roofing Type</label>
-          <select
-            value={localData.roofing || ""}
-            onChange={(e) => handleChange("roofing", e.target.value)}
-            className="w-full border rounded-lg p-2 text-xs md:text-base dark:bg-gray-800 dark:border-gray-700"
-          >
-            <option value="">Select Roofing Type</option>
-            <option value="Iron Sheets">Iron Sheets</option>
-            <option value="Tiles">Roof Tiles</option>
-            <option value="Shingles">Shingles</option>
-          </select>
-        </div>
-      </AccordionSection> */}
 
       {/* Finishing */}
       <AccordionSection title="Finishing" id="finishing">
@@ -610,7 +575,8 @@ const ProjectDetailsResidentialStep: React.FC<ProjectDetailsResidentialStepProps
         </div>
         
       </AccordionSection>
-
+      
+      {/* sewage */}
       <AccordionSection title="Sewage System" id="sewage">
         <div className="space-y-2">
           <div className="flex items-center space-x-2">

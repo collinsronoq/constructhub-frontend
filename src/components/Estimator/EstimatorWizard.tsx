@@ -299,13 +299,16 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import ProjectDetailsResidentialStep from "./EstimatorForms/EstimatorProjectDetails";
-import MaterialSelectionStep from "./EstimatorMaterialList";
+import MaterialSelectionStep1 from "./EstimatorForms/EstimatorMaterialSelection";
+import type { MaterialSelectionProps } from "./EstimatorForms/EstimatorMaterialSelection"
+// import MaterialSelectionStep from "./EstimatorMaterialList";
 import LabourCostStep from "./EstimatorLaborList";
 import EstimateSummary from "./EstimatorSummary";
 import EstimateBreakdown from "./EstimatorBreakdown";
 
 export type WizardStep =
   | "projectDetails"
+  | "materialSelection1"
   | "materialSelection"
   | "labourEstimate"
   | "summary"
@@ -316,36 +319,34 @@ export type WizardStep =
 interface ProjectDetailsData {
   projectName?: string;
   location?: { county?: string; area?: string; coordinates?: string };
-  land?: { size?: number; soilType?: string };
+  land?: { size?: number; soilType?: 'clay' | 'sandy' | 'rocky' | 'murram'};
+  
   structure?: {
-      type?: 'bungalow' | '1.5-storey' | '2-storey' | '3-storey';
-      bedrooms?: number;
-      bathrooms?: number;
-      rooms?: string[];  // e.g., ['kitchen', 'pantry']
-    };
-    sewage?: {
-      type?: 'sewer' | 'septic';
-      septicSize?: number;  // Optional
-    };
-    waterSupply?: 'municipal' | 'borehole' | 'rainwater';  // New
-    
-    security?: { wallHeight?: number; includeGate?: boolean; wallSecurity?: 'wiremesh' | 'electric-wire' };  // Extend existing
-    perimeterWall?: { include?: boolean; height?: number };
-  // structure?: {
-  //   type?: 'bungalow' | '1.5-storey' | '2-storey' | '3-storey';
-  //   bedrooms?: number;
-  //   bathrooms?: number;
-  //   optionalRooms?: string[];
-  // };
+    type?: 'bungalow' | '1.5-storey' | '2-storey' | '3-storey';
+    bedrooms?: number;
+    bathrooms?: number;
+    rooms?: string[];  // e.g., ['kitchen', 'pantry']
+  };
+  sewage?: {
+    type?: 'sewer' | 'septic';
+    septicSize?: number;  // Optional
+  };
+  waterSupply?: 'municipal' | 'borehole' | 'rainwater';  // New
+  
+  security?: { wallHeight?: number; includeGate?: boolean; wallSecurity?: 'wiremesh' | 'electric-wire' };  // Extend existing
+  
+
   foundation?: string;
   roofing?: string;
-  finishing?: string;
   roofStyle?: 'pitched' | 'flat';
+  finishing?: string;
+  perimeterWall?: { include?: boolean; height?: number; wallSecurity?: string };
   // perimeterWall?: boolean;
 }
 
 const steps: { id: WizardStep; label: string }[] = [
   { id: "projectDetails", label: "Project Details" },
+  { id: "materialSelection1", label: "Materials1" },
   { id: "materialSelection", label: "Materials" },
   { id: "labourEstimate", label: "Labour" },
   { id: "summary", label: "Summary" },
@@ -357,7 +358,8 @@ const EstimatorWizard: React.FC = () => {
 
   // 📦 State storage for all sections
   const [projectDetails, setProjectDetails] = useState<ProjectDetailsData>({});
-  const [selectedMaterials, setSelectedMaterials] = useState<any[]>([]);
+  // const [selectedMaterials, setSelectedMaterials] = useState<any[]>([]);
+  const [selectedMaterials1, setSelectedMaterials1] = useState<MaterialSelectionProps['initialData']>();
   const [labourData, setLabourData] = useState<any>({});
   const [estimateData, setEstimateData] = useState<any>(null);
 
@@ -418,13 +420,29 @@ const EstimatorWizard: React.FC = () => {
             }}
           />
         );
-      case "materialSelection":
+      // case "materialSelection":
+      //   return (
+      //     <MaterialSelectionStep
+      //       onMaterialsSelected={(selected) => {
+      //         setSelectedMaterials(selected);
+      //         goToNextStep();
+      //       }}
+      //     />
+      //   );
+      
+      case "materialSelection1":  // Updated: Use MaterialSelectionStep1
         return (
-          <MaterialSelectionStep
-            onMaterialsSelected={(selected) => {
-              setSelectedMaterials(selected);
+          <MaterialSelectionStep1
+            initialData={{
+              ...selectedMaterials1,  // Preserve any prior selections
+              soilType: projectDetails.land?.soilType,  // Pre-fill from Step 1
+              bathrooms: projectDetails.structure?.bathrooms || 2,  // Pre-fill
+            }}
+            onNext={(data) => {
+              setSelectedMaterials1(data);  // Store updated materials
               goToNextStep();
             }}
+            onBack={goToPreviousStep}  // New: Back navigation
           />
         );
       case "labourEstimate":
@@ -483,7 +501,7 @@ const EstimatorWizard: React.FC = () => {
       default:
         return null;
     }
-  }, [currentStep, projectDetails, selectedMaterials, labourData, estimateData]);
+  }, [currentStep, projectDetails, selectedMaterials1, labourData, estimateData]);
 
   return (
     <div className="max-w-5xl mx-auto mb-8 mt-4 p-6 bg-surface-light dark:bg-surface-dark rounded-xl shadow-md space-y-6">
