@@ -137,7 +137,7 @@ const MaterialSelectionStep1: React.FC<MaterialSelectionProps> = ({
           <select
             value={localData.foundation?.type || ""}
             onChange={(e) => handleChange("foundation.type", e.target.value)}
-            className="w-full border p-2"
+            className="w-full border rounded-lg p-2 text-xs md:text-base  dark:bg-background-dark dark:border-gray-700"
           >
             <option value="">Select Type</option>
             <option value="strip">Strip (Shallow, KES ~50K/sqm)</option>
@@ -147,6 +147,7 @@ const MaterialSelectionStep1: React.FC<MaterialSelectionProps> = ({
           <select
             value={localData.foundation?.cementBrand || ""}
             onChange={(e) => handleChange("foundation.cementBrand", e.target.value)}
+            className="w-full border rounded-lg p-2 text-xs md:text-base  dark:bg-background-dark dark:border-gray-700"
           >
             <option value="">Cement Brand (Optional)</option>
             <option value="Bamburi">Bamburi (Durable)</option>
@@ -164,6 +165,7 @@ const MaterialSelectionStep1: React.FC<MaterialSelectionProps> = ({
           <select
             value={localData.walling?.material || ""}
             onChange={(e) => handleChange("walling.material", e.target.value)}
+            className="w-full border rounded-lg p-2 text-xs md:text-base  dark:bg-background-dark dark:border-gray-700"
           >
             <option value="">Select Material</option>
             <option value="machine-cut stones">Machine-Cut Stones (KES 25/pc)</option>
@@ -173,6 +175,7 @@ const MaterialSelectionStep1: React.FC<MaterialSelectionProps> = ({
           <select
             value={localData.walling?.quality || ""}
             onChange={(e) => handleChange("walling.quality", e.target.value)}
+            className="w-full border rounded-lg p-2 text-xs md:text-base  dark:bg-background-dark dark:border-gray-700"
           >
             <option value="">Quality</option>
             <option value="economy">Economy</option>
@@ -189,7 +192,9 @@ const MaterialSelectionStep1: React.FC<MaterialSelectionProps> = ({
         {localData.roofing?.roofStyle === 'pitched' && (
           <div>
             <label>Material</label>
-            <select onChange={(e) => handleChange("roofing.roofStyle", e.target.value)}>
+            <select onChange={(e) => handleChange("roofing.roofStyle", e.target.value)}
+              className="w-full border rounded-lg p-2 text-xs md:text-base  dark:bg-background-dark dark:border-gray-700"
+            >
               <option value="">Material</option>
               <option value="iron sheets">Iron Sheets (Mabati)</option>
               <option value="clay tiles">Clay Tiles</option>
@@ -217,6 +222,7 @@ const MaterialSelectionStep1: React.FC<MaterialSelectionProps> = ({
           <select
             value={localData.plumbing?.pipes || ""}
             onChange={(e) => handleChange("plumbing.pipes", e.target.value)}
+            className="w-full border rounded-lg p-2 text-xs md:text-base  dark:bg-background-dark dark:border-gray-700"
           >
             <option value="">Pipes</option>
             <option value="PVC">PVC (Affordable, KES 100/m)</option>
@@ -226,6 +232,7 @@ const MaterialSelectionStep1: React.FC<MaterialSelectionProps> = ({
           <select
             value={localData.plumbing?.fittingsQuality || ""}
             onChange={(e) => handleChange("plumbing.fittingsQuality", e.target.value)}
+            className="w-full border rounded-lg p-2 text-xs md:text-base  dark:bg-background-dark dark:border-gray-700"
           >
             <option value="">Fittings Quality</option>
             <option value="basic">Basic</option>
@@ -242,6 +249,7 @@ const MaterialSelectionStep1: React.FC<MaterialSelectionProps> = ({
           <select
             value={localData.electrical?.wiring || ""}
             onChange={(e) => handleChange("electrical.wiring", e.target.value)}
+            className="w-full border rounded-lg p-2 text-xs md:text-base  dark:bg-background-dark dark:border-gray-700"
           >
             <option value="">Wiring Type</option>
             <option value="single-phase">Single-Phase (Standard)</option>
@@ -251,6 +259,7 @@ const MaterialSelectionStep1: React.FC<MaterialSelectionProps> = ({
           <select
             value={localData.electrical?.fixtures || ""}
             onChange={(e) => handleChange("electrical.fixtures", e.target.value)}
+            className="w-full border rounded-lg p-2 text-xs md:text-base  dark:bg-background-dark dark:border-gray-700"
           >
             <option value="">Fixtures</option>
             <option value="basic">Basic (Switches/Sockets)</option>
