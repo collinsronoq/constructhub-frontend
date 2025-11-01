@@ -309,7 +309,7 @@ import EstimateBreakdown from "./EstimatorBreakdown";
 export type WizardStep =
   | "projectDetails"
   | "materialSelection1"
-  | "materialSelection"
+  // | "materialSelection"
   | "labourEstimate"
   | "summary"
   | "breakdown";
@@ -347,7 +347,7 @@ interface ProjectDetailsData {
 const steps: { id: WizardStep; label: string }[] = [
   { id: "projectDetails", label: "Project Details" },
   { id: "materialSelection1", label: "Materials1" },
-  { id: "materialSelection", label: "Materials" },
+  // { id: "materialSelection", label: "Materials" },
   { id: "labourEstimate", label: "Labour" },
   { id: "summary", label: "Summary" },
   { id: "breakdown", label: "Breakdown" },
@@ -437,6 +437,7 @@ const EstimatorWizard: React.FC = () => {
               ...selectedMaterials1,  // Preserve any prior selections
               soilType: projectDetails.land?.soilType,  // Pre-fill from Step 1
               bathrooms: projectDetails.structure?.bathrooms || 2,  // Pre-fill
+              roofing: projectDetails.roofStyle? {roofStyle: projectDetails.roofStyle }: undefined
             }}
             onNext={(data) => {
               setSelectedMaterials1(data);  // Store updated materials

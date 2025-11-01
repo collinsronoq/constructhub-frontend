@@ -188,7 +188,7 @@ const MaterialSelectionStep1: React.FC<MaterialSelectionProps> = ({
 
       {/* roofing */}
       <AccordionSection title="Roofing Preference" id="roofing">
-        {/* move this to the material sections */}
+        
         {localData.roofing?.roofStyle === 'pitched' && (
           <div>
             <label>Material</label>
