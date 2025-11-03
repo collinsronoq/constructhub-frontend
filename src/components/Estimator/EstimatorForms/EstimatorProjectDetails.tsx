@@ -197,7 +197,7 @@ interface ProjectDetailsResidentialStepProps {
     roofing?: string;
     roofStyle?: 'pitched' | 'flat';
     finishing?: string;
-    perimeterWall?: { include?: boolean; height?: number; wallSecurity?: string };
+    perimeterWall?: { include?: boolean; height?: number; wallSecurity?: 'barbed-wire' | 'electric-wire' | 'hybrid' };
   };
   onNext: (data: ProjectDetailsResidentialStepProps["initialData"]) => void;
 }
@@ -549,23 +549,24 @@ const ProjectDetailsResidentialStep: React.FC<ProjectDetailsResidentialStepProps
                   onChange={(e) => handleChange("perimeterWall.height", Number(e.target.value))}
                   className="w-full border rounded-lg p-2 text-xs md:text-base dark:bg-background-dark dark:border-gray-700"
                 >
-                  <option>6 ft</option>
-                  <option>8 ft</option>
-                  <option>10 ft</option>
-                  <option>12 ft</option>
-                  <option>14 ft</option>
-                  <option>16 ft</option>
+                  <option value="6ft">6 ft</option>
+                  <option value="8ft">8 ft</option>
+                  <option value="10ft">10 ft</option>
+                  <option value="12ft">12 ft</option>
+                  <option value="14ft">14 ft</option>
+                  <option value="66ft">16 ft</option>
                 </select>
               </div>
               <div className="space-y-2">
-                <label className="block text-xs md:text-base font-medium mb-1">Wall Security</label>
+                <label className="block text-xs md:text-base font-medium my-2">Wall Security</label>
                 <select
-                  value={localData.perimeterWall?.height || 6}
+                  value={localData.perimeterWall?.wallSecurity || "barbed-wire"}
                   onChange={(e) => handleChange("perimeterWall.wallSecurity", e.target.value)}
                   className="w-full border rounded-lg p-2 text-xs md:text-base dark:bg-background-dark dark:border-gray-700"
                 >
-                  <option>barbed wire</option>
-                  <option>electric fence</option>
+                  <option value="barbed-wire">barbed wire</option>
+                  <option value="electric-wires">electric fence</option>
+                  <option value="hybrid">electric fence and barbed wire</option>
                   
                 </select>
               </div>

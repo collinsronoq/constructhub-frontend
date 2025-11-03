@@ -340,7 +340,7 @@ interface ProjectDetailsData {
   roofing?: string;
   roofStyle?: 'pitched' | 'flat';
   finishing?: string;
-  perimeterWall?: { include?: boolean; height?: number; wallSecurity?: string };
+  perimeterWall?: { include?: boolean; height?: number; wallSecurity?: 'barbed-wire' | 'electric-wire' | 'hybrid' };
   // perimeterWall?: boolean;
 }
 
