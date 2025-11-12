@@ -740,7 +740,7 @@ const MaterialSelectionStep1: React.FC<MaterialSelectionProps> = ({
         {onBack && (
           <button
             onClick={onBack}
-            className="bg-gray-300 text-gray-800 px-6 py-2 rounded-lg font-medium hover:bg-gray-400 transition"
+            className="bg-gray-300 text-gray-800 text-xs md:text-base px-6 py-2 rounded-lg font-medium hover:bg-gray-400 transition"
           >
             ← Back
           </button>
@@ -748,7 +748,7 @@ const MaterialSelectionStep1: React.FC<MaterialSelectionProps> = ({
         <button
           onClick={handleSubmit}
           // disabled={!isValid()}
-          className="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium transition"
+          className="bg-blue-600 text-white text-xs md:text-base px-6 py-2 rounded-lg font-medium transition"
         >
           Next →
         </button>

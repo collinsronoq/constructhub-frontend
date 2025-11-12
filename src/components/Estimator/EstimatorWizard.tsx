@@ -482,6 +482,11 @@ const EstimatorWizard: React.FC = () => {
                   name: b.name,
                   cost: b.subtotal,
                 })),
+                materialCost: 1000000,
+                laborCost: 500000,
+                avgKenyaCost: 400000, // Mock/search-based avg
+                potentialSavings: 350000,   // Calc from optimizations
+                keyChoices: ["trying something"], 
               }}
               onViewBreakdown={() => setCurrentStep("breakdown")}
               onEdit={() => setCurrentStep("projectDetails")}
