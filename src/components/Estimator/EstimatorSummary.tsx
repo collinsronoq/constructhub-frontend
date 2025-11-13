@@ -143,7 +143,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, Download, Edit3, AlertCircle, Timer, BrickWall, Wrench, HandCoins } from "lucide-react";
+import { ArrowRight, Download, Edit3, AlertCircle, Timer, BrickWall, Wrench, HandCoins, Wand } from "lucide-react";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';  // Add: yarn add recharts
 
 interface CategoryCost {
@@ -268,7 +268,7 @@ const EstimateSummary: React.FC<EstimateSummaryProps> = ({
       </div>
 
       {/* Project Insights - Expanded  //doing this at 3:00 am */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <div className="p-4 bg-background-light dark:bg-background-dark border border-gray-200 dark:border-gray-700 rounded-lg">
           <div className="flex flex-nowrap gap-2">
             <Timer size={16} />
@@ -290,7 +290,7 @@ const EstimateSummary: React.FC<EstimateSummaryProps> = ({
             
           </div>
           <p className="text-gray-900 dark:text-gray-100 font-medium">
-            Materials: {formatCurrency(data.materialCost)} ({((data.materialCost / total) * 100).toFixed(1)}%) 
+            {formatCurrency(data.materialCost)}<span className="text-brand-light dark:text-brand-dark">({((data.materialCost / total) * 100).toFixed(1)}%) </span> 
           </p>
           
         </div>
@@ -303,7 +303,7 @@ const EstimateSummary: React.FC<EstimateSummaryProps> = ({
           </div>
           
           <p className="text-gray-900 dark:text-gray-100 font-medium">
-            Labor: {formatCurrency(data.laborCost)} ({((data.laborCost / total) * 100).toFixed(1)}%)
+            {formatCurrency(data.laborCost)} <span className="text-brand-light dark:text-brand-dark">({((data.laborCost / total) * 100).toFixed(1)}% of total)</span>
           </p>
         </div>
         <div className="p-4 bg-background-light dark:bg-background-dark border border-gray-200 dark:border-gray-700 rounded-lg">
@@ -318,11 +318,14 @@ const EstimateSummary: React.FC<EstimateSummaryProps> = ({
             <AlertCircle size={16} className="text-yellow-500" aria-label="E.g., by choosing local vendors or economy options" />
           </p>
         </div>
-        <div className="p-4 bg-background-light dark:bg-background-dark border border-gray-200 dark:border-gray-700 rounded-lg col-span-2 lg:col-span-3">
-          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
-            Key Choices Impacting Cost
-          </p>
-          <ul className="text-sm text-gray-900 dark:text-gray-100 list-disc pl-4">
+        <div className="p-4 bg-background-light dark:bg-background-dark border border-gray-200 dark:border-gray-700 rounded-lg sm:col-span-2 lg:col-span-3">
+          <div className="flex flex-nowrap items-center gap-2">
+            <Wand size={16} />
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
+              Key Choices Impacting Cost
+            </p>
+          </div>
+          <ul className="text-sm text-gray-900 dark:text-gray-100 list-disc pl-6">
             {data.keyChoices.map(choice => <li key={choice}>{choice}</li>)}
           </ul>
         </div>

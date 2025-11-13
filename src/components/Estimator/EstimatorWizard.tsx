@@ -304,7 +304,8 @@ import type { MaterialSelectionProps } from "./EstimatorForms/EstimatorMaterialS
 // import MaterialSelectionStep from "./EstimatorMaterialList";
 import LabourCostStep from "./EstimatorLaborList";
 import EstimateSummary from "./EstimatorSummary";
-import EstimateBreakdown from "./EstimatorBreakdown";
+import EstimatorBreakdown from "./EstimatorBreakdown";
+import { useEstimationData } from "../../hooks/Estimator/useEstimationData";
 
 export type WizardStep =
   | "projectDetails"
@@ -362,6 +363,7 @@ const EstimatorWizard: React.FC = () => {
   const [selectedMaterials1, setSelectedMaterials1] = useState<MaterialSelectionProps['initialData']>();
   const [labourData, setLabourData] = useState<any>({});
   const [estimateData, setEstimateData] = useState<any>(null);
+  const { data, isLoading } = useEstimationData();
 
   /** Scroll to top whenever step changes */
   useEffect(() => {
@@ -497,13 +499,23 @@ const EstimatorWizard: React.FC = () => {
       case "breakdown":
         return (
           estimateData && (
-            <EstimateBreakdown
-              breakdown={estimateData.breakdown}
-              total={estimateData.total}
+            <EstimatorBreakdown
+              data={data!}
+              
               onBackToSummary={() => setCurrentStep("summary")}
             />
           )
         );
+        
+
+  if (isLoading)
+    return (
+      <div className="flex flex-col items-center justify-center py-12 text-gray-600 dark:text-gray-300">
+        <div className="animate-spin border-4 border-blue-400 border-t-transparent rounded-full w-10 h-10 mb-3"></div>
+        Fetching detailed breakdown...
+      </div>
+    );
+
       default:
         return null;
     }
