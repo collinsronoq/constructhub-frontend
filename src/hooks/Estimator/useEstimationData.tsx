@@ -41,6 +41,7 @@ export interface EstimationBreakdown {
     vendors: VendorCardProps[];
     technicians: TechnicianCardProps[];
   };
+  other: number;
 }
 
 // ==============================
@@ -56,7 +57,7 @@ const mockEstimationData: EstimationBreakdown = {
       id: "site-analysis",
       title: "Site Analysis & Survey",
       materials: [
-        { id: "sa1", name: "Site Survey Equipment (hire)", qty: 1, unit: "day", unitCost: 15000, subtotal: 15000 },
+        { id: "sa1", name: "Site Survey Equipment (hire)", qty: 1, unit: "day", unitCost: 15000, subtotal: 15000},
         { id: "sa2", name: "Peg and String for Marking", qty: 1, unit: "lot", unitCost: 2000, subtotal: 2000 },
       ],
       labour: [
@@ -282,6 +283,8 @@ const mockEstimationData: EstimationBreakdown = {
     },
   ],
   },
+
+  other: 0,
 };
 
 // ==============================

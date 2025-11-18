@@ -522,7 +522,7 @@ const EstimatorWizard: React.FC = () => {
   }, [currentStep, projectDetails, selectedMaterials1, labourData, estimateData]);
 
   return (
-    <div className="max-w-5xl mx-auto mb-8 mt-4 p-6 bg-surface-light dark:bg-surface-dark rounded-xl shadow-md space-y-6">
+    <div className="mx-auto mb-8 mt-4 p-6 bg-surface-light dark:bg-surface-dark rounded-xl shadow-md space-y-6">
 
       {/* 🧭 Stepper Progress Bar */}
       <div className="relative flex items-center justify-between mb-8">
