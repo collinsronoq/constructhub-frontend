@@ -1,3 +1,5 @@
+import { useNavigate } from "react-router-dom";
+
 
 interface WelcomeSectionProps {
   builderName?: string;
@@ -6,6 +8,14 @@ interface WelcomeSectionProps {
 
 
 const WelcomeSection = ({ builderName = "Collins", onOpenChat }: WelcomeSectionProps) => {
+
+  const navigate = useNavigate();  
+  // Navigation handlers:
+  const goToEstimation = () => navigate("/estimate"); 
+  const goToVendors = () => navigate("/vendors");
+  const goToTechnicians = () => navigate("/technicians");
+
+  
   return (
     <section className="bg-surface-light dark:bg-surface-dark rounded-2xl shadow-md p-6 md:p-8 mb-8">
       {/* Greeting and intro */}
@@ -25,7 +35,7 @@ const WelcomeSection = ({ builderName = "Collins", onOpenChat }: WelcomeSectionP
 
       {/* Quick action buttons */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <button className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition">
+        <button onClick={goToEstimation} className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition">
           Start Estimation
         </button>
         {/* bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white font-medium py-3 px-4 rounded-lg transition */}
@@ -33,11 +43,11 @@ const WelcomeSection = ({ builderName = "Collins", onOpenChat }: WelcomeSectionP
           Ask AI Assistant
         </button>
 
-        <button className="bg-white border border-blue-600 text-blue-600  hover:bg-blue-100 font-medium py-3 px-4 rounded-lg transition">
+        <button onClick={goToVendors} className="bg-white border border-blue-600 text-blue-600  hover:bg-blue-100 font-medium py-3 px-4 rounded-lg transition">
           Find Vendors
         </button>
 
-        <button className="bg-white border border-blue-600 text-blue-600 hover:bg-blue-100 font-medium py-3 px-4 rounded-lg transition">
+        <button onClick={goToTechnicians} className="bg-white border border-blue-600 text-blue-600 hover:bg-blue-100 font-medium py-3 px-4 rounded-lg transition">
           Hire Technicians
         </button>
       </div>

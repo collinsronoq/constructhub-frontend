@@ -379,8 +379,7 @@ import {
 } from "recharts";
 
 import type { EstimationBreakdown } from "../../hooks/Estimator/useEstimationData";
-import VendorCard from "../VendorCard";
-import TechnicianCard from "../TechnicianCard";
+import Recommendations from "../BuilderDashboard/Recommendations";
 import {
   ChevronDown,
   ChevronUp,
@@ -389,10 +388,15 @@ import {
   Layers,
   BrushCleaning,
   Hammer,
-  Plus,
-  SquarePlus,
   CopyPlus,
   ClipboardPlus,
+  BrickWall,
+  House,
+  LampCeiling,
+  HousePlug,
+  Paintbrush,
+  Fence,
+  FenceIcon,
 } from "lucide-react";
 
 /**
@@ -573,7 +577,7 @@ export default function BreakdownRich({ data, onBackToSummary }: BreakdownnProps
     <div className="p-4 md:p-8 space-y-6">
       {/* ===== SUMMARY TOP ===== */}
       <div className="grid md:grid-cols-3 gap-4">
-        <div className="col-span-2 bg-white dark:bg-gray-900 border rounded-lg p-4 shadow-sm">
+        <div className="col-span-2 bg-white dark:bg-background-dark border dark:border-gray-700 rounded-lg p-4 shadow-sm">
           <div className="flex justify-between items-start">
             <div>
               <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
@@ -590,6 +594,7 @@ export default function BreakdownRich({ data, onBackToSummary }: BreakdownnProps
             </div>
           </div>
 
+          {/* the three cards */}
           <div className="mt-4 grid md:grid-cols-3 gap-8 py-4">
             <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded">
               <div className="flex flex-row align-middle gap-2">
@@ -633,7 +638,8 @@ export default function BreakdownRich({ data, onBackToSummary }: BreakdownnProps
                 </ResponsiveContainer>
               </div>
             </div>
-
+            
+            {/* bar chart */}
             <div className="w-full  bg-white dark:bg-gray-900 p-3 rounded border">
               <h4 className="text-base font-medium text-gray-700 dark:text-gray-200 mb-4">Phase Cost Comparison</h4>
               <div className="h-64">
@@ -705,7 +711,7 @@ export default function BreakdownRich({ data, onBackToSummary }: BreakdownnProps
           const mats = sumMaterials(phase);
           const labs = sumLabour(phase);
           return (
-            <div key={phase.id} className="bg-white dark:bg-gray-900 border rounded-lg shadow-sm overflow-hidden">
+            <div key={phase.id} className="bg-white dark:bg-gray-900 border dark:border-gray-700 rounded-lg shadow-sm overflow-hidden">
               <div
                 className="flex items-center justify-between bg-background-light dark:bg-surface-dark p-4 cursor-pointer"
                 onClick={() => togglePhase(phase.id)}
@@ -713,10 +719,18 @@ export default function BreakdownRich({ data, onBackToSummary }: BreakdownnProps
                 <div className="flex items-center gap-3">
                   <span className="p-2 bg-gray-100 dark:bg-gray-800 rounded">
                     {/* choose icon by id roughly */}
-                    {phase.id.includes("foundation") ? <Layers size={18} /> : phase.id.includes("roof") ? <BrushCleaning size={18} /> : <FileText size={18} />}
+                    {
+                      phase.id.includes("foundation") ? <Layers size={18} /> : 
+                      phase.id.includes("superstructure") ? <BrickWall size={18} /> :  
+                      phase.id.includes("roof") ? <House size={18} />: 
+                      phase.id.includes("services-second-fix") ? <LampCeiling size={18} /> : 
+                      phase.id.includes("services-first-fix") ? <HousePlug size={18} /> :
+                      phase.id.includes("finishes") ? <Paintbrush size={18} /> :
+                      phase.id.includes("external") ? <Fence size={18} /> :
+                      <FileText size={18} />}
                   </span>
                   <div>
-                    <div className="font-semibold text-gray-800 dark:text-gray-200">{phase.title}</div>
+                    <div className="text-lg font-semibold text-gray-800 dark:text-gray-200">{phase.title}</div>
                     <div className="text-xs text-gray-500">{phase.technicians.join(" • ")}</div>
                   </div>
                 </div>
@@ -736,10 +750,10 @@ export default function BreakdownRich({ data, onBackToSummary }: BreakdownnProps
                   <div className="grid md:grid-cols-3 gap-4">
                     {/* materials table */}
                     <div className="col-span-2">
-                      <h5 className="font-medium text-gray-700 dark:text-gray-200">Materials</h5>
+                      <h5 className="font-semibold text-gray-800 dark:text-gray-200">Materials</h5>
                       <div className="overflow-x-auto mt-2">
-                        <table className="min-w-full text-sm">
-                          <thead className="text-xs text-gray-500">
+                        <table className="min-w-full text-sm border border-gray-200 dark:border-gray-700">
+                          <thead className="text-gray-500 bg-gray-50 dark:bg-gray-800">
                             <tr>
                               <th className="text-left px-2 py-1">Item</th>
                               <th className="text-right px-2 py-1">Qty</th>
@@ -749,7 +763,7 @@ export default function BreakdownRich({ data, onBackToSummary }: BreakdownnProps
                           </thead>
                           <tbody>
                             {phase.materials.map((m) => (
-                              <tr key={m.id} className="border-t">
+                              <tr key={m.id} className="border-t dark:border-gray-700">
                                 <td className="px-2 py-1">{m.name}</td>
                                 <td className="px-2 py-1 text-right">{m.qty} {m.unit}</td>
                                 <td className="px-2 py-1 text-right">{formatCurrency(m.unitCost)}</td>
@@ -761,10 +775,10 @@ export default function BreakdownRich({ data, onBackToSummary }: BreakdownnProps
                       </div>
 
                       {/* labour */}
-                      <h5 className="font-medium text-gray-700 dark:text-gray-200 mt-4">Labour</h5>
+                      <h5 className="font-semibold text-gray-800 dark:text-gray-200 mt-4">Labour</h5>
                       <div className="overflow-x-auto mt-2">
-                        <table className="min-w-full text-sm">
-                          <thead className="text-xs text-gray-500">
+                        <table className="min-w-full text-sm border border-gray-200 dark:border-gray-700">
+                          <thead className="text-gray-500 bg-gray-50 dark:bg-gray-800">
                             <tr>
                               <th className="text-left px-2 py-1">Role</th>
                               <th className="text-right px-2 py-1">Days</th>
@@ -774,7 +788,7 @@ export default function BreakdownRich({ data, onBackToSummary }: BreakdownnProps
                           </thead>
                           <tbody>
                             {phase.labour.map((l) => (
-                              <tr key={l.id} className="border-t">
+                              <tr key={l.id} className="border-t dark:border-gray-700">
                                 <td className="px-2 py-1">{l.role}</td>
                                 <td className="px-2 py-1 text-right">{l.days}</td>
                                 <td className="px-2 py-1 text-right">{formatCurrency(l.ratePerDay)}</td>
@@ -783,6 +797,24 @@ export default function BreakdownRich({ data, onBackToSummary }: BreakdownnProps
                             ))}
                           </tbody>
                         </table>
+                      </div>
+                      
+                      {/* phase summary */}
+                      <div className="mt-4 bg-background-light dark:bg-surface-dark p-4 rounded">
+                        {/* material summary */}
+                        <div>
+                          <h5>Materials: <span className="ml-4 text-brand-light">{formatCurrency(sumMaterials(phase))}</span></h5>
+                        </div>
+
+                        {/* labour summary */}
+                        <div>
+                          <h5>Labour: <span className="ml-4 text-brand-light">{formatCurrency(sumLabour(phase))}</span></h5>
+                        </div>
+
+                        {/* phase grand total */}
+                        <div className="mt-4">
+                          <h5 className="font-semibold">Phase total: <span className="font-medium ml-4 text-brand-light">{formatCurrency(phase.subtotal)}</span></h5>
+                        </div>
                       </div>
                     </div>
 
@@ -845,7 +877,7 @@ export default function BreakdownRich({ data, onBackToSummary }: BreakdownnProps
       </div>
 
       {/* ===== PERMITS SECTION ===== */}
-      <div className="bg-white dark:bg-gray-900 border rounded-lg p-4 shadow-sm">
+      <div className="bg-white dark:bg-gray-900 border dark:border-gray-700 rounded-lg p-4 shadow-sm">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <MapPin size={18} />
@@ -854,9 +886,9 @@ export default function BreakdownRich({ data, onBackToSummary }: BreakdownnProps
           <div className="text-sm text-gray-500">Important — resolve early</div>
         </div>
 
-        <div className="mt-4 grid md:grid-cols-4 gap-3">
+        <div className="mt-4 grid md:grid-cols-3 gap-3">
           {defaultPermits.map((p) => (
-            <div key={p.id} className="p-3 border rounded bg-gray-50 dark:bg-gray-800">
+            <div key={p.id} className="p-3 border dark:border-gray-700 rounded bg-gray-50 dark:bg-gray-800">
               <div className="flex items-start justify-between">
                 <div>
                   <div className="text-sm font-medium text-gray-800 dark:text-gray-200">{p.name}</div>
@@ -877,16 +909,40 @@ export default function BreakdownRich({ data, onBackToSummary }: BreakdownnProps
       </div>
 
       {/* ===== RECOMMENDATIONS ===== */}
-      <div className="grid md:grid-cols-2 gap-4">
-        <div className="bg-white dark:bg-gray-900 border rounded-lg p-4 shadow-sm">
-          <div className="flex items-center gap-2">
+      <div className="bg-white dark:bg-gray-900 border dark:border-gray-700 rounded-lg shadow-sm">
+        <Recommendations vendors={data.recommendations.vendors} technicians={data.recommendations.technicians} />
+      </div>
+      
+      {/* <div className="bg-white dark:bg-gray-900 border rounded-lg p-4 shadow-sm">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-3">
+          <div>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+              Recommended Vendors & Technicians
+            </h2>
+            <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
+              Based on your project locations and previous estimations
+            </p>
+          </div>
+          {onViewAll && (
+            <button
+              onClick={onViewAll}
+              className="text-blue-600 dark:text-blue-400 text-sm font-medium hover:underline"
+            >
+              View All
+            </button>
+          )}
+        </div> */}
+
+        {/* Vendeor section */}
+        {/* <div className="mb-10">
+          <div className="flex items-center gap-2  border-b border-slate-200 dark:border-slate-200/10 pb-2 mb-4">
             <FileText size={18} />
             <h4 className="font-semibold text-gray-800 dark:text-gray-200">Recommended Vendors (nearby)</h4>
           </div>
-          <div className="mt-3 space-y-2">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {data.recommendations.vendors.map((v) => (
               <div key={v.id}>
-                {/* vendor card — uses your existing component */}
+                vendor card — uses your existing component
                 <VendorCard {...v} />
               </div>
             ))}
@@ -906,7 +962,7 @@ export default function BreakdownRich({ data, onBackToSummary }: BreakdownnProps
             ))}
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* ===== FINAL AI SUMMARY ===== */}
       <div className="bg-gradient-to-r from-blue-50 to-white dark:from-blue-900/20 dark:to-gray-900 border rounded-lg p-4">

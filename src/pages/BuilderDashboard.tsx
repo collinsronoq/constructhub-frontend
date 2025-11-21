@@ -1,6 +1,6 @@
 import { useOutletContext } from "react-router-dom";
 import WelcomeSection from "../components/BuilderDashboard/WelcomeSection";
-import Estimations from "../components/BuilderDashboard/Estimations";
+import RecentEstimations from "../components/BuilderDashboard/RecentEstimations";
 import AIAssistantWidget from "../components/BuilderDashboard/AIAssistantWidget";
 // import AIAssistantPanel from "../components/AIAssistantPanel";
 import Recommendations from "../components/BuilderDashboard/Recommendations";
@@ -46,7 +46,7 @@ const BuilderDashboard = () => {
       <WelcomeSection onOpenChat={ onToggleOpenAI } />
 
       {/* Estimation Summary */}
-      <Estimations estimates={sampleEstimates} />
+      <RecentEstimations estimates={sampleEstimates} />
 
       {/* AI Assistant Overview */}
       <AIAssistantWidget onOpenChat={ onToggleOpenAI } />

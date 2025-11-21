@@ -7,12 +7,14 @@ import DashboardLayout from "./layouts/DashboardLayout"
 import Dashboard from "./pages/BuilderDashboard"
 import VendorProfile from "./pages/VendorProfile"
 import Estimates from "./pages/Estimates"
+import GetEstimate from "./pages/GetEstimate"
 import TechnicianDirectory from "./pages/TechnicianDirectory"
 import AIChat from "./pages/AIChat"
 import Login from "./pages/Login"
 import SignUp from "./pages/SignUp"
 import TechnicianProfile from "./pages/TechnicianProfile"
 import Marketplace from "./pages/MarketPlace"
+import EstimateDetail from "./pages/EstimateDetail"
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
@@ -25,6 +27,8 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/estimates" element={<Estimates />} />
+          <Route path="/estimate" element={<GetEstimate />} />
+          <Route path="/estimation/:id" element={<EstimateDetail />} />
           <Route path="/marketplace" element={<Marketplace />} />
           <Route path="/technicians" element={<TechnicianDirectory />} />
           <Route path="/ai" element={<AIChat />} />

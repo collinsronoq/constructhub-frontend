@@ -47,7 +47,7 @@ export interface EstimationBreakdown {
 // ==============================
 // 🔹 Mock Dataset (3-Bedroom Bungalow)
 // ==============================
-const mockEstimationData: EstimationBreakdown = {
+export const mockEstimationData: EstimationBreakdown = {
   projectTitle: "3-Bedroom Bungalow",
   floorArea: 130,
   quality: "Standard",

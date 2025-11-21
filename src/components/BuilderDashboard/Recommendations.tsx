@@ -3,6 +3,7 @@ import type { VendorCardProps } from "../VendorCard";
 import { useNavigate } from "react-router-dom";
 import type { TechnicianCardProps } from "../TechnicianCard";
 import TechnicianCard from "../TechnicianCard";
+import { Hammer, Store } from "lucide-react";
 
 interface RecommendationsProps {
   vendors?: VendorCardProps[]
@@ -114,7 +115,7 @@ const Recommendations = ({
     };
 
     return (
-      <section className="p-6 bg-surface-light dark:bg-surface-dark rounded-xl shadow-sm my-8">
+      <section className="p-6 bg-surface-light dark:bg-surface-dark rounded-xl shadow-sm">
         {/* Section Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-3">
           <div>
@@ -138,9 +139,13 @@ const Recommendations = ({
         {/* Vendors Section */}
         <div className="mb-10">
           <div className="flex flex-col md:flex-row justify-between items-center border-b border-slate-200 dark:border-slate-200/10 pb-2 mb-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-              Recommended Vendors
-            </h3>
+            <div className="flex items-center gap-2">
+              <Store  size={16}/>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                Recommended Vendors
+              </h3>
+            </div>
+            
             <span className="text-sm text-gray-500 dark:text-gray-400 py-4 md:py-0">
               Verified material suppliers
             </span>
@@ -156,9 +161,12 @@ const Recommendations = ({
         {/* Technicians Section */}
         <div>
           <div className="flex flex-col md:flex-row justify-between items-center border-b border-slate-200 dark:border-slate-200/10 pb-2 mb-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-              Recommended Technicians
-            </h3>
+             <div className="flex items-center gap-2">
+              <Hammer  size={16}/>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                Recommended Technicians
+              </h3>
+            </div>
             <span className="text-sm text-gray-500 dark:text-gray-400 py-4 md:py-0">
               Skilled professionals near your projects
             </span>
