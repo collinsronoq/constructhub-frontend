@@ -67,16 +67,19 @@ const VendorDirectory: React.FC = () => {
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mt-4">
           <VendorSearchBar query={searchQuery} onChange={setSearchQuery} />
 
-          <VendorFilters
-            selectedCategory={selectedCategory}
-            onCategoryChange={setSelectedCategory}
-            selectedLocation={selectedLocation}
-            onLocationChange={setSelectedLocation}
-            selectedSupplierType={selectedSupplierType}
-            onSupplierTypeChange={setSelectedSupplierType}
-            sortBy={sortBy}
-            onSortChange={setSortBy}
-          />
+          <div className="bg-surface-light dark:bg-surface-dark p-4 rounded-lg">
+            <VendorFilters
+              selectedCategory={selectedCategory}
+              onCategoryChange={setSelectedCategory}
+              selectedLocation={selectedLocation}
+              onLocationChange={setSelectedLocation}
+              selectedSupplierType={selectedSupplierType}
+              onSupplierTypeChange={setSelectedSupplierType}
+              sortBy={sortBy}
+              onSortChange={setSortBy}
+            />
+          </div>
+          
         </div>
       </div>
 

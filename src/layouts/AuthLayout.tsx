@@ -104,7 +104,7 @@ const AuthLayout = ({ description }: AuthLayoutProps) => {
         </div>
         <div 
           style={{
-            backgroundImage: "url('src/assets/image_1.jpg')",
+            backgroundImage: "url('public/image_1.jpg')",
             backgroundSize: "cover",
             backgroundPosition: "center",
             backgroundRepeat: "no-repeat",
