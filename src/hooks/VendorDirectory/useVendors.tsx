@@ -1,19 +1,10 @@
 // src/hooks/VendorDirectory/useVendors.ts
 import { useEffect, useState } from "react";
+import type { VendorCardProps } from "../../components/VendorCard";
 
-export interface Vendor {
-  id: string;
-  name: string;
-  category: string;       // Roofing, Electrical, etc.
-  location: string;       // County
-  supplierType: string;   // Retail/Wholesale/Distributor
-  rating: number;         // 1–5 stars
-  verified: boolean;
-  shortDescription: string;
-}
 
 export const useVendors = () => {
-  const [vendors, setVendors] = useState<Vendor[]>([]);
+  const [vendors, setVendors] = useState<VendorCardProps[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -21,34 +12,55 @@ export const useVendors = () => {
       setVendors([
         {
           id: "1",
-          name: "Nakuru Hardware Supplies",
-          category: "Hardware General",
+          name: "Elite Roofing Solutions",
+          category: "Roofing",
           location: "Nakuru",
-          supplierType: "Retail",
-          rating: 4.5,
-          verified: true,
-          shortDescription: "General hardware and building materials.",
+          contact: "+254 712 345 678",
+          supplierType: "Distributor",
+          rating: 4.8,
+          imageUrl: "src/assets/image_3.jpg",
         },
         {
           id: "2",
-          name: "RoofTech Kenya",
-          category: "Roofing",
+          name: "GreenBuild Supplies",
+          category: "Construction Materials",
           location: "Nairobi",
-          supplierType: "Wholesale",
+          contact: "+254 710 998 443",
+          supplierType: "Retail",
           rating: 4.8,
-          verified: true,
-          shortDescription: "Roofing sheets, gutters and structural timber.",
+          imageUrl: "src/assets/image_3.jpg",
         },
         {
           id: "3",
-          name: "Bright Electric Solutions",
+          name: "ProTech Electricals",
           category: "Electrical",
-          location: "Machakos",
+          location: "Rafiki",
+          contact: "+254 723 111 222",
           supplierType: "Distributor",
-          rating: 4.2,
-          verified: false,
-          shortDescription: "Cables, bulbs, sockets and electrical fittings.",
+          rating: 4.8,
+          imageUrl: "src/assets/image_3.jpg",
         },
+        {
+          id: "4",
+          name: "ProTech Finishes",
+          category: "Finishes",
+          location: "Rafiki",
+          contact: "+254 723 111 222",
+          supplierType: "Wholesale",
+          rating: 4.8,
+          imageUrl: "src/assets/image_3.jpg",
+        },
+        {
+          id: "5",
+          name: "Rafiki Timber",
+          category: "Timber",
+          location: "Rafiki",
+          contact: "+254 723 111 222",
+          supplierType: "Distributor",
+          rating: 4.8,
+          imageUrl: "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=400&q=80",
+        },
+        
       ]);
       setLoading(false);
     }, 800);

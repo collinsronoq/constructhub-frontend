@@ -1,5 +1,6 @@
 // src/pages/VendorDirectory.tsx
 import React, { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import VendorSearchBar from "../components/VendorDirectory/VendorSearchBar";
 import VendorFilters from "../components/VendorDirectory/VendorFilters";
 import VendorCard from "../components/VendorCard";
@@ -7,12 +8,18 @@ import { useVendors } from "../hooks/VendorDirectory/useVendors";
 
 const VendorDirectory: React.FC = () => {
   const { vendors, loading } = useVendors();
+  const navigate = useNavigate();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedLocation, setSelectedLocation] = useState("All");
   const [selectedSupplierType, setSelectedSupplierType] = useState("All");
   const [sortBy, setSortBy] = useState("Highest Rated");
+  const [showVerifiedOnly, setShowVerifiedOnly] = useState(false);
+
+  const handleViewVendor = (vendorId: string) => {
+    navigate("/vendor/profile", { state: { id: vendorId } });
+  };
 
   const filteredVendors = useMemo(() => {
     let list = vendors;
@@ -41,12 +48,16 @@ const VendorDirectory: React.FC = () => {
     // Sorting
     if (sortBy === "Highest Rated") {
       list = [...list].sort((a, b) => b.rating - a.rating);
-    } else if (sortBy === "Alphabetical") {
-      list = [...list].sort((a, b) => a.name.localeCompare(b.name));
+    } else if (sortBy === "Lowest Rated") {
+      list = [...list].sort((a, b) => a.rating - b.rating);
     }
 
+    // show verified vendors
+    if(showVerifiedOnly){
+      list = list.filter((v) => v.verified === true);
+    }
     return list;
-  }, [vendors, searchQuery, selectedCategory, selectedLocation, selectedSupplierType, sortBy]);
+  }, [vendors, searchQuery, selectedCategory, selectedLocation, selectedSupplierType, sortBy, showVerifiedOnly]);
 
   return (
     <section className="p-6 bg-surface-light dark:bg-surface-dark rounded-xl shadow-sm my-2 space-y-6">
@@ -76,7 +87,9 @@ const VendorDirectory: React.FC = () => {
               selectedSupplierType={selectedSupplierType}
               onSupplierTypeChange={setSelectedSupplierType}
               sortBy={sortBy}
-              onSortChange={setSortBy}
+              onSortChange={setSortBy}            
+              showVerifiedOnly={showVerifiedOnly} 
+              onVerifiedToggle={setShowVerifiedOnly} 
             />
           </div>
           
@@ -92,7 +105,7 @@ const VendorDirectory: React.FC = () => {
       {!loading && filteredVendors.length > 0 ? (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {filteredVendors.map((vendor) => (
-            <VendorCard key={vendor.id} {...vendor} />
+            <VendorCard key={vendor.id} {...vendor} onViewProfile={() => handleViewVendor(vendor.id)}/>
           ))}
         </div>
       ) : (

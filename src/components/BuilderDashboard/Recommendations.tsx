@@ -19,6 +19,8 @@ const Recommendations = ({
       category: "Roofing Vendor",
       location: "Nakuru",
       contact: "+254 712 345 678",
+      supplierType: "Distributor",
+      rating: 4.8,
       imageUrl: "src/assets/image_3.jpg",
     },
     {
@@ -27,6 +29,8 @@ const Recommendations = ({
       category: "Construction Materials",
       location: "Nairobi",
       contact: "+254 710 998 443",
+      supplierType: "Retail",
+      rating: 4.8,
       imageUrl: "src/assets/image_3.jpg",
     },
     {
@@ -35,6 +39,8 @@ const Recommendations = ({
       category: "Technician",
       location: "Rafiki",
       contact: "+254 723 111 222",
+      supplierType: "Distributor",
+      rating: 4.8,
       imageUrl: "src/assets/image_3.jpg",
     },
     {
@@ -43,6 +49,8 @@ const Recommendations = ({
       category: "Technician",
       location: "Rafiki",
       contact: "+254 723 111 222",
+      supplierType: "Wholesale",
+      rating: 4.8,
       imageUrl: "src/assets/image_3.jpg",
     },
     {
@@ -51,8 +59,10 @@ const Recommendations = ({
       category: "Technician",
       location: "Rafiki",
       contact: "+254 723 111 222",
+      supplierType: "Distributor",
+      rating: 4.8,
       imageUrl: "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=400&q=80",
-    }
+    },
   ],
   technicians = [
     {

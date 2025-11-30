@@ -1,6 +1,4 @@
-
 import React from "react"
-
 import EstimateCard from "../Estimates/EstimateCard"
 import type { EstimateCardProps } from "../Estimates/EstimateCard"
 import { useNavigate } from "react-router-dom"
@@ -17,12 +15,16 @@ interface EstimationSummaryProps {
 
 const RecentEstimations: React.FC<EstimationSummaryProps> = ({ estimates, onViewAll }) => {
 
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
 
   // function that navigates to the estimate page when clicked
-  // const handleViewAll = () =>{
-  //   navigate(".../pages/Estimates");
-  // }
+  const handleViewAll = () =>{
+    if(onViewAll){
+      onViewAll();
+      return;
+    }
+    navigate("/estimates");
+  }
 
   return (
     <section className="p-6 bg-surface-light dark:bg-surface-dark rounded-xl shadow-sm relative">
@@ -52,7 +54,7 @@ const RecentEstimations: React.FC<EstimationSummaryProps> = ({ estimates, onView
       </div>
 
       <button
-        onClick={onViewAll}
+        onClick={handleViewAll}
         className="text-blue-600 dark:text-blue-400 text-base md:text-lg hover:underline absolute bottom-0 right-0 p-4"
       >
         {/* suppose to redirect to the estimations page or just fetch all the estimates from the backend, i will see */}

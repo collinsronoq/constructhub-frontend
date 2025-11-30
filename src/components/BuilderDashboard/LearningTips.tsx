@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import LearningTipCard from "../LearningTipsCard";
 import type { LearningTipCardProps } from "../LearningTipsCard";
 
@@ -34,6 +35,12 @@ const LearningTips: React.FC<LearningTipsProps> = ({
   ],
   onViewAll,
 }) => {
+
+  const navigate = useNavigate();
+
+  const handleLearnMore = (articleId: string) =>{
+    navigate(`/article/${articleId}`)
+  }
   return (
     <section className="p-6 bg-surface-light dark:bg-surface-dark rounded-xl shadow-sm my-8">
       {/* Header */}
@@ -54,7 +61,7 @@ const LearningTips: React.FC<LearningTipsProps> = ({
       {/* Grid of Tips */}
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {tips.map((tip) => (
-          <LearningTipCard key={tip.id} {...tip} />
+          <LearningTipCard key={tip.id} {...tip} onLearnMore={()=> handleLearnMore(tip.id)}/>
         ))}
       </div>
     </section>

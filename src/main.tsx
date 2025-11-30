@@ -16,6 +16,9 @@ import TechnicianProfile from "./pages/TechnicianProfile"
 import Marketplace from "./pages/MarketPlace"
 import EstimateDetail from "./pages/EstimateDetail"
 import VendorDirectory from "./pages/VendorDirectory"
+import ArticlesPage from "./pages/Articles"
+import ArticleDetailsPage from "./pages/ArticleDetailsPage"
+
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
@@ -34,6 +37,8 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           <Route path="/technicians" element={<TechnicianDirectory />} />
           <Route path="/vendors" element={<VendorDirectory />} />
           <Route path="/ai" element={<AIChat />} />
+          <Route path="/articles" element={<ArticlesPage />} />
+          <Route path="/articles/:id" element={<ArticleDetailsPage />} />
           <Route path="/vendor/profile" element={<VendorProfile />} />
           <Route path="/technician/profile" element = {<TechnicianProfile />} />
           

@@ -1,5 +1,4 @@
 import React from "react";
-import { Link } from "react-router-dom";
 
 export interface LearningTipCardProps {
   id: string;
@@ -8,6 +7,7 @@ export interface LearningTipCardProps {
   description: string;
   icon?: React.ReactNode;
   link?: string;
+  onLearnMore: (id: string) => void;
 }
 
 const LearningTipCard: React.FC<LearningTipCardProps> = ({
@@ -16,7 +16,7 @@ const LearningTipCard: React.FC<LearningTipCardProps> = ({
   category,
   description,
   icon,
-  link = "#",
+  onLearnMore,
 }) => {
   return (
     <div className="p-5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm hover:shadow-md transition-transform transform hover:-translate-y-1">
@@ -52,14 +52,15 @@ const LearningTipCard: React.FC<LearningTipCardProps> = ({
       <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
         {description}
       </p>
-
+      
+      
       {/* Learn More Button */}
-      <Link
-        to={link}
+      <button
+        onClick={() => onLearnMore?.(id)}
         className="inline-block w-full text-center px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition"
       >
         Learn More
-      </Link>
+      </button>
     </div>
   );
 };

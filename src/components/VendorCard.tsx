@@ -5,7 +5,9 @@ export interface VendorCardProps {
   name: string
   category: string
   location: string
-  rating?: number
+  supplierType?: string;
+  rating: number
+  verified?: boolean
   imageUrl?: string
   contact?: string
   onViewProfile?: (id: string) => void;
@@ -81,3 +83,5 @@ const VendorCard : React.FC<VendorCardProps> =({ id, name, category, location, i
 }
 
 export default VendorCard
+
+

@@ -13,6 +13,9 @@ interface VendorFiltersProps {
 
   sortBy: string;
   onSortChange: (value: string) => void;
+
+  showVerifiedOnly: boolean;
+  onVerifiedToggle: (checked: boolean) => void;
 }
 
 const VendorFilters: React.FC<VendorFiltersProps> = ({
@@ -27,6 +30,9 @@ const VendorFilters: React.FC<VendorFiltersProps> = ({
 
   sortBy,
   onSortChange,
+
+  showVerifiedOnly,
+  onVerifiedToggle
 }) => {
   const categories = [
     "All",
@@ -44,7 +50,7 @@ const VendorFilters: React.FC<VendorFiltersProps> = ({
 
   const locations = ["All", "Nakuru", "Nairobi", "Machakos", "Kiambu"];
 
-  const sortingOptions = ["Highest Rated", "Alphabetical"];
+  const sortingOptions = ["Highest Rated", "Lowest Rated"];
 
   return (
     <div className="flex flex-wrap items-center gap-4">
@@ -84,6 +90,23 @@ const VendorFilters: React.FC<VendorFiltersProps> = ({
         </select>
       </div>
 
+      {/* Verified Toggle */}
+      <div className="flex items-center gap-2 mt-2 md:mt-6">
+        <input
+          type="checkbox"
+          id="verified"
+          checked={showVerifiedOnly}
+          onChange={(e) => onVerifiedToggle(e.target.checked)}
+          className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+        />
+        <label
+          htmlFor="verified"
+          className="text-sm font-medium text-gray-700 dark:text-gray-300"
+        >
+          Show verified only
+        </label>
+      </div>
+
       {/* Supplier Type */}
       <div className="flex flex-col w-full md:w-1/3">
         <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -119,6 +142,8 @@ const VendorFilters: React.FC<VendorFiltersProps> = ({
           ))}
         </select>
       </div>
+
+      
     </div>
   );
 };
