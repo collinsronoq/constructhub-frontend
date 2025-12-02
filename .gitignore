@@ -7,27 +7,100 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Node / JS
 node_modules
+frontend/node_modules
+backend/node_modules
+
+# Build / output
 dist
 dist-ssr
-*.local
+build/
+frontend/dist
+frontend/build
+backend/dist
+
+# Vite / bundler caches
+.vite
+.cache
+.parcel-cache
+.cache/
+.next
+.nuxt
+.out
+
+# Environment
+.env
+.env.local
+.env.*.local
+frontend/.env
+backend/.env
 
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
 .idea
 .DS_Store
+Thumbs.db
+
+# OS / misc
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+*.local
 
-# env if any
-.env
-.env.local
-.env.*.local
+# Python / backend virtualenvs and artifacts
+venv
+backend/venv
+backend/.venv
+.envrc
+.Python
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+pip-wheel-metadata/
+pip-log.txt
+.pytest_cache/
 
+# Databases / coverage
+*.sqlite3
+*.db
+coverage/
+htmlcov/
+.coverage
 
-# my image
+# Misc build/IDE caches
+*.tsbuildinfo
+.cache-loader
+
+# Docker / deployment
+docker-compose.override.yml
+.dockerignore
+.env.production
+.env.development
+
+# CI / test artifacts
+coverage/
+reports/
+test-results/
+
+# Local image/example (kept from existing)
 image_4.jpg
+
+# Backend-specific extras
+backend/*.log
+backend/*.sqlite3
+backend/*.db
+backend/.cache
+backend/.pytest_cache
+backend/.python-version
+
+# Optional: package manager lock files you may want to ignore across workspace
+# (Uncomment if you prefer to ignore lock files in root)
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
