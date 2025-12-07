@@ -56,7 +56,7 @@ class TechnicianProfileResponse(BaseModel):
     user_id: int
     name: str
     location: Optional[str]
-    skill: Optional[str]
+    specialization: Optional[str]
     skills: Optional[List[str]]
     years_experience: Optional[int]
     bio: Optional[str]

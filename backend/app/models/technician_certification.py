@@ -13,7 +13,7 @@ class TechnicianCertification(Base):
         ForeignKey("technician_profiles.id", ondelete="CASCADE"), nullable=False
     )
 
-    title: Mapped[str] = mapped_column(String(255), nullable=False)
+    title: Mapped[str] = mapped_column(String(255), nullable=True)
     issuer: Mapped[str] = mapped_column(String(255), nullable=True)
     file_url: Mapped[str] = mapped_column(String(1024), nullable=False)
 
@@ -21,7 +21,7 @@ class TechnicianCertification(Base):
     rejected: Mapped[bool] = mapped_column(Boolean, default=False)
     admin_comment: Mapped[str] = mapped_column(Text, nullable=True)
 
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    uploaded_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
     verified_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)
 
     technician_profile = relationship("TechnicianProfile", back_populates="certifications")

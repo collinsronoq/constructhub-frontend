@@ -8,7 +8,10 @@ from app.core.database import engine, AsyncSessionLocal
 from app.core.logging import setup_logger
 from app.models.base import Base
 from app.routers import root
-from backend.app.auth.auth_routes import router as auth_router
+from app.routers.technician_routes.technician_profile import router as technician_profile_router
+from app.routers.technician_routes.technician_directory import router as technician_directory_router
+from app.routers.technician_routes.technician_uploads_route import router as  technician_uploads_router
+from app.auth.auth_routes import router as auth_router
 
 logger = setup_logger("app.main")
 
@@ -26,20 +29,15 @@ app.add_middleware(
 app.include_router(root.router)
 app.include_router(auth_router)
 
-os.makedirs("app/uploads/certifications", exist_ok=True)
-os.makedirs("app/uploads/images", exist_ok=True)
+# technician related njia
+app.include_router(technician_profile_router)
+app.include_router(technician_directory_router)
+app.include_router(technician_uploads_router)
 
-app.mount(
-    "/static/certifications",
-    StaticFiles(directory="app/uploads/certifications"),
-    name="certifications",
-)
+os.makedirs("app/static/uploads/technicians/profile_images", exist_ok=True)
+os.makedirs("app/static/uploads/technicians/certifications", exist_ok=True)
 
-app.mount(
-    "/static/images",
-    StaticFiles(directory="app/uploads/images"),
-    name="images",
-)
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 # create tables on startup if desired (for dev only)
 # @app.on_event("startup")

@@ -10,7 +10,7 @@ ALLOWED_IMAGE_EXTENSIONS = {"jpg", "jpeg", "png", "webp"}
 ALLOWED_DOCUMENT_EXTENSIONS = {"pdf"}
 
 ALLOWED_EXTENSIONS = ALLOWED_IMAGE_EXTENSIONS.union(ALLOWED_DOCUMENT_EXTENSIONS)
-
+MAX_IMAGE_BYTES = 10 * 1024 * 1024  # 10 MB
 
 def validate_extension(filename: str):
     ext = filename.split(".")[-1].lower()
@@ -39,31 +39,40 @@ async def save_certification_file(technician_id: int, file: UploadFile) -> str:
         buffer.write(await file.read())
 
     # Return path as URL-style string
-    return f"/static/certifications/{technician_id}/{unique_name}"
+    return f"/static/uploads/technician/certifications/{technician_id}/{unique_name}"
 
 
-async def save_image_file(
-    entity_type: str,     # "technicians", "vendors", "materials"
-    entity_id: int,
-    file: UploadFile
-) -> str:
+# Base upload dir (matches Storage: A)
+BASE_IMAGE_DIR = os.path.join("app", "static", "uploads", "technicians", "profile_images")
 
+os.makedirs(BASE_IMAGE_DIR, exist_ok=True)
+
+
+async def save_technician_profile_image(tech_id: int, file: UploadFile) -> str:
+    """
+    Validate and save uploaded technician profile image.
+    Returns the public static URL (e.g. /static/uploads/technicians/profile_images/tech_23.png).
+    """
     ext = validate_extension(file.filename)
     if ext not in ALLOWED_IMAGE_EXTENSIONS:
-        raise HTTPException(
-            status_code=400,
-            detail="Only image files (jpg, jpeg, png, webp) are allowed"
-        )
+        raise HTTPException(status_code=400, detail=f"Unsupported image type '{ext}'. Allowed: {', '.join(ALLOWED_IMAGE_EXTENSIONS)}")
 
-    dir_path = os.path.join("app/uploads/images", entity_type, str(entity_id))
+    contents = await file.read()
+    size = len(contents)
+    if size == 0:
+        raise HTTPException(status_code=400, detail="Empty file uploaded")
+    if size > MAX_IMAGE_BYTES:
+        raise HTTPException(status_code=413, detail=f"File too large. Max allowed is {MAX_IMAGE_BYTES // (1024*1024)} MB")
+
+    # Deterministic filename as requested (Naming: A)
+    filename = f"tech_{tech_id}.{ext}"
+    dir_path = BASE_IMAGE_DIR
     os.makedirs(dir_path, exist_ok=True)
 
-    unique_name = f"{uuid.uuid4().hex}_{int(datetime.utcnow().timestamp())}.{ext}"
+    full_path = os.path.join(dir_path, filename)
+    # write binary file (sync write is OK for <=10MB; if you want non-blocking use aiofiles)
+    with open(full_path, "wb") as f:
+        f.write(contents)
 
-    full_path = os.path.join(dir_path, unique_name)
-
-    with open(full_path, "wb") as buffer:
-        buffer.write(await file.read())
-
-    # Return the static URL
-    return f"/static/images/{entity_type}/{entity_id}/{unique_name}"
+    # Public static url (main.py will mount /static)
+    return f"/static/uploads/technicians/profile_images/{filename}"
