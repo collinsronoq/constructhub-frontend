@@ -1,6 +1,8 @@
 # app/main.py
 from fastapi import FastAPI
+import os
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from app.core.config import settings
 from app.core.database import engine, AsyncSessionLocal
 from app.core.logging import setup_logger
@@ -23,6 +25,21 @@ app.add_middleware(
 
 app.include_router(root.router)
 app.include_router(auth_router)
+
+os.makedirs("app/uploads/certifications", exist_ok=True)
+os.makedirs("app/uploads/images", exist_ok=True)
+
+app.mount(
+    "/static/certifications",
+    StaticFiles(directory="app/uploads/certifications"),
+    name="certifications",
+)
+
+app.mount(
+    "/static/images",
+    StaticFiles(directory="app/uploads/images"),
+    name="images",
+)
 
 # create tables on startup if desired (for dev only)
 # @app.on_event("startup")
