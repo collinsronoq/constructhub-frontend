@@ -35,6 +35,8 @@ class VendorProfile(Base):
     name: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
     categories: Mapped[list] = mapped_column(JSON, nullable=True)
     location: Mapped[str] = mapped_column(String(255), nullable=True)
+    supplier_type: Mapped[str] = mapped_column(String(100), nullable=True)
+
 
     contact: Mapped[dict] = mapped_column(JSON, nullable=True)  # {phone, email}
     verified: Mapped[bool] = mapped_column(Boolean, default=False)
@@ -55,10 +57,13 @@ class VendorProfile(Base):
         cascade="all, delete-orphan"
     )
 
-    vendor_items = relationship(
-        "VendorItem",
-        back_populates="vendor",
-        cascade="all, delete-orphan"
-    )
+    # vendor_items = relationship(
+    #     "VendorItem",
+    #     back_populates="vendor",
+    #     cascade="all, delete-orphan"
+    # )
+
+    items = relationship("VendorItem", back_populates="vendor", cascade="all, delete-orphan")
+
 
 

@@ -15,6 +15,14 @@ class VendorCreate(BaseModel):
     contact: Optional[VendorContact] = None
     short_description: Optional[str] = None
 
+class VendorUpdate(BaseModel):
+    name: Optional[str] = None
+    categories: Optional[List[str]] = None
+    location: Optional[str] = None
+    contact: Optional[VendorContact] = None
+    short_description: Optional[str] = None
+    availability: Optional[str] = None
+
 class VendorResponse(BaseModel):
     id: int
     user_id: int
@@ -33,3 +41,5 @@ class VendorResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+

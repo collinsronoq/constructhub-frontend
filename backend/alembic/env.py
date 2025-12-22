@@ -8,6 +8,8 @@ import os
 
 # Load dotenv for DATABASE_URL
 from dotenv import load_dotenv
+
+from backend.app.models import vendor_item
 load_dotenv("backend/.env")
 
 # Alembic Config object
@@ -16,7 +18,7 @@ fileConfig(str(config.config_file_name))
 
 # Import your models
 from app.models.base import Base
-from app.models import user, vendor, technician, material, vendor_material, article, estimate
+from app.models import user, vendor, technician, material, article, estimate
 
 target_metadata = Base.metadata
 
