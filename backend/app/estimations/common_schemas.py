@@ -62,3 +62,32 @@ class EstimateSummary(BaseModel):
 class EstimationResponse(BaseModel):
     summary: EstimateSummary
     breakdown: EstimationBreakdown
+
+
+# hizi ni mambo ya breakdown, hizo phases zake mob specifically
+
+class LabourCost(BaseModel):
+    role: str
+    rate_per_day: float
+    days: int
+    total: float
+
+
+class OtherCost(BaseModel):
+    name: str
+    amount: float
+
+
+class PhaseTotals(BaseModel):
+    materials: float
+    labour: float
+    other: float
+    phase_total: float
+
+
+class PhaseEstimate(BaseModel):
+    phase: str
+    materials: List = []
+    labour: List[LabourCost]
+    other_costs: List[OtherCost]
+    totals: PhaseTotals
