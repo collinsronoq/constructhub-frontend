@@ -72,6 +72,12 @@ class LabourCost(BaseModel):
     days: int
     total: float
 
+class MaterialCost(BaseModel):
+    name: str
+    quantity: float
+    unit: str
+    unit_cost: float
+    subtotal: float
 
 class OtherCost(BaseModel):
     name: str
