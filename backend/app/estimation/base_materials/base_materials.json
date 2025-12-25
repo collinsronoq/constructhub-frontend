@@ -100,6 +100,40 @@
         "phases": ["earthworks", "foundation"]
       }
     }
+  },
+
+  "material_3":{
+    "blockwork": {
+      "machine_cut_stone": {
+        "unit": "piece",
+        "price": 65
+      },
+      "concrete_block": {
+        "unit": "piece",
+        "price": 75
+      },
+      "burnt_brick": {
+        "unit": "piece",
+        "price": 45
+      }
+    },
+    "cement": {
+      "unit": "bag",
+      "price": 720
+    },
+    "sand": {
+      "unit": "tonne",
+      "price": 1800
+    },
+    "ballast": {
+      "unit": "tonne",
+      "price": 2200
+    },
+    "reinforcement": {
+      "unit": "kg",
+      "price": 160
+    }
   }
+
 
 }
