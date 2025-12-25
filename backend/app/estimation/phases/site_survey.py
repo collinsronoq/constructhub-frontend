@@ -1,6 +1,6 @@
 # app/estimations/phases/site_survey.py
-from app.estimations.schemas.site_survey import SiteSurveyInput
-from app.estimations.common_schemas import (
+from app.estimation.schemas.site_survey import SiteSurveyInput
+from app.estimation.common_schemas import (
     PhaseEstimate,
     LabourCost,
     OtherCost,
@@ -13,7 +13,7 @@ def estimate_site_survey(data: SiteSurveyInput) -> PhaseEstimate:
     Estimate site survey costs (labour-only phase).
     """
 
-    # --- Base surveyor rates (can later be moved to config / JSON) ---
+    #  Base surveyor rates (can later be moved to config / JSON) 
     SURVEYOR_DAILY_RATE = 5000
     DAYS_REQUIRED = 1 if data.plot_size_sqm <= 500 else 2
 

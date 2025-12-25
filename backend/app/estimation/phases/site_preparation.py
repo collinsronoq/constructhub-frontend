@@ -1,6 +1,6 @@
 # app/estimations/phases/site_preparation.py
-from app.estimations.schemas.site_preparation import SitePreparationInput
-from app.estimations.common_schemas import (
+from app.estimation.schemas.site_preparation import SitePreparationInput
+from app.estimation.common_schemas import (
     PhaseEstimate,
     LabourCost,
     OtherCost,

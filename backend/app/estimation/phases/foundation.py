@@ -1,7 +1,7 @@
 import math
 
-from app.estimations.schemas.foundation import FoundationInput
-from app.estimations.common_schemas import (
+from app.estimation.schemas.foundation import FoundationInput
+from app.estimation.common_schemas import (
     PhaseEstimate,
     MaterialCost,
     LabourCost,

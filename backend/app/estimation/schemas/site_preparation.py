@@ -7,4 +7,4 @@ class SitePreparationInput(BaseModel):
     soil_type: str  # soft | medium | rocky
     excavation_depth_m: float
     include_disposal: bool = True
-    access_difficulty: Literal["normal", "difficult"] = "normal"  # normal | difficult
+    access_difficulty: Literal["normal", "difficult"] = "normal"  
