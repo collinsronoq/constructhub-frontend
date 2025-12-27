@@ -133,7 +133,102 @@
       "unit": "kg",
       "price": 160
     }
+  },
+
+  "roofing_materials":{
+    
+    "roofing_sheet": {
+      "mabati": 1200,
+      "tile": 1800
+    },
+    "timber": {
+      "cypress": 65000
+    },
+    "nails": 250,
+    "ridge_cap": 1200,
+    "cement": 750,
+    "reinforcement": 160,
+    "waterproofing": 850,
+    "formwork": 1200
+  },
+
+  "services_first_fix_materials": {
+    "pvc_conduit": { "price": 180 },
+    "cable_lighting": { "price": 75 },
+    "cable_power": { "price": 120 },
+    "junction_box": { "price": 150 },
+    "ppr_cold": { "price": 260 },
+    "ppr_hot": { "price": 360 },
+    "pvc_waste": { "price": 280 },
+    "earthing_rod": { "price": 1800 }
+  },
+
+  "services_second_fix_materials": {
+    "switch": { "price": 350 },
+    "socket": { "price": 550 },
+    "light_fitting": { "price": 1500 },
+    "toilet_set": { "price": 14000 },
+    "basin": { "price": 5000 },
+    "kitchen_sink": { "price": 8500 },
+    "shower_mixer": { "price": 9500 },
+    "instant_shower": { "price": 12000 }
+  },
+
+  "finishes_materials": {
+    "floor_tile_main": { "price": 1800 },
+    "floor_tile_wet_ceramic": { "price": 1600 },
+    "floor_tile_wet_porcelain": { "price": 2100 },
+    "laminate_floor": { "price": 1900 },
+    "parquet_floor": { "price": 2600 },
+    "polished_screed": { "price": 1400 },
+    "wall_tile": { "price": 1700 },
+    "tile_adhesive_bag": { "price": 950 },
+    "tile_grout_bag": { "price": 750 },
+
+    "plaster_mortar": { "price": 550 },
+
+    "gypsum_board": { "price": 1250 },
+    "acoustic_board": { "price": 1450 },
+    "tng_board": { "price": 1800 },
+    "ceiling_frame": { "price": 650 },
+    "cornice": { "price": 350 },
+    "skirting": { "price": 250 },
+
+    "paint_interior": { "price": 550 },
+    "paint_ceiling": { "price": 450 },
+    "paint_exterior": { "price": 650 },
+    "primer": { "price": 480 },
+
+    "door_internal_set": { "price": 14500 },
+    "wardrobe_per_m": { "price": 8500 },
+    "kitchen_cabinet_per_m": { "price": 12000 },
+    "countertop_per_m": { "price": 8500 }
+  },
+
+  "external_works_materials": {
+    "paving_block": { "price": 1500 },
+    "kerbstone": { "price": 300 },
+    "drainage_pipe": { "price": 500 },
+    "landscaping_topsoil": { "price": 250 },
+
+    "wall_block": { "price": 70 },
+    "mortar": { "price": 650 },
+    "concrete_m3": { "price": 8500 },
+    "reinforcement": { "price": 160 },
+    "plaster_mortar": { "price": 550 },
+    "chain_link_mesh": { "price": 380 },
+    "concrete_post": { "price": 950 },
+    "precast_panel_per_m": { "price": 2400 },
+    "razor_wire": { "price": 320 },
+    "gate_standard": { "price": 42000 },
+
+    "sewer_pipe": { "price": 480 },
+    "manhole": { "price": 7500 },
+    "biodigester_unit": { "price": 95000 }
   }
+
+
+
 
 
 }

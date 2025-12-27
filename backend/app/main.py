@@ -12,6 +12,8 @@ from app.routers.technician_routes.technician_profile import router as technicia
 from app.routers.technician_routes.technician_directory import router as technician_directory_router
 from app.routers.technician_routes.technician_uploads_route import router as  technician_uploads_router
 from app.auth.auth_routes import router as auth_router
+from app.routers.estimation import router as estimation_router
+from app.routers.recommendations import router as recommendations_router
 
 logger = setup_logger("app.main")
 
@@ -28,6 +30,8 @@ app.add_middleware(
 
 app.include_router(root.router)
 app.include_router(auth_router)
+app.include_router(estimation_router)
+app.include_router(recommendations_router)
 
 # technician related njia
 app.include_router(technician_profile_router)
