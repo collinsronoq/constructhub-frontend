@@ -10,7 +10,7 @@ StructureType = Literal[
 ]
 
 BlockworkType = Literal[
-    "bricks",
+    "burnt_bricks",
     "concrete_blocks",
     "machine_cut_blocks"
 ]
@@ -32,6 +32,10 @@ class SuperstructureInput(BaseModel):
     # Room configuration
     bedrooms: int = Field(..., ge=1)
     bathrooms: int = Field(..., ge=1)
+    master_bedrooms: int = Field(0, ge=0)
+    living_rooms: int = Field(1, ge=0)
+    dining_rooms: int = Field(1, ge=0)
+    kitchens: int = Field(1, ge=0)
 
     additional_rooms: Dict[str, RoomSelection] = Field(
         default_factory=dict,
@@ -44,13 +48,12 @@ class SuperstructureInput(BaseModel):
         "standard",
         "spacious"
     ] = "standard"
+    finishing_level: Literal["standard", "premium", "luxury"] = "standard"
 
     @field_validator("declared_floor_area_sqm")
-    def validate_declared_floor_area(cls, value, values):
+    def validate_declared_floor_area(cls, value, info):
         if value:
-            land_size = values.get("land_size_sqm")
+            land_size = info.data.get("land_size_sqm") if hasattr(info, "data") else None
             if land_size and value > land_size:
-                raise ValueError(
-                    "Declared floor area cannot exceed land size"
-                )
+                raise ValueError("Declared floor area cannot exceed land size")
         return value

@@ -26,6 +26,11 @@ class SuperstructureQuantities:
     slab_area_sqm: float
     slab_concrete_volume_m3: float
 
+    cement_bags: float
+    sand_tonnes: float
+    ballast_tonnes: float
+    reinforcement_kg: float
+
 
 def quantify_superstructure(
     total_floor_area_sqm: float,
@@ -58,6 +63,17 @@ def quantify_superstructure(
     slab_area = total_floor_area_sqm
     slab_volume = round(slab_area * 0.125, 2)  # 125mm slab
 
+    # Concrete mix heuristics (reuse foundation ratios)
+    cement_bags_per_m3 = 6.5
+    sand_tons_per_m3 = 0.5
+    ballast_tons_per_m3 = 0.8
+
+    cement_bags = round((mortar_volume * cement_bags_per_m3) + (slab_volume * cement_bags_per_m3), 1)
+    sand_tonnes = round((mortar_volume * 1.6) + (slab_volume * sand_tons_per_m3), 2)
+    ballast_tonnes = round(slab_volume * ballast_tons_per_m3, 2)
+
+    reinforcement_kg = round((slab_volume * 80) + (beam_length * 10), 2)
+
     return SuperstructureQuantities(
         wall_area_sqm=round(wall_area, 2),
         net_wall_area_sqm=round(net_wall_area, 2),
@@ -67,4 +83,8 @@ def quantify_superstructure(
         beam_length_m=beam_length,
         slab_area_sqm=slab_area,
         slab_concrete_volume_m3=slab_volume,
+        cement_bags=cement_bags,
+        sand_tonnes=sand_tonnes,
+        ballast_tonnes=ballast_tonnes,
+        reinforcement_kg=reinforcement_kg,
     )

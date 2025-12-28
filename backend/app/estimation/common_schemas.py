@@ -15,7 +15,31 @@ class MaterialCost(BaseModel):
     quantity: float
     unit: str
     unit_cost: float
-    total: float
+    subtotal: float | None = None
+    total: float | None = None
+
+    @property
+    def effective_subtotal(self) -> float:
+        if self.subtotal is not None:
+            return self.subtotal
+        if self.total is not None:
+            return self.total
+        return 0.0
+
+    @property
+    def effective_total(self) -> float:
+        if self.total is not None:
+            return self.total
+        if self.subtotal is not None:
+            return self.subtotal
+        return 0.0
+
+    def model_post_init(self, __context):
+        # Normalize subtotal/total so both are populated
+        if self.subtotal is None and self.total is not None:
+            object.__setattr__(self, "subtotal", self.total)
+        if self.total is None and self.subtotal is not None:
+            object.__setattr__(self, "total", self.subtotal)
 
 
 class OtherCost(BaseModel):

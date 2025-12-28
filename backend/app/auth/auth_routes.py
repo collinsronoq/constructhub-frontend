@@ -1,5 +1,6 @@
 # app/auth/routes.py
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_db
@@ -57,16 +58,22 @@ async def register(payload: RegisterRequest, db: AsyncSession = Depends(get_db))
 
 
 @router.post("/login", response_model=AuthResponse)
-async def login(payload: LoginRequest, db: AsyncSession = Depends(get_db)):
+async def login(
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    db: AsyncSession = Depends(get_db),
+):
     try:
-        q = await db.execute(select(User).where(User.email == payload.email))
+        email = form_data.username
+        password = form_data.password
+
+        q = await db.execute(select(User).where(User.email == email))
         user = q.scalars().first()
         if not user:
-            logger.warning(f"Login failed - unknown email: {payload.email}")
+            logger.warning(f"Login failed - unknown email: {email}")
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
 
-        if not verify_password(payload.password, user.hashed_password):
-            logger.warning(f"Login failed - invalid password: {payload.email}")
+        if not verify_password(password, user.hashed_password):
+            logger.warning(f"Login failed - invalid password: {email}")
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
 
         token_payload = {"sub": str(user.id), "name": user.name, "email": user.email, "role": user.role}
@@ -95,5 +102,6 @@ async def logout(current_user: User = Depends(get_current_user)):
 @router.get("/me", response_model=UserResponse)
 async def me(current_user: User = Depends(get_current_user)):
     
+    logger.info(f"current user details{current_user}")
     return UserResponse.model_validate(current_user)
     # raise HTTPException(status_code=501, detail="Use /auth/me with dependency injection")

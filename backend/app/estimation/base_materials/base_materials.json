@@ -104,17 +104,17 @@
 
   "material_3":{
     "blockwork": {
-      "machine_cut_stone": {
+      "burnt_bricks": {
         "unit": "piece",
-        "price": 65
+        "price": 45
       },
-      "concrete_block": {
+      "concrete_blocks": {
         "unit": "piece",
         "price": 75
       },
-      "burnt_brick": {
+      "machine_cut_blocks": {
         "unit": "piece",
-        "price": 45
+        "price": 65
       }
     },
     "cement": {
@@ -133,6 +133,18 @@
       "unit": "kg",
       "price": 160
     }
+  },
+
+  "superstructure_materials": {
+    "blockwork": {
+      "burnt_bricks": { "unit": "piece", "price": 45 },
+      "concrete_blocks": { "unit": "piece", "price": 75 },
+      "machine_cut_blocks": { "unit": "piece", "price": 65 }
+    },
+    "cement": { "unit": "bag", "price": 720 },
+    "sand": { "unit": "tonne", "price": 1800 },
+    "ballast": { "unit": "tonne", "price": 2200 },
+    "reinforcement": { "unit": "kg", "price": 160 }
   },
 
   "roofing_materials":{

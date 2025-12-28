@@ -48,45 +48,54 @@ def estimate_superstructure(
     
     footprint = resolve_land_feasibility(
         land_size_sqm=data.land_size_sqm,
-        storeys=data.storeys,
+        structure_type=data.structure_type,
     )
 
-    
     # Level 4: Automatic floor area derivation
-    
+    room_quantities = {
+        "bedroom": data.bedrooms,
+        "master_bedroom": data.master_bedrooms,
+        "bathroom": data.bathrooms,
+        "kitchen": data.kitchens,
+        "dining": data.dining_rooms,
+        "living_room": data.living_rooms,
+    }
+    for name, room in data.additional_rooms.items():
+        room_quantities[name] = room.count
+
     floor_area = resolve_floor_area_from_rooms(
-        rooms=data.rooms,
-        footprint=footprint,
-        storeys=data.storeys,
+        room_quantities=room_quantities,
+        max_allowable_floor_area_sqm=footprint.total_allowable_floor_area_sqm,
     )
 
     
     # Level 5: Material quantification
     
+    effective_floor_area = data.declared_floor_area_sqm or floor_area.total_floor_area_sqm
+
     quantities = quantify_superstructure(
-        floor_area_sqm=floor_area.total_floor_area,
-        storeys=data.storeys,
-        block_type=data.block_type,
-        quality=data.finishing_level,
+        total_floor_area_sqm=effective_floor_area,
+        number_of_storeys=footprint.floors,
+        blockwork_type=data.blockwork_type,
     )
 
     
     # Level 6: Labour estimation
     
-    labour_items = estimate_superstructure_labour(
-        floor_area_sqm=floor_area.total_floor_area,
-        storeys=data.storeys,
-        complexity=data.structure_complexity,
+    labour_phase = estimate_superstructure_labour(
+        quantities=quantities,
+        finishing_level=data.finishing_level,
+        number_of_storeys=footprint.floors,
     )
-
-    labour_total = sum(l.total for l in labour_items)
+    labour_items = labour_phase.labour
+    labour_total = labour_phase.totals.labour
 
     
     # Level 7: Material pricing
     
     material_pricing = price_superstructure_materials(
         quantities=quantities,
-        block_type=data.block_type,
+        blockwork_type=data.blockwork_type,
         vendor_prices=vendor_prices,
     )
 

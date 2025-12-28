@@ -4,37 +4,44 @@ from app.estimation.common_schemas import (
     PhaseTotals,
 )
 from app.estimation.phases.superstructure.superstructure_quantifier import SuperstructureQuantities
+from app.estimation.base_materials.loader import load_base_materials
 from app.estimation.logic.price_resolver import resolve_material_price
 
 
 def price_superstructure_materials(
     quantities: SuperstructureQuantities,
-    block_type: str,
+    blockwork_type: str,
     vendor_prices: dict | None = None,
 ) -> PhaseEstimate:
     """
     Price superstructure materials using base or vendor prices.
     """
 
-    base_prices = load_base_materials().get("materials_2", {}).get("materials", {})
+    base_prices = load_base_materials().get("superstructure_materials", {})
+    if not base_prices:
+        raise ValueError("Base prices for superstructure (superstructure_materials) not found.")
+
     vendor_prices = vendor_prices or {}
+
+    def get_price(key: str, variant: str | None = None, vendor_key: str | None = None) -> float:
+        vp = vendor_prices.get(vendor_key or key)
+        return resolve_material_price(
+            material_key=key,
+            variant=variant,
+            base_prices=base_prices,
+            vendor_price=vp,
+        )
 
     materials = []
 
     # --- BLOCKWORK ---
-    block_price = resolve_material_price(
-        material_key="blockwork",
-        variant=block_type,
-        base_prices=base_prices,
-        vendor_price=vendor_prices.get("blockwork"),
-    )
-
-    block_cost = quantities.total_blocks * block_price
+    block_price = get_price("blockwork", variant=blockwork_type, vendor_key="blockwork")
+    block_cost = quantities.block_units * block_price
 
     materials.append(
         MaterialCost(
-            name=f"{block_type.replace('_', ' ').title()} Blocks",
-            quantity=quantities.total_blocks,
+            name=f"{blockwork_type.replace('_', ' ').title()} Blocks",
+            quantity=quantities.block_units,
             unit="pieces",
             unit_cost=block_price,
             total=round(block_cost),
@@ -42,15 +49,8 @@ def price_superstructure_materials(
     )
 
     # --- CEMENT ---
-    cement_price = resolve_material_price(
-        "cement",
-        None,
-        base_prices,
-        vendor_prices.get("cement"),
-    )
-
+    cement_price = get_price("cement")
     cement_cost = quantities.cement_bags * cement_price
-
     materials.append(
         MaterialCost(
             name="Cement",
@@ -62,15 +62,8 @@ def price_superstructure_materials(
     )
 
     # --- SAND ---
-    sand_price = resolve_material_price(
-        "sand",
-        None,
-        base_prices,
-        vendor_prices.get("sand"),
-    )
-
+    sand_price = get_price("sand")
     sand_cost = quantities.sand_tonnes * sand_price
-
     materials.append(
         MaterialCost(
             name="Sand",
@@ -82,15 +75,8 @@ def price_superstructure_materials(
     )
 
     # --- BALLAST ---
-    ballast_price = resolve_material_price(
-        "ballast",
-        None,
-        base_prices,
-        vendor_prices.get("ballast"),
-    )
-
+    ballast_price = get_price("ballast")
     ballast_cost = quantities.ballast_tonnes * ballast_price
-
     materials.append(
         MaterialCost(
             name="Ballast",
@@ -102,15 +88,8 @@ def price_superstructure_materials(
     )
 
     # --- REINFORCEMENT ---
-    steel_price = resolve_material_price(
-        "reinforcement",
-        None,
-        base_prices,
-        vendor_prices.get("reinforcement"),
-    )
-
+    steel_price = get_price("reinforcement")
     steel_cost = quantities.reinforcement_kg * steel_price
-
     materials.append(
         MaterialCost(
             name="Reinforcement Steel",
@@ -121,7 +100,7 @@ def price_superstructure_materials(
         )
     )
 
-    material_total = sum(m.total for m in materials)
+    material_total = sum(m.effective_total for m in materials)
 
     totals = PhaseTotals(
         materials=material_total,
