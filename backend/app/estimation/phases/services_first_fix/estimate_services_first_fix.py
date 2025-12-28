@@ -1,5 +1,5 @@
 from app.estimation.common_schemas import PhaseEstimate, PhaseTotals
-from app.estimation.schemas.services_1 import ServicesFirstFixInput
+from app.estimation.schemas.services import ServicesFirstFixInput
 from app.estimation.phases.services_first_fix.quantifier import quantify_services_first_fix
 from app.estimation.phases.services_first_fix.material_pricier import price_services_first_fix_materials
 from app.estimation.phases.services_first_fix.labour import estimate_services_first_fix_labour

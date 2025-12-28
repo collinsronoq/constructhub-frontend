@@ -4,7 +4,6 @@ from app.estimation.common_schemas import (
     PhaseTotals,
 )
 from app.estimation.phases.superstructure.superstructure_quantifier import SuperstructureQuantities
-from app.estimation.base_materials.loader import load_base_materials
 from app.estimation.logic.price_resolver import resolve_material_price
 
 
@@ -17,7 +16,7 @@ def price_superstructure_materials(
     Price superstructure materials using base or vendor prices.
     """
 
-    base_prices = load_base_materials()
+    base_prices = load_base_materials().get("materials_2", {}).get("materials", {})
     vendor_prices = vendor_prices or {}
 
     materials = []

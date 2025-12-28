@@ -1,7 +1,7 @@
 from math import ceil
 
 from app.estimation.common_schemas import LabourCost, PhaseEstimate, PhaseTotals
-from app.estimation.schemas.services_1 import ServicesFirstFixQuantities, ServicesFirstFixInput
+from app.estimation.schemas.services import ServicesFirstFixQuantities, ServicesFirstFixInput
 
 ELECTRICIAN_RATE = 2700
 ELECTRICAL_HELPER_RATE = 1500

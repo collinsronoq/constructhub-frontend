@@ -53,8 +53,8 @@ class VendorProfile(Base):
 
     reviews = relationship(
         "Review",
-        back_populates="vendor_profile",
-        cascade="all, delete-orphan"
+        primaryjoin="foreign(Review.reviewee_id)==VendorProfile.user_id",
+        viewonly=True,
     )
 
     # vendor_items = relationship(

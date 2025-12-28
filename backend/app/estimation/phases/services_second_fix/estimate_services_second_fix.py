@@ -1,5 +1,5 @@
 from app.estimation.common_schemas import PhaseEstimate, PhaseTotals
-from backend.app.estimation.schemas.services_2 import ServicesSecondFixInput
+from app.estimation.schemas.services import ServicesSecondFixInput
 from app.estimation.phases.services_second_fix.quantifier import quantify_services_second_fix
 from app.estimation.phases.services_second_fix.material_pricier import price_services_second_fix_materials
 from app.estimation.phases.services_second_fix.labour import estimate_services_second_fix_labour

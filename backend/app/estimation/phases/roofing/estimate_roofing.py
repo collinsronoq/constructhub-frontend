@@ -3,7 +3,7 @@
 from app.estimation.common_schemas import PhaseEstimate, PhaseTotals
 
 from app.estimation.schemas.roofing import RoofingInput
-from backend.app.estimation.phases.roofing.roofing_geometry import derive_roof_geometry
+from app.estimation.phases.roofing.roofing_geometry import derive_roof_geometry
 from app.estimation.phases.roofing.roofing_quantifier import (
     quantify_roofing,
 )

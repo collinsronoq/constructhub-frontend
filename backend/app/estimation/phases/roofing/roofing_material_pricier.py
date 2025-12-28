@@ -18,7 +18,7 @@ def price_roofing_materials(
     Price roofing materials using base or vendor prices.
     """
 
-    base_prices = load_base_materials()
+    base_prices = load_base_materials().get("roofing_materials", {})
     vendor_prices = vendor_prices or {}
 
     materials: list[MaterialCost] = []

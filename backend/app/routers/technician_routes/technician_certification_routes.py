@@ -24,30 +24,37 @@ async def upload_certification(
     payload: TechnicianCertificationCreate,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(role_required("technician"))
-):
-    # get technician profile
-    q = await db.execute(
-        select(TechnicianProfile).where(TechnicianProfile.user_id == current_user.id)
-    )
-    profile = q.scalars().first()
+):  
+    try:
+        # get technician profile
+        q = await db.execute(
+            select(TechnicianProfile).where(TechnicianProfile.user_id == current_user.id)
+        )
+        profile = q.scalars().first()
 
-    if not profile:
-        raise HTTPException(status_code=404, detail="Technician profile not found")
+        if not profile:
+            raise HTTPException(status_code=404, detail="Technician profile not found")
 
-    cert = TechnicianCertification(
-        technician_id=profile.id,
-        title=payload.title,
-        issuer=payload.issuer,
-        file_url=payload.file_url,
-    )
+        cert = TechnicianCertification(
+            technician_id=profile.id,
+            title=payload.title,
+            issuer=payload.issuer,
+            file_url=payload.file_url,
+        )
 
-    db.add(cert)
-    await db.commit()
-    await db.refresh(cert)
+        db.add(cert)
+        await db.commit()
+        await db.refresh(cert)
 
-    logger.info(f"Certification uploaded by {current_user.email}: {payload.title}")
-    return cert
+        logger.info(f"Certification uploaded by {current_user.email}: {payload.title}")
+        return cert
 
+    except HTTPException:
+        raise
+
+    except Exception as exc:
+        logger.exception("Failed to upload technician certification")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Unexpeted error incurred") from exc
 
 
 # Technician View Their Certifications
@@ -57,10 +64,19 @@ async def get_my_certifications(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(role_required("technician"))
 ):
-    q = await db.execute(
-        select(TechnicianCertification)
-        .join(TechnicianProfile)
-        .where(TechnicianProfile.user_id == current_user.id)
-    )
-    certifications = q.scalars().all()
-    return certifications
+    try:
+        q = await db.execute(
+            select(TechnicianCertification)
+            .join(TechnicianProfile)
+            .where(TechnicianProfile.user_id == current_user.id)
+        )
+        certifications = q.scalars().all()
+        return certifications
+
+    
+    except HTTPException:
+        raise
+
+    except Exception as exc:
+        logger.exception("Failed to load technician certifications")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Unexpeted error incurred") from exc

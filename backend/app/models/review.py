@@ -21,5 +21,13 @@ class Review(Base):
     reviewee = relationship("User", foreign_keys=[reviewee_id], back_populates="reviews_received")
 
     # convenience convenience backrefs (not required but helpful)
-    vendor_profile = relationship("VendorProfile", primaryjoin="Review.reviewee_id==VendorProfile.user_id", viewonly=True)
-    technician_profile = relationship("TechnicianProfile", primaryjoin="Review.reviewee_id==TechnicianProfile.user_id", viewonly=True)
+    vendor_profile = relationship(
+        "VendorProfile",
+        primaryjoin="foreign(Review.reviewee_id)==VendorProfile.user_id",
+        viewonly=True,
+    )
+    technician_profile = relationship(
+        "TechnicianProfile",
+        primaryjoin="foreign(Review.reviewee_id)==TechnicianProfile.user_id",
+        viewonly=True,
+    )

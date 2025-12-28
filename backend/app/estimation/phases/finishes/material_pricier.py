@@ -25,9 +25,7 @@ def price_finishes_materials(
     Price finishes materials using base or vendor overrides.
     """
 
-    raw_base = load_base_materials()
-    base_dict = raw_base if isinstance(raw_base, dict) else raw_base.model_dump()
-
+    base_dict = load_base_materials()
     finishes_prices = base_dict.get("finishes_materials", {})
     vendor_block = (vendor_prices or {}).get("finishes_materials", {})
 

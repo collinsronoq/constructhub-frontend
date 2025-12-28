@@ -25,6 +25,7 @@ class User(Base):
 
     # Optional one-to-one relationships
     vendor_profile = relationship("VendorProfile", back_populates="user", uselist=False)
+    vendor = relationship("Vendor", back_populates="user", uselist=False)
     technician_profile = relationship("TechnicianProfile", back_populates="user", uselist=False)
 
     # reviews written by this user

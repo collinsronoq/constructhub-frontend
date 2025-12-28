@@ -8,8 +8,9 @@ BASE_DIR = Path(__file__).resolve().parent
 MATERIALS_FILE = BASE_DIR / "base_materials.json"
 
 
-def load_base_materials() -> BaseMaterialsCatalog:
+def load_base_materials() -> dict:
+    """
+    Load base materials JSON as a plain dict.
+    """
     with open(MATERIALS_FILE, "r", encoding="utf-8") as f:
-        raw_data = json.load(f)
-
-    return BaseMaterialsCatalog(**raw_data)
+        return json.load(f)

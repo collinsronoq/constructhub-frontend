@@ -1,7 +1,7 @@
 from app.estimation.common_schemas import MaterialCost, PhaseEstimate, PhaseTotals
 from app.estimation.logic.price_resolver import resolve_material_price
 from app.estimation.base_materials.loader import load_base_materials
-from app.estimation.schemas.services_1 import ServicesFirstFixQuantities
+from app.estimation.schemas.services import ServicesFirstFixQuantities
 
 
 def price_services_first_fix_materials(
@@ -12,7 +12,7 @@ def price_services_first_fix_materials(
     Price first-fix materials using base or vendor overrides.
     """
 
-    base_prices = load_base_materials()
+    base_prices = load_base_materials().get("services_first_fix_materials", {})
     vendor_prices = vendor_prices or {}
 
     materials: list[MaterialCost] = []

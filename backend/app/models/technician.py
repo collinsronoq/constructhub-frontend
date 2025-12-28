@@ -2,24 +2,6 @@ from sqlalchemy import String, Integer, Float, Boolean, Text, ForeignKey, JSON
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.models.base import Base
 
-class Technician(Base):
-    __tablename__ = "technicians"
-
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), unique=True, nullable=True)
-    name: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
-    skill: Mapped[str] = mapped_column(String(120), nullable=False)  # single skill per your decision
-    location: Mapped[str] = mapped_column(String(120), nullable=True)
-    rating: Mapped[float] = mapped_column(Float, default=0.0)
-    verified: Mapped[bool] = mapped_column(Boolean, default=False)
-    short_description: Mapped[str] = mapped_column(Text, nullable=True)
-
-    user = relationship("User", back_populates="technician")
-
-
-
-# app/models/technician_profile.py
-
 
 class TechnicianProfile(Base):
     __tablename__ = "technician_profiles"
@@ -57,4 +39,8 @@ class TechnicianProfile(Base):
 )
 
     user = relationship("User", back_populates="technician_profile")
-    reviews = relationship("Review", back_populates="technician_profile", cascade="all, delete-orphan")
+    reviews = relationship(
+        "Review",
+        primaryjoin="foreign(Review.reviewee_id)==TechnicianProfile.user_id",
+        viewonly=True,
+    )

@@ -2,7 +2,7 @@
 from pydantic import BaseModel, EmailStr, Field
 from typing import List, Optional, Dict
 from datetime import datetime
-from backend.app.schemas.vendor_item_schema import VendorItem
+from app.schemas.vendor_item_schema import VendorItemResponse
 
 class VendorContact(BaseModel):
     phone: Optional[str] = None
@@ -37,7 +37,7 @@ class VendorResponse(BaseModel):
     availability: Optional[str] = None
     short_description: Optional[str] = None
 
-    vendor_items: List[VendorItem] = []
+    vendor_items: List[VendorItemResponse] = []
 
     class Config:
         from_attributes = True

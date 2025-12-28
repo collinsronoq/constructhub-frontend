@@ -1,70 +1,7 @@
 # estimations/schemas.py
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import List
 
-
-class MaterialItem(BaseModel):
-    id: str
-    name: str
-    qty: float
-    unit: str
-    unitCost: float
-    subtotal: float
-
-
-class LabourItem(BaseModel):
-    id: str
-    role: str
-    days: int
-    ratePerDay: float
-    subtotal: float
-
-
-class PhaseEstimate(BaseModel):
-    id: str
-    title: str
-    subtotal: float
-    materials: List[MaterialItem]
-    labour: List[LabourItem]
-    technicians: List[str]
-
-
-class EstimationBreakdown(BaseModel):
-    projectTitle: str
-    floorArea: int
-    quality: str
-    phases: List[PhaseEstimate]
-
-    recommendations: dict
-
-
-class CategoryCost(BaseModel):
-    name: str
-    cost: float
-
-
-class EstimateSummary(BaseModel):
-    projectName: str
-    projectType: str
-    location: str
-    totalCost: float
-    duration: str
-
-    materialCost: float
-    laborCost: float
-    avgKenyaCost: float
-    potentialSavings: float
-    keyChoices: List[str]
-
-    categories: List[CategoryCost]
-
-
-class EstimationResponse(BaseModel):
-    summary: EstimateSummary
-    breakdown: EstimationBreakdown
-
-
-# hizi ni mambo ya breakdown, hizo phases zake mob specifically
 
 class LabourCost(BaseModel):
     role: str
@@ -72,12 +9,14 @@ class LabourCost(BaseModel):
     days: int
     total: float
 
+
 class MaterialCost(BaseModel):
     name: str
     quantity: float
     unit: str
     unit_cost: float
-    subtotal: float
+    total: float
+
 
 class OtherCost(BaseModel):
     name: str
@@ -93,7 +32,7 @@ class PhaseTotals(BaseModel):
 
 class PhaseEstimate(BaseModel):
     phase: str
-    materials: List = []
-    labour: List[LabourCost]
-    other_costs: List[OtherCost]
+    materials: List[MaterialCost] = Field(default_factory=list)
+    labour: List[LabourCost] = Field(default_factory=list)
+    other_costs: List[OtherCost] = Field(default_factory=list)
     totals: PhaseTotals

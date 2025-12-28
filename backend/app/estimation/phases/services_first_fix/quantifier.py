@@ -1,6 +1,6 @@
 from math import ceil
 
-from app.estimation.schemas.services_1 import (
+from app.estimation.schemas.services import (
     ServicesFirstFixInput,
     ServicesFirstFixQuantities,
 )
