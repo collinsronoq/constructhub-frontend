@@ -129,7 +129,7 @@ async def save_vendor_logo(vendor_id: int, file: UploadFile) -> str:
 BASE_VENDOR_ITEMS_DIR = os.path.join("app", "static", "uploads", "vendors", "items")
 os.makedirs(BASE_VENDOR_ITEMS_DIR, exist_ok=True)
 
-async def save_vendor_item_image(vendor_id: int, file: UploadFile) -> str:
+async def save_vendor_item_image(vendor_id: int, item_id: int, file: UploadFile) -> str:
     ext = validate_extension(file.filename)
     if ext not in ALLOWED_IMAGE_EXTENSIONS:
         raise HTTPException(status_code=400, detail="Invalid image type")
@@ -142,11 +142,13 @@ async def save_vendor_item_image(vendor_id: int, file: UploadFile) -> str:
     if size > MAX_IMAGE_BYTES:
         raise HTTPException(status_code=413, detail="File too large")
 
-    filename = f"vendor_{vendor_id}_{uuid.uuid4().hex}.{ext}"
-    dir_path = BASE_VENDOR_ITEMS_DIR
+    filename = f"vendor_{vendor_id}_item_{item_id}_{uuid.uuid4().hex}.{ext}"
+    dir_path = os.path.join(BASE_VENDOR_ITEMS_DIR, str(vendor_id), str(item_id))
     full_path = os.path.join(dir_path, filename)
+
+    os.makedirs(dir_path, exist_ok=True)
 
     with open(full_path, "wb") as f:
         f.write(contents)
 
-    return f"/static/uploads/vendors/items/{filename}"
+    return f"/static/uploads/vendors/items/{vendor_id}/{item_id}/{filename}"

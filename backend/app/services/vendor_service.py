@@ -27,8 +27,12 @@ class VendorService:
             name=data.name,
             categories=data.categories,
             location=data.location,
-            contact=data.contact.dict() if data.contact else None,
+            supplier_type=data.supplier_type,
+            contact=data.contact.model_dump() if data.contact else None,
             short_description=data.short_description,
+            banner_url=data.banner_url,
+            logo_url=data.logo_url,
+            availability=data.availability,
         )
 
         db.add(vendor)
@@ -46,7 +50,10 @@ class VendorService:
 
         # update fields
         for field, value in data.dict(exclude_unset=True).items():
-            setattr(vendor, field, value)
+            if field == "contact" and value is not None:
+                setattr(vendor, field, value.dict())
+            else:
+                setattr(vendor, field, value)
 
         await db.commit()
         await db.refresh(vendor)

@@ -23,7 +23,7 @@ class TechnicianCertificationResponse(BaseModel):
     verified: bool
     rejected: bool
     admin_comment: Optional[str]
-    created_at: datetime
+    uploaded_at: datetime
     verified_at: Optional[datetime]
 
     class Config:

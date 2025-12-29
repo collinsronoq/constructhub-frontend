@@ -131,23 +131,44 @@ async def delete_vendor_item(
     except Exception as exc:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Unexpected error") from exc
 
-# upload image route
-@router.post("/{vendor_id}/items/upload-image")
+# upload image route - ties image directly to item
+@router.post("/{vendor_id}/items/{item_id}/upload-image")
 async def upload_item_image(
     vendor_id: int,
+    item_id: int,
     file: UploadFile = File(...),
     user: User = Depends(role_required("vendor")),
     db: AsyncSession = Depends(get_db)
 ):
     try:
-        q = await db.execute(select(VendorProfile).where(VendorProfile.id == vendor_id))
-        vendor = q.scalars().first()
+        # Ensure item exists and belongs to vendor
+        q_item = await db.execute(
+            select(VendorItem).where(
+                VendorItem.id == item_id,
+                VendorItem.vendor_id == vendor_id,
+            )
+        )
+        item = q_item.scalars().first()
+        if not item:
+            raise HTTPException(404, "Item not found")
 
+        # Auth check against vendor ownership
+        q_vendor = await db.execute(select(VendorProfile).where(VendorProfile.id == vendor_id))
+        vendor = q_vendor.scalars().first()
+        if not vendor:
+            raise HTTPException(404, "Vendor not found")
         if user.role != "admin" and vendor.user_id != user.id:
             raise HTTPException(403, "Not authorized")
 
-        file_url = await save_vendor_item_image(vendor_id, file)
-        return {"file_url": file_url}
+        file_url = await save_vendor_item_image(vendor_id, item_id, file)
+
+        # Persist the image URL on the item (assuming `image_url` exists)
+        if hasattr(item, "image_url"):
+            item.image_url = file_url
+            await db.commit()
+            await db.refresh(item)
+
+        return {"file_url": file_url, "item_id": item_id}
     except HTTPException:
         raise
     except Exception as exc:

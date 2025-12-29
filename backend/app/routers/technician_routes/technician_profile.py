@@ -36,12 +36,12 @@ async def create_profile(
             user_id=current_user.id,
             name=payload.name,
             location=payload.location,
-            skill=payload.skill,
+            specialization=payload.specialization,
             skills=payload.skills,
             years_experience=payload.years_experience,
             bio=payload.bio,
             short_description=payload.short_description,
-            contact=payload.contact,
+            contact=payload.contact.model_dump() if payload.contact else None,
             availability="Available"
         )
 

@@ -1,15 +1,21 @@
 # app/routes/technician_uploads.py
 
-from fastapi import APIRouter, UploadFile, File, Depends, HTTPException, status
+from fastapi import APIRouter, UploadFile, File, Depends, HTTPException, status, Form
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
-from app.auth.dependencies import get_current_user
+from app.auth.dependencies import get_current_user, role_required
 from app.models.technician import TechnicianProfile
 from app.models.user import User
 from app.schemas.media_schema import ImageUploadResponse
 from app.schemas.media_schema import CertificationUploadResponse
+from app.schemas.technician_certification_schema import (
+    TechnicianCertificationCreate,
+    TechnicianCertificationResponse,
+)
+from app.schemas.technician_schema import TechnicianCertificationUpdate
+from app.models.technician_certification import TechnicianCertification
 
 from app.utils.file_upload import (
     save_technician_profile_image,
@@ -27,7 +33,7 @@ async def upload_profile_image(
     user_id: int,
     file: UploadFile = File(...),
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(role_required("technician")),
 ):
     """
     Upload technician profile image.
@@ -66,13 +72,14 @@ async def upload_profile_image(
             detail="Unexpected error incurred",
         ) from exc
 
+
 @router.post("/{user_id}/certifications/upload", response_model=CertificationUploadResponse)
 async def upload_certification(
     user_id: int,
-    cert_name:str,
+    cert_name: str | None = Form(None),
     file: UploadFile = File(...),
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(role_required("technician")),
 ):
     """
     Upload a certification PDF for a technician.
@@ -99,9 +106,8 @@ async def upload_certification(
 
         cert = TechnicianCertification(
             technician_id=profile.id,
-            title=cert_name,
+            title=cert_name or file.filename,
             file_url=file_url,
-            name=file.filename
         )
 
         db.add(cert)
@@ -123,3 +129,82 @@ async def upload_certification(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Unexpected error incurred",
         ) from exc
+
+
+@router.patch("/{cert_id}", response_model=TechnicianCertificationResponse)
+async def update_certification(
+    cert_id: int,
+    payload: TechnicianCertificationUpdate,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(role_required("technician")),
+):
+    """
+    Update title/issuer of an unverified certification.
+    """
+    try:
+        q = await db.execute(
+            select(TechnicianCertification, TechnicianProfile.user_id)
+            .join(TechnicianProfile, TechnicianCertification.technician_id == TechnicianProfile.id)
+            .where(TechnicianCertification.id == cert_id)
+        )
+        row = q.first()
+        if not row:
+            raise HTTPException(status_code=404, detail="Certification not found")
+
+        cert, owner_user_id = row
+
+        # Ownership check
+        if current_user.role != "admin" and owner_user_id != current_user.id:
+            raise HTTPException(status_code=403, detail="Not authorized")
+
+        if cert.verified:
+            raise HTTPException(status_code=400, detail="Cannot edit a verified certification")
+
+        for field, value in payload.model_dump(exclude_unset=True).items():
+            setattr(cert, field, value)
+
+        await db.commit()
+        await db.refresh(cert)
+        return cert
+    except HTTPException:
+        raise
+    except Exception as exc:
+        logger.exception("Failed to update technician certification", extra={"cert_id": cert_id})
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Unexpected error") from exc
+
+
+@router.delete("/{cert_id}", status_code=204)
+async def delete_certification(
+    cert_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(role_required("technician")),
+):
+    """
+    Delete an unverified certification.
+    """
+    try:
+        q = await db.execute(
+            select(TechnicianCertification, TechnicianProfile.user_id)
+            .join(TechnicianProfile, TechnicianCertification.technician_id == TechnicianProfile.id)
+            .where(TechnicianCertification.id == cert_id)
+        )
+        row = q.first()
+        if not row:
+            raise HTTPException(status_code=404, detail="Certification not found")
+
+        cert, owner_user_id = row
+
+        if current_user.role != "admin" and owner_user_id != current_user.id:
+            raise HTTPException(status_code=403, detail="Not authorized")
+
+        if cert.verified:
+            raise HTTPException(status_code=400, detail="Cannot delete a verified certification")
+
+        await db.delete(cert)
+        await db.commit()
+        return None
+    except HTTPException:
+        raise
+    except Exception as exc:
+        logger.exception("Failed to delete technician certification", extra={"cert_id": cert_id})
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Unexpected error") from exc

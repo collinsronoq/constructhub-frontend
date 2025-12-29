@@ -11,19 +11,26 @@ class VendorContact(BaseModel):
 
 class VendorCreate(BaseModel):
     name: str
-    categories: List[str] = []
+    categories: List[str] = Field(default_factory=list)
     location: Optional[str] = None
+    supplier_type: Optional[str] = None
     contact: Optional[VendorContact] = None
     short_description: Optional[str] = None
+    banner_url: Optional[str] = None
+    logo_url: Optional[str] = None
+    availability: Optional[str] = None
 
 
 class VendorUpdate(BaseModel):
     name: Optional[str] = None
     categories: Optional[List[str]] = None
     location: Optional[str] = None
+    supplier_type: Optional[str] = None
     contact: Optional[VendorContact] = None
     short_description: Optional[str] = None
     availability: Optional[str] = None
+    banner_url: Optional[str] = None
+    logo_url: Optional[str] = None
 
 class VendorResponse(BaseModel):
     id: int
@@ -31,6 +38,7 @@ class VendorResponse(BaseModel):
     name: str
     categories: List[str] = []
     location: Optional[str] = None
+    supplier_type: Optional[str] = None
     contact: Optional[VendorContact] = None
     verified: bool = False
     banner_url: Optional[str] = None
