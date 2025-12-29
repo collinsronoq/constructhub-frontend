@@ -9,23 +9,32 @@ import os
 # Load dotenv for DATABASE_URL
 from dotenv import load_dotenv
 
-from backend.app.models import vendor_item
 load_dotenv("backend/.env")
 
 # Alembic Config object
 config = context.config
 fileConfig(str(config.config_file_name))
 
-# Import your models
+# Import your models so autogenerate can detect schema changes
 from app.models.base import Base
-from app.models import user, vendor, technician, material, article, estimate
+import app.models  # noqa: F401  - imports register all mapped models
 
 target_metadata = Base.metadata
 
 
+def _get_database_url() -> str:
+    """
+    Resolve the database URL from env or alembic.ini fallback.
+    """
+    url = os.getenv("DATABASE_URL")
+    if url:
+        return url
+    return config.get_main_option("sqlalchemy.url")
+
+
 def run_migrations_offline():
     """Run migrations in 'offline' mode."""
-    url = os.getenv("DATABASE_URL")
+    url = _get_database_url()
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -51,7 +60,7 @@ def do_run_migrations(connection: Connection):
 async def run_migrations_online():
     """Run migrations in 'online' mode with async support."""
     
-    url = os.getenv("DATABASE_URL")
+    url = _get_database_url()
     
     # Create async engine (same as in database.py)
     connectable = create_async_engine(

@@ -15,6 +15,7 @@ from app.core.logging import setup_logger
 from app.services.recommendation_service import get_recommendations
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.schemas.permit import Permit
+from app.models.estimate import Estimation
 from app.estimation.storage import (
     append_index_entry,
     save_estimation_blob,
@@ -43,31 +44,31 @@ async def generate_estimation(payload: EstimationRequest, db: AsyncSession, user
 
     logger.info("Starting estimation: foundation")
     phases.append(estimate_foundation(payload.foundation))
-    logger.info(f"\n\n foundation information:\n {phases}")
+    logger.info(f"\n\n foundation information:\n {phases[2]}")
 
     logger.info("Starting estimation: superstructure")
     phases.append(estimate_superstructure(payload.superstructure, vendor_prices=vendor_prices))
-    logger.info(f"\n\n superstrucutre information:\n {phases}")
+    logger.info(f"\n\n superstrucutre information:\n {phases[3]}")
 
     logger.info("Starting estimation: roofing")
     phases.append(estimate_roofing_phase(payload.roofing, vendor_prices=vendor_prices))
-    logger.info(f"\n\n roofing information:\n {phases}")
+    logger.info(f"\n\n roofing information:\n {phases[4]}")
 
     logger.info("Starting estimation: services_first_fix")
     phases.append(estimate_services_first_fix(payload.services_first_fix, vendor_prices=vendor_prices))
-    logger.info(f"\n\n service first fix information:\n {phases}")
+    logger.info(f"\n\n service first fix information:\n {phases[5]}")
 
     logger.info("Starting estimation: services_second_fix")
     phases.append(estimate_services_second_fix(payload.services_second_fix, vendor_prices=vendor_prices))
-    logger.info(f"\n\n service second fix information:\n {phases}")
+    logger.info(f"\n\n service second fix information:\n {phases[6]}")
 
     logger.info("Starting estimation: finishes")
     phases.append(estimate_finishes(payload.finishes, vendor_prices=vendor_prices))
-    logger.info(f"\n\n finishes information:\n {phases}")
+    logger.info(f"\n\n finishes information:\n {phases[7]}")
 
     logger.info("Starting estimation: external_works")
     phases.append(estimate_external_works(payload.external_works, vendor_prices=vendor_prices))
-    logger.info(f"\n\n external works information:\n {phases}")
+    logger.info(f"\n\n external works information:\n {phases[8]}")
 
     material_total = sum(p.totals.materials for p in phases)
     labour_total = sum(p.totals.labour for p in phases)
@@ -139,13 +140,15 @@ async def generate_estimation(payload: EstimationRequest, db: AsyncSession, user
         "id": estimate_id,
         "summary": summary,
         "breakdown": breakdown,
-        "permits": permits,
+        "permits": [p.model_dump() for p in permits],
         "recommendations": recs,
     }
 
     # Persist to disk with lightweight index
+    blob_path_str: str | None = None
     try:
-        save_estimation_blob(user_id=user_id, estimate_id=estimate_id, data=response)
+        blob_path = save_estimation_blob(user_id=user_id, estimate_id=estimate_id, data=response)
+        blob_path_str = str(blob_path)
         append_index_entry(
             user_id=user_id,
             estimate_id=estimate_id,
@@ -153,8 +156,28 @@ async def generate_estimation(payload: EstimationRequest, db: AsyncSession, user
             location=location_hint,
             total_cost=summary["total_cost"],
         )
-    except Exception as exc:
-        logger.exception("Failed to persist estimation", extra={"user_id": user_id})
+    except Exception:
+        logger.exception("Failed to persist estimation to disk/index", extra={"user_id": user_id})
+
+    # Persist a queryable summary row in the DB (id matches JSON id)
+    try:
+        est_record = Estimation(
+            estimate_id=estimate_id,
+            user_id=user_id,
+            project_title=payload.project_name or location_hint,
+            location=location_hint,
+            floor_area=payload.superstructure.declared_floor_area_sqm
+            or payload.superstructure.land_size_sqm,
+            quality=payload.superstructure.finishing_level,
+            total_cost=summary["total_cost"],
+            blob_path=blob_path_str,
+            summary_json=summary,
+        )
+        db.add(est_record)
+        await db.commit()
+    except Exception:
+        await db.rollback()
+        logger.exception("Failed to persist estimation summary in DB", extra={"user_id": user_id})
 
     try:
         logger.info(

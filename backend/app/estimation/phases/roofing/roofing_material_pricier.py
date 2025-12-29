@@ -23,11 +23,14 @@ def price_roofing_materials(
 
     materials: list[MaterialCost] = []
 
-    
-    # FLAT ROOF (SLAB)
-    
+    sheet_variant_map = {
+        "corrugated_mabati": "mabati",
+        "box_profile_mabati": "mabati",
+        "stone_coated_tiles": "tile",
+        "clay_tiles": "tile",
+    }
+
     if roof_type == "flat":
-        # Concrete
         concrete_price = resolve_material_price(
             "cement",
             None,
@@ -39,13 +42,12 @@ def price_roofing_materials(
             MaterialCost(
                 name="Roof Slab Concrete",
                 quantity=quantities.concrete_volume_m3,
-                unit="m³",
+                unit="mA3",
                 unit_cost=concrete_price,
                 total=round(quantities.concrete_volume_m3 * concrete_price),
             )
         )
 
-        # Reinforcement
         steel_price = resolve_material_price(
             "reinforcement",
             None,
@@ -63,7 +65,6 @@ def price_roofing_materials(
             )
         )
 
-        # Formwork
         formwork_price = resolve_material_price(
             "formwork",
             None,
@@ -81,7 +82,6 @@ def price_roofing_materials(
             )
         )
 
-        # Waterproofing
         waterproof_price = resolve_material_price(
             "waterproofing",
             None,
@@ -99,21 +99,18 @@ def price_roofing_materials(
             )
         )
 
-    
-    # PITCHED ROOFS
-    
     else:
-        # Roofing sheets / tiles
+        sheet_variant = sheet_variant_map.get(roofing_material or "", None)
         sheet_price = resolve_material_price(
             "roofing_sheet",
-            roofing_material,
+            sheet_variant,
             base_prices,
             vendor_prices.get("roofing_sheet"),
         )
 
         materials.append(
             MaterialCost(
-                name=f"{roofing_material.title()} Roofing",
+                name=f"{(roofing_material or 'Roofing').replace('_', ' ').title()}",
                 quantity=quantities.roofing_sheets_sqm,
                 unit="sqm",
                 unit_cost=sheet_price,
@@ -121,7 +118,6 @@ def price_roofing_materials(
             )
         )
 
-        # Timber
         timber_price = resolve_material_price(
             "timber",
             None,
@@ -133,13 +129,12 @@ def price_roofing_materials(
             MaterialCost(
                 name="Roof Timber",
                 quantity=quantities.timber_cubic_m,
-                unit="m³",
+                unit="mA3",
                 unit_cost=timber_price,
                 total=round(quantities.timber_cubic_m * timber_price),
             )
         )
 
-        # Nails
         nails_price = resolve_material_price(
             "nails",
             None,
@@ -157,7 +152,6 @@ def price_roofing_materials(
             )
         )
 
-        # Ridge caps
         if quantities.ridge_length_m > 0:
             ridge_price = resolve_material_price(
                 "ridge_cap",
@@ -176,10 +170,7 @@ def price_roofing_materials(
                 )
             )
 
-    
-    # TOTALS
-    
-    material_total = sum(m.total for m in materials)
+    material_total = sum(m.effective_total for m in materials)
 
     totals = PhaseTotals(
         materials=material_total,

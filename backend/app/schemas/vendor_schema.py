@@ -8,12 +8,14 @@ class VendorContact(BaseModel):
     phone: Optional[str] = None
     email: Optional[EmailStr] = None
 
+
 class VendorCreate(BaseModel):
     name: str
     categories: List[str] = []
     location: Optional[str] = None
     contact: Optional[VendorContact] = None
     short_description: Optional[str] = None
+
 
 class VendorUpdate(BaseModel):
     name: Optional[str] = None

@@ -100,12 +100,14 @@ def estimate_roofing_phase(
     material_estimate = price_roofing_materials(
         quantities,
         data.roof_type,
+        data.roof_covering,
         vendor_prices,
     )
 
     labour_estimate = estimate_roofing_labour(
         roof_type=data.roof_type,
         roof_area_sqm=geometry.roof_area_sqm,
+        roof_covering=data.roof_covering,
     )
 
     totals = PhaseTotals(

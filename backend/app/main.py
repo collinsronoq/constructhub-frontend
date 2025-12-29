@@ -5,7 +5,7 @@ from contextlib import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from app.core.config import settings
-from app.core.database import ensure_database_schema
+from app.core.database import ensure_database_schema, engine
 from app.core.logging import setup_logger
 from app.routers import root
 from app.routers.technician_routes.technician_profile import router as technician_profile_router
@@ -25,12 +25,16 @@ from app.routers.marketplace_routes import router as marketplace_router
 logger = setup_logger("app.main")
 
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Dev/local schema ensure; prefer Alembic migrations for prod
     await ensure_database_schema()
-    yield
-
+    try:
+        yield
+    finally:
+        logger.warning("Disposing database engine...")
+        await engine.dispose()
+        logger.warning("Database engine disposed.")
 
 app = FastAPI(title=settings.APP_NAME, debug=settings.DEBUG, lifespan=lifespan)
 

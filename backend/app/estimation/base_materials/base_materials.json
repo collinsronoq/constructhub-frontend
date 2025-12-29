@@ -148,20 +148,17 @@
   },
 
   "roofing_materials":{
-    
     "roofing_sheet": {
-      "mabati": 1200,
-      "tile": 1800
+      "mabati": { "unit": "sqm", "price": 1200 },
+      "tile": { "unit": "sqm", "price": 1800 }
     },
-    "timber": {
-      "cypress": 65000
-    },
-    "nails": 250,
-    "ridge_cap": 1200,
-    "cement": 750,
-    "reinforcement": 160,
-    "waterproofing": 850,
-    "formwork": 1200
+    "timber": { "unit": "m3", "price": 65000 },
+    "nails": { "unit": "kg", "price": 250 },
+    "ridge_cap": { "unit": "m", "price": 1200 },
+    "cement": { "unit": "bag", "price": 750 },
+    "reinforcement": { "unit": "kg", "price": 160 },
+    "waterproofing": { "unit": "sqm", "price": 850 },
+    "formwork": { "unit": "sqm", "price": 1200 }
   },
 
   "services_first_fix_materials": {

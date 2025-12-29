@@ -25,6 +25,7 @@ def _area_adjustment_factor(actual_area: float) -> float:
 def estimate_roofing_labour(
     roof_type: str,
     roof_area_sqm: float,
+    roof_covering: str | None = None,
 ) -> PhaseEstimate:
     """
     Estimate roofing labour using a fixed crew-per-roof-type model.
@@ -56,10 +57,14 @@ def estimate_roofing_labour(
         },
     }
 
-    if roof_type not in roofing_models:
-        raise ValueError(f"Unsupported roof type: {roof_type}")
+    # Map structural roof type + covering to labour model
+    if roof_type == "flat":
+        labour_model_key = "flat_slab"
+    else:
+        # default to mabati crews unless covering includes tiles
+        labour_model_key = "tiles" if (roof_covering and "tile" in roof_covering) else "mabati"
 
-    model = roofing_models[roof_type]
+    model = roofing_models[labour_model_key]
 
     # --- Duration adjustment ---
     adjustment = _area_adjustment_factor(roof_area_sqm)
