@@ -1,152 +1,234 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import TechnicianHeader from "../components/TechnicianProfile/TechnicianHeader";
 import TechnicianAbout from "../components/TechnicianProfile/TechnicianAbout";
 import TechnicianSkills from "../components/TechnicianProfile/TechnicianSkills";
 import TechnicianReviews from "../components/TechnicianProfile/TechnicianReviews";
 import TechnicianVerificationModal from "../components/TechnicianProfile/TechnicianVerificationModal";
-
-// interface TechnicianProfileProps {
-//   name: string;
-//   specialization: string;
-//   location: string;
-//   experience?: string;
-//   rating?: number;
-//   contact?: string;
-//   email?: string;
-//   verified?: boolean;
-//   availability?: "Available" | "Busy" | "Away";
-//   imageUrl?: string;
-//   bio?: string[];
-//   skills?: string[];
-//   certification?: string[];
-//   isTechnicianView?: boolean; // true if logged-in user is the technician
-//   reviews?: ReviewCardProps[]
-  
-// }
+import { useAuth } from "../hooks/auth/useAuth";
+import { useTechnicianProfile } from "../hooks/Technician/useTechnicianProfile";
+import { useTechnicianCertifications } from "../hooks/Technician/useTechnicianCertifications";
+import { uploadTechnicianProfileImage } from "../services/api/technicianUploads";
+import { useTechnicianReviews } from "../hooks/Technician/useTechnicianReviews";
 
 const TechnicianProfile = () => {
-  // Sample placeholder data
-  const technician = {
-    name: "Collins Rono",
-    specialization: "Electrical Engineer",
-    location: "Nakuru, Kenya",
-    experience: "5 years",
-    verified: false,
-    availability: "Available",
-    rating: 4,
-    imageUrl: "src/assets/image_4.jpg",
-    contact: "+254 712 345 678",
-    email: "electrician@gmail.com",
-    isTechnicianView: true,
-    bio: "A dedicated electrical technician with over five years of experience in residential and commercial installations, wiring, and power systems. Passionate about delivering quality and ensuring safety in every project.",
-    skills: ["Wiring", "Lighting Installation", "Solar Systems", "Safety Compliance"],
-    certifications: ["Electrical Safety Certification", "Solar Energy Technician Certificate"],
-   
-    reviews: [
-      {
-        id: "1",
-        reviewerName: "John Mwangi",
-        reviewerRole: "Builder",
-        rating: 5,
-        date: "Oct 5, 2025",
-        review: "Very professional and punctual. The wiring was done perfectly!",
-      },
-      {
-        id: "2",
-        reviewerName: "Sarah Otieno",
-        reviewerRole: "Contractor",
-        rating: 4,
-        date: "Oct 3, 2025",
-        review: "Good work overall. Slight delay on completion but well executed.",
-      },
-      {
-        id: "3",
-        reviewerName: "James Kariuki",
-        reviewerRole: "Builder",
-        rating: 5,
-        date: "Sep 29, 2025",
-        review: "Reliable and skilled technician. Definitely recommend!",
-      },
-    ],
-  };
+  const { user } = useAuth();
+  const userId = user?.id;
+
+  const { profile, loading, error, createProfile, updateProfile, refresh } = useTechnicianProfile(userId);
+  const { certs, updateCertification, deleteCertification, loading: certLoading } =
+    useTechnicianCertifications(userId);
+  const { reviews } = useTechnicianReviews(userId);
 
   const [isVerifyModalOpen, setIsVerifyModalOpen] = useState(false);
 
-  // inside component
-  
+  // form state
+  const [form, setForm] = useState({
+    name: "",
+    specialization: "",
+    location: "",
+    years_experience: "",
+    bio: "",
+    short_description: "",
+    skills: "",
+    phone: "",
+    email: "",
+    availability: "Available",
+  });
+
+  useEffect(() => {
+    if (profile) {
+      setForm({
+        name: profile.name || "",
+        specialization: profile.specialization || "",
+        location: profile.location || "",
+        years_experience: profile.years_experience ? String(profile.years_experience) : "",
+        bio: profile.bio || "",
+        short_description: profile.short_description || "",
+        skills: profile.skills?.join(", ") || "",
+        phone: profile.contact?.phone || "",
+        email: profile.contact?.email || "",
+        availability: profile.availability || "Available",
+      });
+    }
+  }, [profile]);
+
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const payload = {
+      name: form.name,
+      specialization: form.specialization,
+      location: form.location,
+      years_experience: form.years_experience ? Number(form.years_experience) : undefined,
+      bio: form.bio,
+      short_description: form.short_description,
+      skills: form.skills ? form.skills.split(",").map((s) => s.trim()).filter(Boolean) : [],
+      contact: { phone: form.phone, email: form.email },
+      availability: form.availability,
+    };
+
+    if (profile) {
+      await updateProfile(payload);
+    } else {
+      await createProfile(payload);
+    }
+    await refresh();
+  };
+
+  const handleProfileImageUpload = async (file: File) => {
+    if (!userId) return;
+    await uploadTechnicianProfileImage(userId, file);
+    await refresh();
+  };
+
+  const experienceText = profile?.years_experience ? `${profile.years_experience} years` : undefined;
+  const contactText = profile?.contact?.phone;
+  const emailText = profile?.contact?.email;
+
+  if (!userId) {
+    return <div className="p-6">Please log in as a technician to manage your profile.</div>;
+  }
+
   return (
     <section className="p-6 bg-surface-light dark:bg-surface-dark rounded-xl shadow-md space-y-6">
-      {/* Verification Notice */}
-      {/* {!technician.verified && (
-        <div className="p-4 bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-700 rounded-lg text-sm text-yellow-800 dark:text-yellow-300">
-          ⚠️ This technician has not yet been verified by ConstructHub. 
-          <span className="block text-xs mt-1">
-            Verification helps technicians gain visibility and trust.
-          </span>
+      {loading && <p>Loading profile...</p>}
+      {error && <p className="text-red-600">{error}</p>}
+
+      {/* Profile header */}
+      {profile && (
+        <TechnicianHeader
+          name={profile.name}
+          specialization={profile.specialization || ""}
+          location={profile.location || ""}
+          experience={experienceText}
+          rating={profile.average_rating || 0}
+          availability={profile.availability || "Available"}
+          contact={contactText || undefined}
+          email={emailText || undefined}
+          verified={profile.verified}
+          imageUrl={profile.profile_image_url || undefined}
+          isTechnicianView
+          onEditProfile={() => fileInputRef.current?.focus()}
+        />
+      )}
+
+      {/* Profile form (create/update) */}
+      <form onSubmit={handleSubmit} className="space-y-4 bg-white dark:bg-gray-900 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <input className="input" placeholder="Name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
+          <input className="input" placeholder="Specialization" value={form.specialization} onChange={(e) => setForm({ ...form, specialization: e.target.value })} required />
+          <input className="input" placeholder="Location" value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} />
+          <input className="input" placeholder="Years experience" value={form.years_experience} onChange={(e) => setForm({ ...form, years_experience: e.target.value })} />
+          <input className="input" placeholder="Skills (comma separated)" value={form.skills} onChange={(e) => setForm({ ...form, skills: e.target.value })} />
+          <input className="input" placeholder="Phone" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+          <input className="input" placeholder="Email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+          <select className="input" value={form.availability} onChange={(e) => setForm({ ...form, availability: e.target.value })}>
+            <option>Available</option>
+            <option>Busy</option>
+            <option>Away</option>
+          </select>
         </div>
-      )} */}
-      {/* Verification Notice (Visible only to technician) */}
-      {technician.isTechnicianView && !technician.verified && (
-        <div className="text-xs md:text-sm bg-yellow-50 dark:bg-yellow-900/40 border-b border-yellow-300 dark:border-yellow-700 text-yellow-800 dark:text-yellow-200 px-4 py-3 flex flex-col sm:flex-row justify-between items-center gap-2">
-          <span>
-            Your account is currently <strong>unverified</strong>. Verify now to gain more visibility to builders.
-          </span>
-          <button
-            onClick={() => setIsVerifyModalOpen(true)}
-            className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-1 rounded-md text-xs md:text-sm font-medium transition"
-          >
+        <textarea className="input" placeholder="Short description" value={form.short_description} onChange={(e) => setForm({ ...form, short_description: e.target.value })} />
+        <textarea className="input" placeholder="Bio" value={form.bio} onChange={(e) => setForm({ ...form, bio: e.target.value })} />
+        <div className="flex items-center gap-3">
+          <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-md">
+            {profile ? "Update Profile" : "Create Profile"}
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            className="text-sm"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) handleProfileImageUpload(file);
+            }}
+          />
+        </div>
+      </form>
+
+      {/* Verification prompt */}
+      {profile && !profile.verified && (
+        <div className="text-xs md:text-sm bg-yellow-50 dark:bg-yellow-900/40 border border-yellow-300 dark:border-yellow-700 text-yellow-800 dark:text-yellow-200 px-4 py-3 flex flex-col sm:flex-row justify-between items-center gap-2">
+          <span>Your account is currently unverified. Upload certifications for admin review.</span>
+          <button onClick={() => setIsVerifyModalOpen(true)} className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-1 rounded-md text-xs md:text-sm font-medium transition">
             Verify Now
           </button>
         </div>
       )}
 
+      {/* Certifications list */}
+      <div className="bg-white dark:bg-gray-900 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+        <div className="flex justify-between items-center mb-3">
+          <h3 className="font-semibold">Certifications</h3>
+          <button onClick={() => setIsVerifyModalOpen(true)} className="text-blue-600 text-sm">Add certification</button>
+        </div>
+        {certLoading && <p>Loading certifications...</p>}
+        {certs.length === 0 && <p className="text-sm text-gray-500">No certifications uploaded.</p>}
+        <ul className="space-y-2">
+          {certs.map((c) => (
+            <li key={c.id} className="flex items-center justify-between text-sm border p-2 rounded">
+              <div>
+                <div className="font-medium">{c.title || "Certification"}</div>
+                <div className="text-gray-500">{c.verified ? "Verified" : "Pending"}</div>
+              </div>
+              {!c.verified && (
+                <div className="flex gap-2">
+                  <button className="text-blue-600" onClick={() => updateCertification(c.id, { title: c.title || "" })}>Edit</button>
+                  <button className="text-red-600" onClick={() => deleteCertification(c.id)}>Delete</button>
+                </div>
+              )}
+            </li>
+          ))}
+        </ul>
+      </div>
 
-      {/* modal for verifiaction */}
+      {/* Existing UI sections (bio/skills/reviews) use profile data when available */}
+      {profile && (
+        <>
+          <TechnicianHeader
+            name={profile.name}
+            specialization={profile.specialization || ""}
+            location={profile.location || ""}
+            experience={experienceText}
+            rating={profile.average_rating || 0}
+            availability={profile.availability || "Available"}
+            contact={contactText || undefined}
+            email={emailText || undefined}
+            verified={profile.verified}
+            imageUrl={profile.profile_image_url || undefined}
+            isTechnicianView
+            onChangeAvailability={async (status) => {
+              await updateProfile({ availability: status });
+              await refresh();
+            }}
+          />
+          <TechnicianAbout
+            bio={profile.bio || ""}
+            skills={profile.skills || []}
+            specialization={profile.specialization || ""}
+            verified={profile.verified}
+          />
+          <TechnicianSkills
+            experience={experienceText}
+            certifications={certs.map((c) => c.title || "Certification")}
+            verified={profile.verified}
+          />
+          <TechnicianReviews reviews={reviews} verified={profile.verified} />
+        </>
+      )}
+
+      {/* Verification Modal */}
       <TechnicianVerificationModal
         isOpen={isVerifyModalOpen}
         onClose={() => setIsVerifyModalOpen(false)}
-        technicianId="tech_001"
-        specialization={technician.specialization}
-        existingCertifications={technician.certifications}
-        
+        technicianId={String(userId)}
+        specialization={form.specialization || profile?.specialization || ""}
+        existingCertifications={certs.map((c) => c.title || "Certification")}
       />
-      {/* Header Section (with Contact actions included) */}
-      <TechnicianHeader
-        name={technician.name}
-        specialization={technician.specialization}
-        location={technician.location}
-        experience={technician.experience}
-        rating={technician.rating}
-        availability={technician.availability}
-        contact={technician.contact}
-        verified={technician.verified}
-        email={technician.email}
-      />
-
-
-      {/* Bio Section */}
-      <TechnicianAbout 
-        bio={technician.bio} 
-        skills={technician.skills}
-        specialization={technician.specialization}
-        verified={technician.verified}
-      />
-
-      {/* Skills Section */}
-      <TechnicianSkills 
-        experience={technician.experience}
-        certifications={technician.certifications}
-        verified={technician.verified} 
-        
-      />
-
-      
-      
-
-      {/* Reviews Section */}
-      <TechnicianReviews reviews={technician.reviews} verified={technician.verified}/>
     </section>
-  )
+  );
 };
 
 export default TechnicianProfile;

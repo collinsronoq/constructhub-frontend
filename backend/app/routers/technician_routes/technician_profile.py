@@ -114,7 +114,7 @@ async def my_profile(
         ) from exc
 
 
-@router.get("/{user_id}", response_model=TechnicianProfilePublic)
+@router.get("/profile/{user_id}", response_model=TechnicianProfilePublic)
 async def get_public_profile(
     user_id: int,
     db: AsyncSession = Depends(get_db)

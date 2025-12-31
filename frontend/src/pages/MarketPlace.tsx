@@ -1,24 +1,20 @@
 import React, { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { useMarketplaceItems } from "../hooks/MarketPlace/useMarketPlaceItems"
+import { useMarketplaceItems } from "../hooks/MarketPlace/useMarketPlaceItems";
 import MarketplaceSearchBar from "../components/MarketPlace/MarketplaceSearchBar";
 import MarketplaceFilters from "../components/MarketPlace/MarketplaceFilters";
 import MarketplaceItemCard from "../components/MarketPlace/MarketplaceItemCard";
 
 const Marketplace: React.FC = () => {
   const navigate = useNavigate();
-
-  /** 🔗 Fetch marketplace data (simulated API + dummy data) */
   const { items, loading, error } = useMarketplaceItems();
 
-  /** 🔍 Search + Filter states */
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedLocation, setSelectedLocation] = useState("All");
   const [showVerifiedOnly, setShowVerifiedOnly] = useState(false);
   const [sortBy, setSortBy] = useState("default");
 
-  /** 🧠 Derived items after filtering, searching, and sorting */
   const filteredItems = useMemo(() => {
     let filtered = items.filter((item) => {
       const matchesSearch =
@@ -29,15 +25,14 @@ const Marketplace: React.FC = () => {
         selectedCategory === "All" || item.category === selectedCategory;
 
       const matchesLocation =
-        selectedLocation === "All" || item.vendorLocation === selectedLocation;
+        selectedLocation === "All" || (item.vendor_location || "") === selectedLocation;
 
       const matchesVerification =
-        !showVerifiedOnly || item.vendorVerified === true;
+        !showVerifiedOnly || item.vendor_verified === true;
 
       return matchesSearch && matchesCategory && matchesLocation && matchesVerification;
     });
 
-    // Sorting
     switch (sortBy) {
       case "priceLowHigh":
         filtered = [...filtered].sort((a, b) => a.price - b.price);
@@ -56,7 +51,6 @@ const Marketplace: React.FC = () => {
     return filtered;
   }, [items, searchQuery, selectedCategory, selectedLocation, showVerifiedOnly, sortBy]);
 
-  /** 🔎 Navigate to Vendor Profile */
   const handleViewVendor = (vendorId: string) => {
     navigate("/vendor/profile", { state: { id: vendorId } });
   };
@@ -64,17 +58,13 @@ const Marketplace: React.FC = () => {
   return (
     <section className="p-6 bg-surface-light dark:bg-surface-dark rounded-xl shadow-sm my-4 space-y-6">
       <div className="bg-background-light dark:bg-background-dark p-6 rounded-xl">
-        {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
-          <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
-            Marketplace
-          </h2>
+          <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">Marketplace</h2>
           <p className="text-gray-500 dark:text-gray-400 text-sm">
-            Compare prices and explore verified vendors from Nakuru & Machakos.
+            Compare prices and explore verified vendors.
           </p>
         </div>
 
-        {/* Search + Filters */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <MarketplaceSearchBar query={searchQuery} onChange={setSearchQuery} />
           <MarketplaceFilters
@@ -88,34 +78,34 @@ const Marketplace: React.FC = () => {
             onSortChange={setSortBy}
           />
         </div>
-
       </div>
-      
-      
-      {/* Loading + Error states */}
-      {loading && (
-        <p className="text-center text-gray-500 dark:text-gray-400">Loading marketplace...</p>
-      )}
-      {error && (
-        <p className="text-center text-red-500">Failed to load marketplace data.</p>
-      )}
 
-      {/* Product Grid */}
+      {loading && <p className="text-center text-gray-500 dark:text-gray-400">Loading marketplace...</p>}
+      {error && <p className="text-center text-red-500">Failed to load marketplace data.</p>}
+
       {!loading && filteredItems.length > 0 ? (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {filteredItems.map((item) => (
             <MarketplaceItemCard
               key={item.id}
-              {...item}
-              onViewVendor={() => handleViewVendor(item.vendorId)}
+              id={String(item.id)}
+              name={item.name}
+              category={item.category}
+              price={item.price}
+              unit={item.unit}
+              imageUrl={item.image_url || ""}
+              available={item.available}
+              vendorId={item.vendor_id ? String(item.vendor_id) : undefined}
+              vendorName={item.vendor_name || "Vendor"}
+              vendorLocation={item.vendor_location || ""}
+              vendorVerified={item.vendor_verified || false}
+              onViewVendor={() => item.vendor_id && handleViewVendor(String(item.vendor_id))}
             />
           ))}
         </div>
       ) : (
         !loading && (
-          <p className="text-center text-gray-500 dark:text-gray-400 py-8">
-            No items found matching your filters.
-          </p>
+          <p className="text-center text-gray-500 dark:text-gray-400 py-8">No items found matching your filters.</p>
         )
       )}
     </section>
@@ -123,4 +113,3 @@ const Marketplace: React.FC = () => {
 };
 
 export default Marketplace;
-

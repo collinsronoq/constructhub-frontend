@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
-import type { EstimationBreakdown } from "./useEstimationData";
-import { mockEstimationData } from "./useEstimationData";
+import { fetchEstimationById } from "../../services/api/estimations";
+import { mockEstimationData, type EstimationBreakdown } from "./useEstimationData";
+import { mapEstimationDetailToBreakdown } from "./estimationMapper";
 
 export function useEstimationById(id?: string, useMock?: boolean) {
   const [data, setData] = useState<EstimationBreakdown | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<Error | null>(null);
 
-  // prefer explicit param; fall back to env var VITE_USE_MOCKS
   const shouldUseMock = useMock ?? (import.meta.env.VITE_USE_MOCKS === "true");
 
   useEffect(() => {
@@ -22,7 +22,6 @@ export function useEstimationById(id?: string, useMock?: boolean) {
     setError(null);
 
     if (shouldUseMock) {
-      // simulate network latency
       const t = setTimeout(() => {
         setData(mockEstimationData);
         setIsLoading(false);
@@ -30,15 +29,9 @@ export function useEstimationById(id?: string, useMock?: boolean) {
       return () => clearTimeout(t);
     }
 
-    // real fetch path (falls back to mock on failure)
-    fetch(`/api/estimations/${id}`)
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch estimate");
-        return res.json();
-      })
-      .then((payload: EstimationBreakdown) => setData(payload))
+    fetchEstimationById(id)
+      .then((payload) => setData(mapEstimationDetailToBreakdown(payload)))
       .catch((err) => {
-        // fallback to mock so UI still works in dev
         setData(mockEstimationData);
         setError(err);
       })

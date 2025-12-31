@@ -1,43 +1,39 @@
 import { useState } from "react";
 import type { TechnicianVerificationPayload } from "../../components/TechnicianProfile/TechnicianVerificationModal";
+import { uploadTechnicianCertification } from "../../services/api/technicianUploads";
+import { createCertification } from "../../services/api/technicians";
 
 /**
  * Hook responsible for submitting technician verification data.
- * Currently simulates backend behavior but structured for real API integration.
+ * Uploads certification files and creates pending certifications for admin review.
  */
 export function useVerifyTechnician() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  /** Submit verification request */
   async function verifyTechnician(payload: TechnicianVerificationPayload) {
     try {
       setLoading(true);
       setError(null);
       setSuccess(false);
 
-      // --- Simulated delay for API request ---
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      const userId = Number(payload.technicianId);
+      if (!userId) throw new Error("Missing technician id");
 
-      // --- Mock API behavior ---
-      // Replace this with real backend call later
-      console.log("✅ Submitting verification payload:", payload);
+      for (const cert of payload.certifications) {
+        if (!cert.file) continue;
 
-      // Example backend call (to be uncommented when backend is ready)
-      /*
-      const response = await fetch(`/api/technicians/${payload.technicianId}/verify`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+        const uploadRes = await uploadTechnicianCertification(userId, cert.file, cert.name);
+        const file_url = uploadRes.file_url;
 
-      if (!response.ok) {
-        throw new Error("Failed to verify technician");
+        await createCertification({
+          title: cert.name || cert.file.name || "Certification",
+          issuer: undefined,
+          file_url,
+        });
       }
-      */
 
-      // --- Mock success response ---
       setSuccess(true);
     } catch (err) {
       console.error(err);
@@ -49,4 +45,3 @@ export function useVerifyTechnician() {
 
   return { verifyTechnician, loading, success, error };
 }
-

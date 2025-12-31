@@ -21,6 +21,7 @@ interface VendorHeaderProps {
   averageRating?: number;
   isVendorView?: boolean;
   availability?: "Open" | "Closed" | "Temporarily Unavailable";
+  onChangeAvailability?: (status: string) => void;
 }
 
 const VendorHeader: React.FC<VendorHeaderProps> = ({
@@ -34,6 +35,7 @@ const VendorHeader: React.FC<VendorHeaderProps> = ({
   averageRating,
   isVendorView = false,
   availability = "Open",
+  onChangeAvailability,
 }) => {
   const [status, setStatus] = useState(availability);
 
@@ -89,12 +91,12 @@ const VendorHeader: React.FC<VendorHeaderProps> = ({
               <h1 className="text-2xl sm:text-3xl font-bold text-gray-600 dark:text-brand-dark md:text-white">
                 {name}
               </h1>
-              {verified ? (
-                <BadgeCheck
-                  className="w-5 h-5 text-blue-500"
-                  
-                />
-              ) : (
+            {verified ? (
+              <BadgeCheck
+                className="w-5 h-5 text-blue-500"
+                
+              />
+            ) : (
                 <span className="text-sm text-gray-500 dark:text-gray-400">
                   (Unverified)
                 </span>
@@ -119,6 +121,13 @@ const VendorHeader: React.FC<VendorHeaderProps> = ({
                 <MapPin className="w-4 h-4" /> {location}
               </div>
             )}
+            {/* Rating */}
+            {averageRating !== undefined && (
+              <div className="flex items-center justify-center sm:justify-start gap-2 text-sm text-gray-700 dark:text-gray-300 mt-2">
+                <span className="font-medium">{averageRating.toFixed(1)}</span>
+                <span className="text-xs text-gray-500">/ 5.0</span>
+              </div>
+            )}
           </div>
         </div>
 
@@ -140,7 +149,10 @@ const VendorHeader: React.FC<VendorHeaderProps> = ({
             {isVendorView && (
               <select
                 value={status}
-                onChange={(e) => setStatus(e.target.value as any)}
+                onChange={(e) => {
+                  setStatus(e.target.value as any);
+                  onChangeAvailability?.(e.target.value);
+                }}
                 className="text-xs sm:text-sm bg-transparent border border-gray-300 dark:border-gray-700 rounded-md px-2 py-1 text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
               >
                 <option>Open</option>

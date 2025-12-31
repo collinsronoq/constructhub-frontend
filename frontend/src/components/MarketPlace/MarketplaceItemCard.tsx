@@ -8,11 +8,11 @@ interface MarketplaceItemCardProps {
   unit: string;
   imageUrl: string;
   available: boolean;
-  vendorName: string;
-  vendorId: string;
-  vendorLocation: string;
-  vendorVerified: boolean;
-  onViewVendor: () => void;
+  vendorName?: string;
+  vendorId?: string;
+  vendorLocation?: string;
+  vendorVerified?: boolean;
+  onViewVendor?: () => void;
 }
 
 const MarketplaceItemCard: React.FC<MarketplaceItemCardProps> = ({

@@ -1,60 +1,64 @@
-import { useState, useEffect } from "react";
-import type { VendorItemCardProps } from "../components/VendorProfile/VendorShowcase/VendorItemCard";
+import { useEffect, useState } from "react";
+import { fetchVendorItems, createVendorItem, updateVendorItem } from "../services/api/vendorItems";
 
-export function useVendorItems(vendorId: string) {
-  const [items, setItems] = useState<VendorItemCardProps[]>([]);
-  const [loading, setLoading] = useState(true);
+export interface VendorItem {
+  id: number;
+  name: string;
+  category: string;
+  subcategory?: string | null;
+  unit: string;
+  price: number;
+  description?: string | null;
+  available: boolean;
+  image_url?: string | null;
+}
+
+export function useVendorItems(vendorId: number) {
+  const [items, setItems] = useState<VendorItem[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  /** Fetch all items */
-  async function fetchItems() {
+  async function loadItems() {
+    setLoading(true);
+    setError(null);
     try {
-      setLoading(true);
-      const res = await fetch(`/api/vendors/${vendorId}/items`);
-      const data = await res.json();
-      setItems(data);
+      const data = await fetchVendorItems(vendorId);
+      setItems(data as VendorItem[]);
     } catch (err) {
+      console.error("Failed to load vendor items", err);
       setError("Failed to load items");
     } finally {
       setLoading(false);
     }
   }
 
-  /** Add new item */
-  async function addItem(newItem: VendorItemCardProps) {
+  async function addItem(payload: Omit<VendorItem, "id">) {
     try {
-      const res = await fetch(`/api/vendors/${vendorId}/items`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newItem),
-      });
-      const saved = await res.json();
-      setItems((prev) => [...prev, saved]);
+      const created = await createVendorItem(vendorId, payload);
+      setItems((prev) => [...prev, created as VendorItem]);
+      return created as VendorItem;
     } catch (err) {
+      console.error("Failed to add item", err);
       setError("Failed to add item");
+      throw err;
     }
   }
 
-  /** Update existing item */
-  async function updateItem(itemId: string, updated: VendorItemCardProps) {
+  async function editItem(itemId: number, payload: Partial<VendorItem>) {
     try {
-      const res = await fetch(`/api/vendors/${vendorId}/items/${itemId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updated),
-      });
-      const saved = await res.json();
-      setItems((prev) =>
-        prev.map((item) => (item.id === saved.id ? saved : item))
-      );
+      const updated = await updateVendorItem(vendorId, itemId, payload);
+      setItems((prev) => prev.map((it) => (it.id === itemId ? (updated as VendorItem) : it)));
+      return updated as VendorItem;
     } catch (err) {
+      console.error("Failed to update item", err);
       setError("Failed to update item");
+      throw err;
     }
   }
 
   useEffect(() => {
-    fetchItems();
+    loadItems();
   }, [vendorId]);
 
-  return { items, loading, error, fetchItems, addItem, updateItem };
+  return { items, loading, error, refresh: loadItems, addItem, editItem };
 }

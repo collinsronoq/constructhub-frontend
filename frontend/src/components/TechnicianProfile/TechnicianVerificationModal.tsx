@@ -11,7 +11,7 @@ interface CertificationInput {
 export interface TechnicianVerificationPayload {
   technicianId: string;
   specialization: string;
-  certifications: { name: string; fileUrl?: string }[];
+  certifications: { name: string; file?: File }[];
 }
 
 interface TechnicianVerificationModalProps {
@@ -76,7 +76,7 @@ const TechnicianVerificationModal: React.FC<TechnicianVerificationModalProps> = 
       specialization,
       certifications: certifications.map((c) => ({
         name: c.name,
-        fileUrl: c.previewUrl,
+        file: c.file,
       })),
     };
 

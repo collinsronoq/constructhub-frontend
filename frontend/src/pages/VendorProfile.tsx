@@ -1,139 +1,209 @@
-import VendorHeader from "../components/VendorProfile/VendorHeader"
-import image2 from "../assets/image_2.jpg"
-import image5 from "../assets/image_5.jpg"
-import VendorAbout from "../components/VendorProfile/VendorAbout"
-import VendorShowcase from "../components/VendorProfile/VendorShowcase/VendorShowcase"
-import VendorReviews from "../components/VendorProfile/VendorReviews"
-import { useVendorProfile } from "../hooks/useVendorProfile"
-import { useVendorItems } from "../hooks/useVendorItems"
+import { useEffect, useRef, useState, useMemo } from "react";
+import VendorHeader from "../components/VendorProfile/VendorHeader";
+import VendorAbout from "../components/VendorProfile/VendorAbout";
+import VendorShowcase from "../components/VendorProfile/VendorShowcase/VendorShowcase";
+import VendorReviews from "../components/VendorProfile/VendorReviews";
+import { useVendorProfile } from "../hooks/useVendorProfile";
+import { useVendorItems } from "../hooks/useVendorItems";
+import { useAuth } from "../hooks/auth/useAuth";
+import { useVendorReviews } from "../hooks/useVendorReviews";
 
-const VendorProfile = () =>{
+const VendorProfile = () => {
+  const { user } = useAuth();
+  const userId = user?.id;
 
-  const vendorId = "vendor_001";
-  const { vendor, loading: profileLoading } = useVendorProfile(vendorId);
-  const { items, loading: itemsLoading } = useVendorItems(vendorId)
+  const { vendor, loading: profileLoading, error, createProfile, updateProfile, refresh, uploadBanner, uploadLogo } =
+    useVendorProfile(userId);
+  const { items, loading: itemsLoading, addItem, editItem } = useVendorItems(userId || 0);
+  const { reviews } = useVendorReviews(userId);
 
-  const FakeVendorInfo = {
-    name: "Ronok Hardware",
-    categories: ["roofing materials", "electrical materilas"],
-    location: "Rafiki, Nakuru",
-    contact: {
-      phone: "254 712 345 678",
-      email: "vendor2gmail.com"
-    },
-    verified: true,
-    bannerUrl: image5,
-    logoUrl: image2,
-    averageRating: 4,
-    isVendorView: true,  // determines visibility of edit/verify buttons
+  const [form, setForm] = useState({
+    name: "",
+    categories: "",
+    location: "",
+    supplier_type: "",
+    phone: "",
+    email: "",
+    short_description: "",
     availability: "Open",
-    reviews: [
-      {
-        id: "1",
-        reviewerName: "John Mwangi",
-        reviewerRole: "Builder",
-        rating: 5,
-        date: "Oct 5, 2025",
-        review: "Very professional and punctual. The wiring was done perfectly!",
-      },
-      {
-        id: "2",
-        reviewerName: "Sarah Otieno",
-        reviewerRole: "Contractor",
-        rating: 4,
-        date: "Oct 3, 2025",
-        review: "Good work overall. Slight delay on completion but well executed.",
-      },
-      {
-        id: "3",
-        reviewerName: "James Kariuki",
-        reviewerRole: "Builder",
-        rating: 5,
-        date: "Sep 29, 2025",
-        review: "Reliable and skilled technician. Definitely recommend!",
-      },
-    ],
-  }
+  });
 
-  const initialItems = [
-    {
-      id: "1",
-      name: "Cement 50kg Bag",
-      category: "Building Materials",
-      unit: "bag",
-      price: 800,
-      available: true,
-      imageUrl: image5,
-    },
-    {
-      id: "2",
-      name: "Cement 50kg Bag",
-      category: "Building Materials",
-      unit: "bag",
-      price: 800,
-      available: true,
-      imageUrl: image5,
-    },
-    {
-      id: "3",
-      name: "Cement 50kg Bag",
-      category: "Plumbing",
-      unit: "bag",
-      price: 800,
-      available: true,
-      imageUrl: image5,
-    },
-    {
-      id: "4",
-      name: "Cement 50kg Bag",
-      category: "Roofing",
-      unit: "bag",
-      price: 800,
-      available: true,
-      imageUrl: image5,
-    },
-    {
-      id: "5",
-      name: "Gloss Paint",
-      category: "Paints",
-      unit: "litre",
-      price: 550,
-      available: false,
-      imageUrl: image2,
-    },
-        
-  ]
+  const bannerInputRef = useRef<HTMLInputElement | null>(null);
+  const logoInputRef = useRef<HTMLInputElement | null>(null);
 
-  const VendorInfo = vendor || FakeVendorInfo;
-  const VendorItems = items.length ? items : initialItems;
+  useEffect(() => {
+    if (vendor) {
+      setForm({
+        name: vendor.name || "",
+        categories: vendor.categories?.join(", ") || "",
+        location: vendor.location || "",
+        supplier_type: vendor.supplier_type || "",
+        phone: vendor.contact?.phone || "",
+        email: vendor.contact?.email || "",
+        short_description: vendor.short_description || "",
+        availability: vendor.availability || "Open",
+      });
+    }
+  }, [vendor]);
 
-  if(profileLoading || itemsLoading)
-    return <p className="text-center py-8">Loading vendor details..</p>
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const payload = {
+      name: form.name,
+      categories: form.categories ? form.categories.split(",").map((c) => c.trim()).filter(Boolean) : [],
+      location: form.location,
+      supplier_type: form.supplier_type,
+      contact: { phone: form.phone, email: form.email },
+      short_description: form.short_description,
+      availability: form.availability,
+    };
+    if (vendor) {
+      await updateProfile(payload);
+    } else {
+      await createProfile(payload);
+    }
+    await refresh();
+  };
+
+  const displayVendor = vendor || {
+    name: form.name || "Vendor",
+    categories: form.categories ? form.categories.split(",").map((c) => c.trim()).filter(Boolean) : [],
+    location: form.location,
+    contact: { phone: form.phone, email: form.email },
+    verified: false,
+    banner_url: undefined,
+    logo_url: undefined,
+    average_rating: 0,
+    isVendorView: true,
+    availability: form.availability,
+    short_description: form.short_description,
+    reviews: [],
+  };
+
+  const showcaseItems = useMemo(() => {
+    return items.map((it) => ({
+      id: String(it.id),
+      name: it.name,
+      category: it.category,
+      subcategory: it.subcategory || undefined,
+      unit: it.unit,
+      price: it.price,
+      description: it.description || undefined,
+      available: it.available,
+      imageUrl: it.image_url || "",
+    }));
+  }, [items]);
+
+  const loadingState = profileLoading || itemsLoading;
 
   return (
     <>
-      <VendorHeader 
-        name={VendorInfo.name} 
-        categories={VendorInfo.categories} 
-        location={VendorInfo.location}
-        contact={VendorInfo.contact}
-        verified={VendorInfo.verified}
-        bannerUrl={VendorInfo.bannerUrl}
-        // logoUrl={VendorInfo.logoUrl}
-        averageRating={VendorInfo.averageRating}
-        isVendorView={VendorInfo.isVendorView}
-        
+      {!userId && <div className="p-6">Please log in as a vendor to manage your profile.</div>}
+      {loadingState && <p className="text-center py-8">Loading vendor details...</p>}
+      {error && <p className="text-red-600">{error}</p>}
+
+      <VendorHeader
+        name={displayVendor.name}
+        categories={displayVendor.categories}
+        location={displayVendor.location || undefined}
+        contact={displayVendor.contact || undefined}
+        verified={displayVendor.verified}
+        bannerUrl={displayVendor.banner_url || undefined}
+        logoUrl={displayVendor.logo_url || undefined}
+        averageRating={displayVendor.average_rating}
+        isVendorView
+        availability={displayVendor.availability as any}
+        onChangeAvailability={async (status) => {
+          await updateProfile({ availability: status });
+          await refresh();
+        }}
       />
+
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-4 bg-white dark:bg-gray-900 p-4 rounded-lg border border-gray-200 dark:border-gray-700 my-4"
+      >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <input className="input" placeholder="Business name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
+          <input className="input" placeholder="Categories (comma separated)" value={form.categories} onChange={(e) => setForm({ ...form, categories: e.target.value })} />
+          <input className="input" placeholder="Location" value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} />
+          <input className="input" placeholder="Supplier type (Retail/Wholesale)" value={form.supplier_type} onChange={(e) => setForm({ ...form, supplier_type: e.target.value })} />
+          <input className="input" placeholder="Phone" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+          <input className="input" placeholder="Email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+          <select className="input" value={form.availability} onChange={(e) => setForm({ ...form, availability: e.target.value })}>
+            <option>Open</option>
+            <option>Closed</option>
+            <option>By Appointment</option>
+          </select>
+        </div>
+        <textarea className="input" placeholder="Short description" value={form.short_description} onChange={(e) => setForm({ ...form, short_description: e.target.value })} />
+
+        <div className="flex flex-col md:flex-row gap-4 items-start">
+          <div className="flex items-center gap-2">
+            <input
+              ref={bannerInputRef}
+              type="file"
+              accept="image/*"
+              className="text-sm"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) uploadBanner(file);
+              }}
+            />
+            <span className="text-sm text-gray-500">Upload banner</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <input
+              ref={logoInputRef}
+              type="file"
+              accept="image/*"
+              className="text-sm"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) uploadLogo(file);
+              }}
+            />
+            <span className="text-sm text-gray-500">Upload logo</span>
+          </div>
+        </div>
+
+        <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-md">
+          {vendor ? "Update Profile" : "Create Profile"}
+        </button>
+      </form>
+
       <VendorAbout />
-
-      <VendorShowcase initialItems={VendorItems} isVendorView = {true}/>
-
-      <VendorReviews reviews={VendorInfo.reviews} verified={VendorInfo.verified}/>
-
-
+      <VendorShowcase
+        initialItems={showcaseItems}
+        isVendorView={true}
+        onAddItem={async (item) => {
+          await addItem({
+            name: item.name,
+            category: item.category,
+            subcategory: item.subcategory,
+            unit: item.unit || "",
+            price: item.price,
+            description: item.description,
+            available: item.available,
+            image_url: item.imageUrl,
+          } as any);
+        }}
+        onEditItem={async (id, item) => {
+          await editItem(Number(id), {
+            name: item.name,
+            category: item.category,
+            subcategory: item.subcategory,
+            unit: item.unit,
+            price: item.price,
+            description: item.description,
+            available: item.available,
+            image_url: item.imageUrl,
+          });
+        }}
+      />
+      <VendorReviews reviews={reviews} verified={displayVendor.verified} isVendorView />
     </>
-    
-  )
-}
+  );
+};
 
-export default VendorProfile
+export default VendorProfile;
