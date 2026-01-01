@@ -32,17 +32,18 @@ async def fetch_articles(
         raise HTTPException(status_code=500, detail="Unable to fetch articles") from exc
 
 
-@router.get("/", response_model=list[ArticleOut])
+@router.get("/featured", response_model=list[ArticleOut])
 async def fetch_featured_articles(limit: int = 8, offset: int = 0, db: AsyncSession = Depends(get_db)):
     try:
-        return await list_articles(db=db, limit=limit, offset=offset)
-    
+        return await list_articles(db=db, limit=limit, offset=offset, featured_only=True)
     except HTTPException:
         raise
-
     except Exception as exc:
         logger.exception("Failed to fetch featured articles")
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Unexpected error {exc} encountered while fetching featured articles")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Unexpected error {exc} encountered while fetching featured articles",
+        )
 
 
 @router.get("/{article_id}", response_model=ArticleOut)

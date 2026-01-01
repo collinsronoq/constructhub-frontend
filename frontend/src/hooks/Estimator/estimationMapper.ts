@@ -1,5 +1,5 @@
 import type { EstimationDetail, EstimationRequest } from "../../services/api/estimationTypes";
-import type { EstimationBreakdown } from "./useEstimationData";
+import type { EstimationBreakdown } from "./types";
 
 export interface EstimationMeta {
   request?: EstimationRequest;

@@ -1,6 +1,6 @@
 // src/components/Articles/ArticleCard.tsx
 import React from "react";
-import type { Article } from "../../hooks/Articles/useArticles";
+import type { Article } from "../../services/api/articles";
 import { useNavigate } from "react-router-dom";
 import { Clock2 } from "lucide-react";
 
@@ -29,8 +29,8 @@ const ArticleCard: React.FC<{ article: Article }> = ({ article }) => {
             {article.category}
           </div>
           <div className="flex justify-center text-xs text-gray-500">
-            <Clock2 size={15}/>
-            <span className="pl-1">{article.readTime}</span>
+            <Clock2 size={15} />
+            <span className="pl-1">{article.read_time}</span>
 
           </div>
         </div>

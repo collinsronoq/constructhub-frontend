@@ -6,7 +6,7 @@ import ArticleFilters from "../components/Articles/ArticleFilters";
 import ArticleCard from "../components/Articles/ArticleCard";
 
 const ArticlesPage: React.FC = () => {
-  const { articles, featuredArticles, loading } = useArticles();
+  const { articles, featuredArticles, loading, error } = useArticles();
 
   const [category, setCategory] = useState<string>("All");
   const [sortBy, setSortBy] = useState<string>("Most Recent");
@@ -17,7 +17,7 @@ const ArticlesPage: React.FC = () => {
     if (category !== "All") list = list.filter((a) => a.category === category);
 
     if (sortBy === "Most Recent") {
-      list = [...list].sort((a, b) => +new Date(b.publishDate) - +new Date(a.publishDate));
+      list = [...list].sort((a, b) => +new Date(b.publish_date) - +new Date(a.publish_date));
     } else if (sortBy === "Most Popular") {
       list = [...list].sort((a, b) => (b.views || 0) - (a.views || 0));
     } else if (sortBy === "Alphabetical") {
@@ -52,6 +52,7 @@ const ArticlesPage: React.FC = () => {
       </div>
 
       {loading && <div className="text-center text-gray-500">Loading articles...</div>}
+      {error && <div className="text-center text-red-500 text-sm">{error}</div>}
 
       {!loading && (
         <>

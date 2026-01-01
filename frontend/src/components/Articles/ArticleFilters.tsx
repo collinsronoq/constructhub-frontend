@@ -1,6 +1,6 @@
 // src/components/Articles/ArticleFilters.tsx
 import React from "react";
-import type { ArticleCategory } from "../../hooks/Articles/useArticles";
+import type { ArticleCategory } from "../../services/api/articles";
 
 interface Props {
   category: string;

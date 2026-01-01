@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { fetchEstimationById } from "../../services/api/estimations";
-import { mockEstimationData, type EstimationBreakdown } from "./useEstimationData";
+import { mockEstimationData } from "./useEstimationData";
+import type { EstimationBreakdown } from "./types";
 import { mapEstimationDetailToBreakdown } from "./estimationMapper";
 
 export function useEstimationById(id?: string, useMock?: boolean) {

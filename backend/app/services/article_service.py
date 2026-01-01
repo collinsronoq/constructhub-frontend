@@ -11,8 +11,13 @@ from app.schemas.article_schema import ArticleCreate, ArticleUpdate, ArticleOut
 logger = setup_logger("services.article")
 
 
-async def list_articles(db: AsyncSession, limit: int = 50, offset: int = 0) -> List[ArticleOut]:
-    stmt = select(Article).order_by(Article.publish_date.desc()).offset(offset).limit(limit)
+async def list_articles(
+    db: AsyncSession, limit: int = 50, offset: int = 0, featured_only: bool = False
+) -> List[ArticleOut]:
+    stmt = select(Article).order_by(Article.publish_date.desc())
+    if featured_only and hasattr(Article, "is_featured"):
+        stmt = stmt.where(Article.is_featured.is_(True))
+    stmt = stmt.offset(offset).limit(limit)
     result = await db.execute(stmt)
     articles = result.scalars().all()
     return [

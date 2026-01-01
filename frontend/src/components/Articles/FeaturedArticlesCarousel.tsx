@@ -1,6 +1,6 @@
 // src/components/Articles/FeaturedArticlesCarousel.tsx
 import React from "react";
-import type { Article } from "../../hooks/Articles/useArticles"; 
+import type { Article } from "../../services/api/articles"; 
 import ArticleCard from "./ArticleCard";
 
 const FeaturedArticlesCarousel: React.FC<{ items: Article[] }> = ({ items }) => {

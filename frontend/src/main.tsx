@@ -17,6 +17,7 @@ import EstimateDetail from "./pages/EstimateDetail"
 import VendorDirectory from "./pages/VendorDirectory"
 import ArticlesPage from "./pages/Articles"
 import ArticleDetailsPage from "./pages/ArticleDetailsPage"
+import AdminArticlesPage from "./pages/AdminArticles"
 
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
@@ -38,6 +39,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           <Route path="/ai" element={<AIChat />} />
           <Route path="/articles" element={<ArticlesPage />} />
           <Route path="/articles/:id" element={<ArticleDetailsPage />} />
+          <Route path="/admin/articles" element={<AdminArticlesPage />} />
           <Route path="/vendor/profile" element={<VendorProfile />} />
           <Route path="/technician/profile" element = {<TechnicianProfile />} />
           
@@ -47,4 +49,3 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     </BrowserRouter>
   </React.StrictMode>
 )
-

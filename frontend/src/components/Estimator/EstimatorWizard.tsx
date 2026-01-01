@@ -3,10 +3,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import ProjectDetailsResidentialStep from "./EstimatorForms/EstimatorProjectDetails";
 import MaterialSelectionStep1 from "./EstimatorForms/EstimatorMaterialSelection";
 import type { MaterialSelectionProps } from "./EstimatorForms/EstimatorMaterialSelection";
-import LabourCostStep from "./EstimatorLaborList";
+import EstimatorReviewStep from "./EstimatorReviewStep";
 import EstimateSummary from "./EstimatorSummary";
 import EstimatorBreakdown from "./EstimatorBreakdown";
 import { useEstimationWizard } from "../../hooks/useEstimationWizard";
+import { mapEstimationDetailToBreakdown } from "../../hooks/Estimator/estimationMapper";
+import type { EstimationRequest } from "../../services/api/estimationTypes";
 
 export type WizardStep =
   | "projectDetails"
@@ -24,9 +26,12 @@ interface ProjectDetailsData {
     bedrooms?: number;
     bathrooms?: number;
     rooms?: string[];
+    floorArea?: number;
+    storeys?: number;
   };
   roofStyle?: "pitched" | "flat";
   finishing?: string;
+  perimeterWall?: { include?: boolean; lengthM?: number; includeGate?: boolean };
 }
 
 const steps: { id: WizardStep; label: string }[] = [
@@ -43,6 +48,18 @@ const EstimatorWizard: React.FC = () => {
   const [selectedMaterials1, setSelectedMaterials1] = useState<MaterialSelectionProps["initialData"]>();
   const { request, updateSection, submit, submitting, result, error } = useEstimationWizard();
   const [localResult, setLocalResult] = useState(result);
+  const uiBreakdown = useMemo(
+    () =>
+      localResult
+        ? mapEstimationDetailToBreakdown(localResult, {
+            request,
+            projectName: projectDetails.projectName,
+            landSize: projectDetails.land?.size,
+            finishing: projectDetails.finishing,
+          })
+        : null,
+    [localResult, request, projectDetails]
+  );
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -69,6 +86,29 @@ const EstimatorWizard: React.FC = () => {
   };
 
   const stepContent = useMemo(() => {
+    const mapStructureType = (t?: string): EstimationRequest["superstructure"]["structure_type"] => {
+      switch (t) {
+        case "2-storey":
+          return "two_storey";
+        case "3-storey":
+          return "three_storey";
+        default:
+          return "bungalow";
+      }
+    };
+
+    const mapRoofCover = (pref?: string) => {
+      if (pref === "stone-coated") return "stone_coated_tiles";
+      if (pref === "clay tiles") return "clay_tiles";
+      return "corrugated_mabati";
+    };
+
+    const mapWalling = (material?: string) => {
+      if (material === "bricks") return "burnt_bricks";
+      if (material === "concrete blocks" || material === "machine-cut stones") return "concrete_blocks";
+      return request.superstructure.blockwork_type;
+    };
+
     switch (currentStep) {
       case "projectDetails":
         return (
@@ -96,14 +136,29 @@ const EstimatorWizard: React.FC = () => {
               updateSection("superstructure", {
                 ...request.superstructure,
                 land_size_sqm: Number(data.land?.size || request.superstructure.land_size_sqm || 1),
-                structure_type: (data.structure?.type as any) || request.superstructure.structure_type,
+                structure_type: mapStructureType(data.structure?.type),
                 bedrooms: data.structure?.bedrooms || request.superstructure.bedrooms || 1,
                 bathrooms: data.structure?.bathrooms || request.superstructure.bathrooms || 1,
+                finishing_level:
+                  data.finishing === "premium" ? "luxury" : data.finishing === "economy" ? "standard" : (data.finishing as any) || request.superstructure.finishing_level || "standard",
+                declared_floor_area_sqm: data.structure?.floorArea || request.superstructure.declared_floor_area_sqm,
               });
               updateSection("roofing", {
                 ...request.roofing,
                 building_footprint_sqm: Number(data.land?.size || request.roofing.building_footprint_sqm || 1),
                 roof_type: data.roofStyle === "flat" ? "flat" : request.roofing.roof_type,
+                storeys: data.structure?.storeys || (data.structure?.type === "3-storey" ? 3 : data.structure?.type === "2-storey" ? 2 : 1),
+              });
+              updateSection("finishes", {
+                ...request.finishes,
+                total_floor_area_sqm: data.structure?.floorArea || Number(data.land?.size || request.finishes.total_floor_area_sqm || 0),
+                finishing_level:
+                  data.finishing === "premium" ? "luxury" : data.finishing === "economy" ? "standard" : (data.finishing as any) || request.finishes.finishing_level || "standard",
+              });
+              updateSection("external_works", {
+                ...request.external_works,
+                perimeter_wall_length_m: data.perimeterWall?.include ? data.perimeterWall.lengthM || 0 : request.external_works.perimeter_wall_length_m,
+                include_gate: data.perimeterWall?.include ? data.perimeterWall.includeGate || false : request.external_works.include_gate,
               });
               goToNextStep();
             }}
@@ -116,10 +171,49 @@ const EstimatorWizard: React.FC = () => {
               ...selectedMaterials1,
               soilType: projectDetails.land?.soilType,
               bathrooms: projectDetails.structure?.bathrooms || 2,
-              roofing: projectDetails.roofStyle ? { roofStyle: projectDetails.roofStyle } : undefined,
             }}
             onNext={(data) => {
               setSelectedMaterials1(data);
+              if (data.foundation?.type) {
+                updateSection("foundation", { ...request.foundation, foundation_type: data.foundation.type });
+              }
+              if (data.walling?.material) {
+                updateSection("superstructure", { ...request.superstructure, blockwork_type: mapWalling(data.walling.material) });
+              }
+              if (data.roofing?.roofingPreference) {
+                updateSection("roofing", { ...request.roofing, roof_covering: mapRoofCover(data.roofing.roofingPreference) });
+              }
+              if (data.finishing) {
+                const level = data.finishing === "premium" ? "luxury" : data.finishing === "basic" ? "standard" : data.finishing;
+                updateSection("finishes", { ...request.finishes, finishing_level: level as any });
+                updateSection("superstructure", { ...request.superstructure, finishing_level: level as any });
+              }
+              // Basic services defaults based on rooms/baths
+              const sockets = Math.max(8, (projectDetails.structure?.bedrooms || 1) * 4);
+              const lighting = Math.max(8, (projectDetails.structure?.rooms?.length || 4) * 2);
+              const plumbing = Math.max(4, (projectDetails.structure?.bathrooms || 1) * 2);
+              const floorArea =
+                Number(
+                  projectDetails.structure?.floorArea ||
+                    projectDetails.land?.size ||
+                    request.services_first_fix.floor_area_sqm ||
+                    0
+                ) || 0;
+              updateSection("services_first_fix", {
+                ...request.services_first_fix,
+                floor_area_sqm: floorArea,
+                socket_points: sockets,
+                lighting_points: lighting,
+                plumbing_points: plumbing,
+              });
+              updateSection("services_second_fix", {
+                ...request.services_second_fix,
+                floor_area_sqm: floorArea,
+                switches: sockets,
+                sockets,
+                light_fittings: lighting,
+                sanitary_fixtures: projectDetails.structure?.bathrooms || 1,
+              });
               goToNextStep();
             }}
             onBack={goToPreviousStep}
@@ -127,11 +221,13 @@ const EstimatorWizard: React.FC = () => {
         );
       case "labourEstimate":
         return (
-          <LabourCostStep
+          <EstimatorReviewStep
             projectDetails={{
               structureType: projectDetails.structure?.type || "Bungalow",
               floorArea: Number(projectDetails.land?.size || 100),
               quality: projectDetails.finishing || "Standard",
+              roofStyle: projectDetails.roofStyle,
+              location: request.site_survey.location,
             }}
             onBack={goToPreviousStep}
             onNext={() => {
@@ -141,21 +237,26 @@ const EstimatorWizard: React.FC = () => {
         );
       case "summary":
         return (
-          localResult && (
+          uiBreakdown && (
             <EstimateSummary
               data={{
-                projectName: request.project_name || "Project",
+                projectName: uiBreakdown.projectTitle,
                 projectType: projectDetails.structure?.type || "Residential",
                 location: request.site_survey.location || "N/A",
-                totalCost: localResult.summary?.total_cost || 0,
+                totalCost: uiBreakdown.totalCost,
                 duration: "",
-                categories:
-                  localResult.breakdown?.map((b: any) => ({
-                    name: b.phase || b.name || "Phase",
-                    cost: b.totals?.phase_total || b.subtotal || 0,
-                  })) || [],
-                materialCost: localResult.summary?.material_cost || 0,
-                laborCost: localResult.summary?.labour_cost || 0,
+                categories: uiBreakdown.phases.map((p) => ({
+                  name: p.title,
+                  cost: p.subtotal,
+                })),
+                materialCost: uiBreakdown.phases.reduce(
+                  (sum, p) => sum + p.materials.reduce((mSum, m) => mSum + m.subtotal, 0),
+                  0
+                ),
+                laborCost: uiBreakdown.phases.reduce(
+                  (sum, p) => sum + p.labour.reduce((lSum, l) => lSum + l.subtotal, 0),
+                  0
+                ),
                 avgKenyaCost: 0,
                 potentialSavings: 0,
                 keyChoices: [],
@@ -168,14 +269,12 @@ const EstimatorWizard: React.FC = () => {
         );
       case "breakdown":
         return (
-          localResult && (
-            <EstimatorBreakdown data={localResult} onBackToSummary={() => setCurrentStep("summary")} />
-          )
+          uiBreakdown && <EstimatorBreakdown data={uiBreakdown} onBackToSummary={() => setCurrentStep("summary")} />
         );
       default:
         return null;
     }
-  }, [currentStep, projectDetails, selectedMaterials1, request, localResult]);
+  }, [currentStep, projectDetails, selectedMaterials1, request, localResult, uiBreakdown]);
 
   return (
     <div className="mx-auto mb-8 mt-4 p-6 bg-surface-light dark:bg-surface-dark rounded-xl shadow-md space-y-6">
