@@ -93,13 +93,16 @@ const Marketplace: React.FC = () => {
               category={item.category}
               price={item.price}
               unit={item.unit}
-              imageUrl={item.image_url || ""}
+              imageUrl={(item as any).imageUrl || (item as any).image_url || ""}
               available={item.available}
-              vendorId={item.vendor_id ? String(item.vendor_id) : undefined}
-              vendorName={item.vendor_name || "Vendor"}
-              vendorLocation={item.vendor_location || ""}
-              vendorVerified={item.vendor_verified || false}
-              onViewVendor={() => item.vendor_id && handleViewVendor(String(item.vendor_id))}
+              vendorId={item.vendorId ? String(item.vendorId) : item.vendor_id ? String(item.vendor_id) : undefined}
+              vendorName={(item as any).vendorName || (item as any).vendor_name || "Vendor"}
+              vendorLocation={(item as any).vendorLocation || (item as any).vendor_location || ""}
+              vendorVerified={(item as any).vendorVerified ?? (item as any).vendor_verified ?? false}
+              onViewVendor={() => {
+                const vid = item.vendorId ?? item.vendor_id;
+                if (vid) handleViewVendor(String(vid));
+              }}
             />
           ))}
         </div>

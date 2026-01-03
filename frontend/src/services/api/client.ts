@@ -67,6 +67,18 @@ export async function apiFetch<T>(path: string, options: RequestOptions = {}): P
     const error = new Error("API error") as Error & { status?: number; detail?: any };
     error.status = res.status;
     error.detail = detail;
+
+    // If unauthorized/expired, clear token and redirect to login
+    if (auth && (res.status === 401 || res.status === 403)) {
+      const path = window.location.pathname;
+      const onAuthPage = path.startsWith("/login") || path.startsWith("/signup");
+      setAccessToken(null);
+      if (!onAuthPage) {
+        // Use replace to avoid back navigation to protected pages
+        window.location.replace("/login");
+      }
+    }
+
     throw error;
   }
 

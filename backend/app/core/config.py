@@ -13,7 +13,7 @@ class Settings(BaseSettings):
  
     SECRET_KEY: str = "ehbdhe"
     JWT_ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 120
 
     class Config:
         env_file = ".env"

@@ -22,6 +22,10 @@ export async function getMyTechnicianProfile(userId: number): Promise<Technician
   return apiFetch<TechnicianProfile>("/technicians/me", { method: "GET" });
 }
 
+export async function getTechnicianProfileById(profileId: number): Promise<TechnicianProfile> {
+  return apiFetch<TechnicianProfile>(`/technicians/profile/by-id/${profileId}`, { method: "GET", auth: false });
+}
+
 export async function listMyCertifications(): Promise<TechnicianCertification[]> {
   return apiFetch<TechnicianCertification[]>("/technicians/certifications", { method: "GET" });
 }

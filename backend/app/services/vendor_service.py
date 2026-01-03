@@ -64,3 +64,9 @@ class VendorService:
         q = await db.execute(select(VendorProfile).where(VendorProfile.user_id == user_id))
         vendor = q.scalars().first()
         return vendor
+
+    @staticmethod
+    async def get_vendor_profile_by_id(vendor_id: int, db: AsyncSession):
+        q = await db.execute(select(VendorProfile).where(VendorProfile.id == vendor_id))
+        vendor = q.scalars().first()
+        return vendor

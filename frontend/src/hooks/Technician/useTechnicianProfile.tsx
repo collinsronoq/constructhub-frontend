@@ -4,27 +4,30 @@ import {
   updateTechnicianProfile,
   getTechnicianProfile,
   getMyTechnicianProfile,
+  getTechnicianProfileById,
 } from "../../services/api/technicians";
 import type { TechnicianProfile, TechnicianProfileCreate, TechnicianProfileUpdate } from "../../services/api/types";
 
-export function useTechnicianProfile(userId?: number) {
+export function useTechnicianProfile(userId?: number, profileId?: number) {
   const [profile, setProfile] = useState<TechnicianProfile | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
-    if (!userId) return;
+    if (!userId && !profileId) return;
     setLoading(true);
     setError(null);
     try {
-      const data = await getMyTechnicianProfile(userId);
+      const data = profileId
+        ? await getTechnicianProfileById(profileId)
+        : await getMyTechnicianProfile(userId as number);
       setProfile(data);
     } catch (err: any) {
       setError(err?.detail?.detail || "Failed to load profile");
     } finally {
       setLoading(false);
     }
-  }, [userId]);
+  }, [userId, profileId]);
 
   const create = useCallback(async (payload: TechnicianProfileCreate) => {
     setLoading(true);

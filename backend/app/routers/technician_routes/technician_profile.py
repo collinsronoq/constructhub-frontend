@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from app.core.database import get_db
 from app.models.technician import TechnicianProfile
+from app.services.technician_profile_service import TechnicianProfileService
 from app.schemas.technician_schema import (
     TechnicianProfileCreate,
     TechnicianProfileUpdate,
@@ -122,8 +123,7 @@ async def get_public_profile(
     db: AsyncSession = Depends(get_db)
 ):
     try:
-        q = await db.execute(select(TechnicianProfile).where(TechnicianProfile.user_id == user_id))
-        profile = q.scalars().first()
+        profile = await TechnicianProfileService.get_by_user_id(user_id, db)
 
         if not profile:
             raise HTTPException(status_code=404, detail="Technician not found")
@@ -133,6 +133,26 @@ async def get_public_profile(
         raise
     except Exception as exc:
         logger.exception("Failed to load technician public profile data", extra={"user_id": user_id})
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Unexpected error incurred",
+        ) from exc
+
+
+@router.get("/profile/by-id/{profile_id}", response_model=TechnicianProfilePublic)
+async def get_public_profile_by_id(
+    profile_id: int,
+    db: AsyncSession = Depends(get_db)
+):
+    try:
+        profile = await TechnicianProfileService.get_by_profile_id(profile_id, db)
+        if not profile:
+            raise HTTPException(status_code=404, detail="Technician not found")
+        return profile
+    except HTTPException:
+        raise
+    except Exception as exc:
+        logger.exception("Failed to load technician public profile data", extra={"profile_id": profile_id})
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Unexpected error incurred",

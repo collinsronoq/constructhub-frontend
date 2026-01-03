@@ -3,30 +3,42 @@ import React, { useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useArticle, useArticles } from "../hooks/Articles/useArticles";
 import ArticleCard from "../components/Articles/ArticleCard";
+import { useAuth } from "../hooks/auth/useAuth";
 
 const ArticleDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const numericId = id ? Number(id) : undefined;
-  const { article, loading, error } = useArticle(numericId);
+  const { user } = useAuth();
+  const { article, loading, error } = useArticle(id);
   const { articles } = useArticles();
 
-  if (loading) return <div className="p-6 text-gray-500">Loading article...</div>;
-  if (error || !article) return <div className="p-6 text-red-500">Article not found.</div>;
-
-  const paragraphs = article.content.split("\n\n");
   const related = useMemo(() => {
     if (!article) return [];
     return articles.filter((a) => a.category === article.category && a.id !== article.id).slice(0, 3);
   }, [articles, article]);
+
+  if (loading) return <div className="p-6 text-gray-500">Loading article...</div>;
+  if (error || !article)
+    return (
+      <div className="p-6 text-red-500">
+        <p>Article not found or failed to load.</p>
+        {error && <p className="text-sm text-red-400 mt-2">{error}</p>}
+        <button onClick={() => navigate(-1)} className="mt-3 text-sm px-3 py-2 border rounded">
+          Go back
+        </button>
+      </div>
+    );
+
+  const paragraphs = (article.content || "").split(/\n\s*\n/);
 
   return (
     <section className="p-6 bg-surface-light dark:bg-surface-dark rounded-xl shadow-sm my-2">
       <div className="bg-background-light dark:bg-background-dark p-6 rounded-xl">
         <div className="flex items-start justify-between">
           <div>
-            <div className="text-sm text-gray-500">
-              {article.category} • {article.read_time}
+            <div className="text-sm text-gray-500 flex items-center gap-1">
+              <span>{article.category}</span>
+              {article.read_time && <span className="text-xs text-gray-400">• {article.read_time}</span>}
             </div>
             <h1 className="text-2xl md:text-4xl font-bold mt-2 text-gray-900 dark:text-gray-100">{article.title}</h1>
             <div className="mt-2 text-sm text-gray-600">
@@ -37,6 +49,14 @@ const ArticleDetailsPage: React.FC = () => {
             <button onClick={() => navigate(-1)} className="text-sm px-3 py-2 border rounded">
               Back
             </button>
+            {user?.role === "admin" && (
+              <button
+                onClick={() => navigate("/admin/articles")}
+                className="ml-2 text-sm px-3 py-2 border rounded bg-blue-50 text-blue-700"
+              >
+                Manage
+              </button>
+            )}
           </div>
         </div>
 

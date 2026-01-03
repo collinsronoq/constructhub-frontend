@@ -5,6 +5,7 @@ import "./index.css"
 import DashboardLayout from "./layouts/DashboardLayout"
 import Dashboard from "./pages/BuilderDashboard"
 import VendorProfile from "./pages/VendorProfile"
+import VendorItemsPage from "./pages/VendorItems"
 import Estimates from "./pages/Estimates"
 import GetEstimate from "./pages/GetEstimate"
 import TechnicianDirectory from "./pages/TechnicianDirectory"
@@ -36,6 +37,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           <Route path="/marketplace" element={<Marketplace />} />
           <Route path="/technicians" element={<TechnicianDirectory />} />
           <Route path="/vendors" element={<VendorDirectory />} />
+          <Route path="/vendor/items" element={<VendorItemsPage />} />
+          <Route path="/vendors/:vendorId/items" element={<VendorItemsPage />} />
+          <Route path="/vendors/:vendorId/profile" element={<VendorProfile />} />
           <Route path="/ai" element={<AIChat />} />
           <Route path="/articles" element={<ArticlesPage />} />
           <Route path="/articles/:id" element={<ArticleDetailsPage />} />

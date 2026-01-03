@@ -14,7 +14,7 @@ export type ArticleCategory =
   | "Site Preparation";
 
 export interface Article {
-  id: number;
+  id: number | string;
   title: string;
   category: ArticleCategory | string;
   content: string;
@@ -39,7 +39,7 @@ export async function fetchFeaturedArticles(limit = 8, offset = 0): Promise<Arti
   return apiFetch<Article[]>(`/articles/featured?limit=${limit}&offset=${offset}`, { method: "GET", auth: false });
 }
 
-export async function fetchArticle(id: number): Promise<Article> {
+export async function fetchArticle(id: number | string): Promise<Article> {
   return apiFetch<Article>(`/articles/${id}`, { method: "GET", auth: false });
 }
 

@@ -9,16 +9,19 @@ import { useTechnicianProfile } from "../hooks/Technician/useTechnicianProfile";
 import { useTechnicianCertifications } from "../hooks/Technician/useTechnicianCertifications";
 import { uploadTechnicianProfileImage } from "../services/api/technicianUploads";
 import { useTechnicianReviews } from "../hooks/Technician/useTechnicianReviews";
+import { useLocation, useParams } from "react-router-dom";
 
 const TechnicianProfile = () => {
   const { user } = useAuth();
   const userId = user?.id;
-  
+  const location = useLocation() as any;
+  const { technicianId: technicianIdParam } = useParams();
+  const viewProfileId = technicianIdParam ? Number(technicianIdParam) : location.state?.id;
 
-  const { profile, loading, error, createProfile, updateProfile, refresh } = useTechnicianProfile(userId);
+  const { profile, loading, error, createProfile, updateProfile, refresh } = useTechnicianProfile(userId, viewProfileId);
   const { certs, updateCertification, deleteCertification, loading: certLoading } =
     useTechnicianCertifications(userId);
-  const { reviews } = useTechnicianReviews(userId);
+  const { reviews } = useTechnicianReviews(viewProfileId || userId);
 
   const [isVerifyModalOpen, setIsVerifyModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -90,8 +93,10 @@ const TechnicianProfile = () => {
   const contactText = profile?.contact?.phone;
   const emailText = profile?.contact?.email;
 
-  if (!userId) {
-    return <div className="p-6">Please log in as a technician to manage your profile.</div>;
+  const isOwner = Boolean(userId && profile && profile.user_id === userId && !viewProfileId);
+
+  if (!userId && !viewProfileId) {
+    return <div className="p-6">Please log in to view profiles.</div>;
   }
 
   return (
@@ -148,8 +153,8 @@ const TechnicianProfile = () => {
         />
       </div>
 
-      {/* Verification prompt */}
-      {profile && !profile.verified && (
+      {/* Verification prompt (owner only) */}
+      {profile && !profile.verified && isOwner && (
         <div className="text-xs md:text-sm bg-yellow-50 dark:bg-yellow-900/40 border border-yellow-300 dark:border-yellow-700 text-yellow-800 dark:text-yellow-200 px-4 py-3 flex flex-col sm:flex-row justify-between items-center gap-2">
           <span>Your account is currently unverified. Upload certifications for admin review.</span>
           <button onClick={() => setIsVerifyModalOpen(true)} className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-1 rounded-md text-xs md:text-sm font-medium transition">
@@ -159,7 +164,7 @@ const TechnicianProfile = () => {
       )}
 
       {/* Certifications list */}
-      <div className="bg-white dark:bg-gray-900 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+      {isOwner && <div className="bg-white dark:bg-gray-900 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
         <div className="flex justify-between items-center mb-3">
           <h3 className="font-semibold">Certifications</h3>
           <button onClick={() => setIsVerifyModalOpen(true)} className="text-blue-600 text-sm">Add certification</button>
@@ -182,7 +187,7 @@ const TechnicianProfile = () => {
             </li>
           ))}
         </ul>
-      </div>
+      </div>}
 
       {/* Existing UI sections (bio/skills/reviews) use profile data when available */}
       {profile && (
@@ -207,7 +212,7 @@ const TechnicianProfile = () => {
       <TechnicianVerificationModal
         isOpen={isVerifyModalOpen}
         onClose={() => setIsVerifyModalOpen(false)}
-        technicianId={String(userId)}
+    technicianId={String(profile?.user_id || userId)}
         specialization={form.specialization || profile?.specialization || ""}
         existingCertifications={certs.map((c) => c.title || "Certification")}
       />

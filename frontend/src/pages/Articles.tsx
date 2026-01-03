@@ -4,9 +4,13 @@ import { useArticles } from "../hooks/Articles/useArticles";
 import FeaturedArticlesCarousel from "../components/Articles/FeaturedArticlesCarousel";
 import ArticleFilters from "../components/Articles/ArticleFilters";
 import ArticleCard from "../components/Articles/ArticleCard";
+import { useAuth } from "../hooks/auth/useAuth";
+import { useNavigate } from "react-router-dom";
 
 const ArticlesPage: React.FC = () => {
   const { articles, featuredArticles, loading, error } = useArticles();
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   const [category, setCategory] = useState<string>("All");
   const [sortBy, setSortBy] = useState<string>("Most Recent");
@@ -35,6 +39,14 @@ const ArticlesPage: React.FC = () => {
             <h2 className="text-xl md:text-4xl font-semibold text-gray-900 dark:text-gray-100">Learning Tips & Articles</h2>
             <p className="text-md md:text-4xl text-gray-600 dark:text-gray-400 mt-2">Practical construction articles to guide you in your projects.</p>
           </div>
+          {user?.role === "admin" && (
+            <button
+              onClick={() => navigate("/admin/articles")}
+              className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm"
+            >
+              Manage Articles
+            </button>
+          )}
 
           <div className="mt-4 md:mt-0">
             <ArticleFilters category={category} onCategoryChange={setCategory} sortBy={sortBy} onSortChange={setSortBy} />

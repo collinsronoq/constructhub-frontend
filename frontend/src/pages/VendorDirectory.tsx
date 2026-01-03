@@ -7,7 +7,7 @@ import VendorCard from "../components/VendorCard";
 import { useVendors } from "../hooks/VendorDirectory/useVendors";
 
 const VendorDirectory: React.FC = () => {
-  const { vendors, loading } = useVendors();
+  const { vendors, loading, error } = useVendors();
   const navigate = useNavigate();
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -100,6 +100,7 @@ const VendorDirectory: React.FC = () => {
       {loading && (
         <p className="text-center text-gray-500 dark:text-gray-400">Loading vendors...</p>
       )}
+      {error && <p className="text-center text-red-600">{error}</p>}
 
       {/* Vendor Cards */}
       {!loading && filteredVendors.length > 0 ? (

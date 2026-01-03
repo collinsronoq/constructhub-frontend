@@ -13,12 +13,17 @@ export interface VendorItem {
   image_url?: string | null;
 }
 
-export function useVendorItems(vendorId: number) {
+export function useVendorItems(vendorId?: number) {
   const [items, setItems] = useState<VendorItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   async function loadItems() {
+    if (!vendorId) {
+      setItems([]);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
@@ -33,6 +38,7 @@ export function useVendorItems(vendorId: number) {
   }
 
   async function addItem(payload: Omit<VendorItem, "id">) {
+    if (!vendorId) throw new Error("Missing vendor id");
     try {
       const created = await createVendorItem(vendorId, payload);
       setItems((prev) => [...prev, created as VendorItem]);
@@ -45,6 +51,7 @@ export function useVendorItems(vendorId: number) {
   }
 
   async function editItem(itemId: number, payload: Partial<VendorItem>) {
+    if (!vendorId) throw new Error("Missing vendor id");
     try {
       const updated = await updateVendorItem(vendorId, itemId, payload);
       setItems((prev) => prev.map((it) => (it.id === itemId ? (updated as VendorItem) : it)));

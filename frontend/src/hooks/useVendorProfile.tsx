@@ -3,6 +3,7 @@ import {
   createVendorProfile,
   updateVendorProfile,
   getVendorProfile,
+  getVendorProfileById,
 } from "../services/api/vendors";
 import { uploadVendorBanner, uploadVendorLogo } from "../services/api/vendorUploads";
 
@@ -34,24 +35,30 @@ export interface VendorProfileCreate {
 
 export type VendorProfileUpdate = Partial<VendorProfileCreate>;
 
-export function useVendorProfile(userId?: number) {
+export function useVendorProfile(userId?: number, vendorProfileId?: number) {
   const [vendor, setVendor] = useState<VendorProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
-    if (!userId) return;
+    if (!userId && !vendorProfileId) {
+      setVendor(null);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
-      const data = await getVendorProfile(userId);
+      const data = vendorProfileId
+        ? await getVendorProfileById(vendorProfileId)
+        : await getVendorProfile(userId as number);
       setVendor(data);
     } catch (err: any) {
       setError("Failed to load vendor profile");
     } finally {
       setLoading(false);
     }
-  }, [userId]);
+  }, [userId, vendorProfileId]);
 
   const create = useCallback(async (payload: VendorProfileCreate) => {
     setLoading(true);

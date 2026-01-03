@@ -191,9 +191,19 @@ export function useArticles({ useMock, limit = 50, offset = 0 }: UseArticlesOpti
         setArticles(mockArticles);
         setFeaturedArticles(mockArticles.filter((a) => a.is_featured));
       } else {
-        const [all, featured] = await Promise.all([fetchArticles(limit, offset), fetchFeaturedArticles(8, 0)]);
-        setArticles(all);
-        setFeaturedArticles(featured);
+        try {
+          const [all, featured] = await Promise.all([fetchArticles(limit, offset), fetchFeaturedArticles(8, 0)]);
+          setArticles(all);
+          setFeaturedArticles(featured);
+          if (!all.length) {
+            setError("No articles available yet. Be the first to add one.");
+          }
+        } catch (err: any) {
+          // fallback to mock if backend fails
+          setArticles(mockArticles);
+          setFeaturedArticles(mockArticles.filter((a) => a.is_featured));
+          setError(err?.message || "Using demo articles while loading failed.");
+        }
       }
     } catch (err: any) {
       setError(err?.message || "Failed to load articles");
@@ -214,7 +224,7 @@ export function useArticles({ useMock, limit = 50, offset = 0 }: UseArticlesOpti
   return { articles, featuredArticles: sortedFeatured, loading, error, refetch: load };
 }
 
-export function useArticle(id?: number, { useMock }: { useMock?: boolean } = {}) {
+export function useArticle(id?: number | string, { useMock }: { useMock?: boolean } = {}) {
   const [article, setArticle] = useState<Article | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -222,17 +232,26 @@ export function useArticle(id?: number, { useMock }: { useMock?: boolean } = {})
 
   useEffect(() => {
     if (!id) return;
+    const numericId = !Number.isNaN(Number(id)) ? Number(id) : null;
     const load = async () => {
       setLoading(true);
       setError(null);
       try {
         if (useMockData) {
-          const found = mockArticles.find((a) => a.id === id);
+          const found = mockArticles.find((a) => String(a.id) === String(id));
           setArticle(found || null);
           if (!found) setError("Article not found");
         } else {
-          const data = await fetchArticle(id);
-          setArticle(data);
+          try {
+            const data = await fetchArticle(numericId ?? id);
+            setArticle(data);
+          } catch (err: any) {
+            // fallback to mock if backend fails
+            const found = mockArticles.find((a) => String(a.id) === String(id));
+            setArticle(found || null);
+            if (!found) setError("Article not found");
+            console.error("Failed to fetch article, using mock fallback", err);
+          }
         }
       } catch (err: any) {
         setError(err?.message || "Failed to load article");
@@ -253,10 +272,4 @@ export function useArticleMutations() {
     remove: (id: number) => deleteArticle(id),
   };
 }
-
-
-
-
-
-
 

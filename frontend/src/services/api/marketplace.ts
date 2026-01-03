@@ -9,11 +9,16 @@ export interface MarketplaceItemApi {
   price: number;
   description?: string | null;
   available: boolean;
-  image_url?: string | null;
-  vendor_id: number;
+  image_url?: string | null; // snake_case (legacy)
+  imageUrl?: string | null;  // camelCase (backend currently uses this)
+  vendor_id?: number;
+  vendorId?: number;
   vendor_name?: string | null;
+  vendorName?: string | null;
   vendor_location?: string | null;
+  vendorLocation?: string | null;
   vendor_verified?: boolean | null;
+  vendorVerified?: boolean | null;
 }
 
 export async function fetchMarketplaceItems(): Promise<MarketplaceItemApi[]> {

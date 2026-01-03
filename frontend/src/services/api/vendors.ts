@@ -43,6 +43,10 @@ export async function getVendorProfile(userId: number): Promise<VendorProfileApi
   return apiFetch<VendorProfileApi>(`/vendors/profile/${userId}`, { method: "GET", auth: false });
 }
 
+export async function getVendorProfileById(vendorId: number): Promise<VendorProfileApi> {
+  return apiFetch<VendorProfileApi>(`/vendors/profile/by-id/${vendorId}`, { method: "GET", auth: false });
+}
+
 export async function fetchVendorDirectory(): Promise<VendorDirectoryItem[]> {
   return apiFetch<VendorDirectoryItem[]>("/vendors/directory", { method: "GET", auth: false });
 }

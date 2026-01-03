@@ -22,6 +22,9 @@ interface VendorHeaderProps {
   isVendorView?: boolean;
   availability?: "Open" | "Closed" | "Temporarily Unavailable";
   onChangeAvailability?: (status: string) => void;
+  onEditProfile?: () => void;
+  onManageItems?: () => void;
+  onViewCatalog?: () => void;
 }
 
 const VendorHeader: React.FC<VendorHeaderProps> = ({
@@ -36,6 +39,9 @@ const VendorHeader: React.FC<VendorHeaderProps> = ({
   isVendorView = false,
   availability = "Open",
   onChangeAvailability,
+  onEditProfile,
+  onManageItems,
+  onViewCatalog,
 }) => {
   const [status, setStatus] = useState(availability);
 
@@ -167,7 +173,7 @@ const VendorHeader: React.FC<VendorHeaderProps> = ({
             <span className="text-gray-700 dark:text-gray-300 font-semibold items-center">CONTACT</span>
             {contact?.phone && (
               <div className="flex items-center gap-2">
-                <Phone className="w-4 h-4" /> +{contact.phone}
+                <Phone className="w-4 h-4" /> {contact.phone}
               </div>
             )}
             {contact?.email && (
@@ -178,18 +184,32 @@ const VendorHeader: React.FC<VendorHeaderProps> = ({
           </div>
 
           {/* Vendor-only Actions */}
-          {isVendorView && (
-            <div className="flex flex-col sm:flex-row gap-2 mt-2">
-              <button className="flex items-center justify-center gap-1 text-sm px-4 py-1.5 rounded-md border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 transition">
-                <Edit className="w-4 h-4" /> Edit Profile
-              </button>
-              {!verified && (
-                <button className="text-sm text-blue-600 dark:text-blue-400 hover:underline">
-                  Verify Business
+          <div className="flex flex-col sm:flex-row gap-2 mt-2">
+            {isVendorView && (
+              <>
+                <button
+                  onClick={onEditProfile}
+                  className="flex items-center justify-center gap-1 text-sm px-4 py-1.5 rounded-md border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+                >
+                  <Edit className="w-4 h-4" /> Edit Profile
                 </button>
-              )}
-            </div>
-          )}
+                <button
+                  onClick={onManageItems}
+                  className="flex items-center justify-center gap-1 text-sm px-4 py-1.5 rounded-md border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+                >
+                  Manage Items
+                </button>
+              </>
+            )}
+            {!isVendorView && onViewCatalog && (
+              <button
+                onClick={onViewCatalog}
+                className="flex items-center justify-center gap-1 text-sm px-4 py-1.5 rounded-md border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+              >
+                View Catalog
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </header>
