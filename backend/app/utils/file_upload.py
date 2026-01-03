@@ -2,11 +2,11 @@ import os
 from fastapi import UploadFile, HTTPException
 from datetime import datetime
 import uuid
+from app.core.config import settings
 
+MEDIA_BASE_URL = settings.MEDIA_BASE_URL.rstrip("/")
 
-
-
-UPLOAD_ROOT = "app/uploads/certifications"
+CERT_UPLOAD_ROOT = os.path.join("app", "static", "uploads", "technicians", "certifications")
 
 ALLOWED_IMAGE_EXTENSIONS = {"jpg", "jpeg", "png", "webp"}
 ALLOWED_DOCUMENT_EXTENSIONS = {"pdf"}
@@ -31,7 +31,7 @@ def validate_extension(filename: str):
 async def save_certification_file(technician_id: int, file: UploadFile) -> str:
     validate_extension(file.filename)
 
-    dir_path = os.path.join(UPLOAD_ROOT, str(technician_id))
+    dir_path = os.path.join(CERT_UPLOAD_ROOT, str(technician_id))
     os.makedirs(dir_path, exist_ok=True)
 
     extension = file.filename.split(".")[-1].lower()
@@ -42,14 +42,14 @@ async def save_certification_file(technician_id: int, file: UploadFile) -> str:
     with open(full_path, "wb") as buffer:
         buffer.write(await file.read())
 
-    return f"/static/uploads/technician/certifications/{technician_id}/{unique_name}"
+    rel = f"/uploads/technicians/certifications/{technician_id}/{unique_name}"
+    return f"{MEDIA_BASE_URL}{rel}"
 
 
 
 # Technician Profile Image Upload
 
 BASE_IMAGE_DIR = os.path.join("app", "static", "uploads", "technicians", "profile_images")
-os.makedirs(BASE_IMAGE_DIR, exist_ok=True)
 
 
 async def save_technician_profile_image(tech_id: int, file: UploadFile) -> str:
@@ -64,13 +64,17 @@ async def save_technician_profile_image(tech_id: int, file: UploadFile) -> str:
     if size > MAX_IMAGE_BYTES:
         raise HTTPException(status_code=413, detail="File too large (max 10MB)")
 
-    filename = f"tech_{tech_id}.{ext}"
-    full_path = os.path.join(BASE_IMAGE_DIR, filename)
+    folder = os.path.join(BASE_IMAGE_DIR, str(tech_id))
+    os.makedirs(folder, exist_ok=True)
+
+    filename = f"tech_{tech_id}_{uuid.uuid4().hex}.{ext}"
+    full_path = os.path.join(folder, filename)
 
     with open(full_path, "wb") as f:
         f.write(contents)
 
-    return f"/static/uploads/technicians/profile_images/{filename}"
+    rel = f"/uploads/technicians/profile_images/{tech_id}/{filename}"
+    return f"{MEDIA_BASE_URL}{rel}"
 
 
 
@@ -99,7 +103,8 @@ async def save_vendor_banner(vendor_id: int, file: UploadFile) -> str:
     with open(full_path, "wb") as f:
         f.write(contents)
 
-    return f"/static/uploads/vendors/{vendor_id}/banner/{filename}"
+    rel = f"/uploads/vendors/{vendor_id}/banner/{filename}"
+    return f"{MEDIA_BASE_URL}{rel}"
 
 
 async def save_vendor_logo(vendor_id: int, file: UploadFile) -> str:
@@ -120,7 +125,8 @@ async def save_vendor_logo(vendor_id: int, file: UploadFile) -> str:
     with open(full_path, "wb") as f:
         f.write(contents)
 
-    return f"/static/uploads/vendors/{vendor_id}/logo/{filename}"
+    rel = f"/uploads/vendors/{vendor_id}/logo/{filename}"
+    return f"{MEDIA_BASE_URL}{rel}"
 
 
 
@@ -151,4 +157,5 @@ async def save_vendor_item_image(vendor_id: int, item_id: int, file: UploadFile)
     with open(full_path, "wb") as f:
         f.write(contents)
 
-    return f"/static/uploads/vendors/items/{vendor_id}/{item_id}/{filename}"
+    rel = f"/uploads/vendors/items/{vendor_id}/{item_id}/{filename}"
+    return f"{MEDIA_BASE_URL}{rel}"

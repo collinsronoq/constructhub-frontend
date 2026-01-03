@@ -1,10 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import {
-  listMyCertifications,
-  createCertification,
-  updateCertification,
-  deleteCertification,
-} from "../../services/api/technicians";
+import { listMyCertifications, updateCertification, deleteCertification } from "../../services/api/technicians";
 import { uploadTechnicianCertification } from "../../services/api/technicianUploads";
 import type { TechnicianCertification } from "../../services/api/types";
 
@@ -31,21 +26,13 @@ export function useTechnicianCertifications(userId?: number) {
       setLoading(true);
       setError(null);
       try {
-        let file_url = options.fileUrl;
-        if (!file_url && options.file && userId) {
-          const uploadRes = await uploadTechnicianCertification(userId, options.file, options.title);
-          file_url = uploadRes.file_url;
-        }
-        if (!file_url) {
+        if (options.file && userId) {
+          await uploadTechnicianCertification(userId, options.file, options.title);
+        } else if (!options.fileUrl) {
           throw new Error("Missing file");
         }
-        const created = await createCertification({
-          title: options.title || options.file?.name || "Certification",
-          issuer: options.issuer,
-          file_url,
-        });
-        setCerts((prev) => [...prev, created]);
-        return created;
+        // Refresh list to reflect new upload (upload route already creates DB row)
+        await load();
       } catch (err: any) {
         setError("Failed to add certification");
         throw err;

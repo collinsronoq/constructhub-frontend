@@ -3,6 +3,7 @@ import {
   createTechnicianProfile,
   updateTechnicianProfile,
   getTechnicianProfile,
+  getMyTechnicianProfile,
 } from "../../services/api/technicians";
 import type { TechnicianProfile, TechnicianProfileCreate, TechnicianProfileUpdate } from "../../services/api/types";
 
@@ -16,7 +17,7 @@ export function useTechnicianProfile(userId?: number) {
     setLoading(true);
     setError(null);
     try {
-      const data = await getTechnicianProfile(userId);
+      const data = await getMyTechnicianProfile(userId);
       setProfile(data);
     } catch (err: any) {
       setError(err?.detail?.detail || "Failed to load profile");

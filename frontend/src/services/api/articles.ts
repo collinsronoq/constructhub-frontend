@@ -27,18 +27,6 @@ export interface Article {
   views: number;
 }
 
-export type ArticleCategory =
-  | "Construction Basics"
-  | "Cost Saving Tips"
-  | "Materials Guide"
-  | "Permits & Regulations"
-  | "Roofing"
-  | "Plumbing"
-  | "Electrical"
-  | "Foundation & Structural Work"
-  | "Finishing & Interior"
-  | "House Design"
-  | "Site Preparation";
 
 export type ArticleCreate = Omit<Article, "id" | "views">;
 export type ArticleUpdate = Partial<ArticleCreate>;

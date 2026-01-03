@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
 from app.estimation.schemas.aggregate import EstimationRequest
+from app.estimation.schemas.request_in import EstimationRequestIn
 from app.estimation.service import generate_estimation
 from app.core.logging import setup_logger
 from app.core.database import get_db
@@ -19,12 +20,13 @@ logger = setup_logger("estimations")
 
 @router.post("/", summary="Generate a full project estimation")
 async def create_estimation(
-    request: EstimationRequest,
+    request: EstimationRequestIn,
     db: AsyncSession = Depends(get_db),
     current_user=Depends(get_current_user),
 ):
     try:
-        result = await generate_estimation(request, db, user_id=current_user.id)
+        strict_request = request.to_strict()
+        result = await generate_estimation(strict_request, db, user_id=current_user.id)
         return result
     except Exception as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc

@@ -1,7 +1,6 @@
 import { useState } from "react";
 import type { TechnicianVerificationPayload } from "../../components/TechnicianProfile/TechnicianVerificationModal";
 import { uploadTechnicianCertification } from "../../services/api/technicianUploads";
-import { createCertification } from "../../services/api/technicians";
 
 /**
  * Hook responsible for submitting technician verification data.
@@ -23,15 +22,7 @@ export function useVerifyTechnician() {
 
       for (const cert of payload.certifications) {
         if (!cert.file) continue;
-
-        const uploadRes = await uploadTechnicianCertification(userId, cert.file, cert.name);
-        const file_url = uploadRes.file_url;
-
-        await createCertification({
-          title: cert.name || cert.file.name || "Certification",
-          issuer: undefined,
-          file_url,
-        });
+        await uploadTechnicianCertification(userId, cert.file, cert.name);
       }
 
       setSuccess(true);

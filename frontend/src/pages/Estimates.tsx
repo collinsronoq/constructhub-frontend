@@ -9,63 +9,28 @@
 // export default Estimates
 
 
-import Estimations from "../components/Estimates/Estimates"
+import Estimations from "../components/Estimates/Estimates";
+import { useEstimations } from "../hooks/Estimator/useEstimations";
 
-const Estimates = () =>{
+const Estimates = () => {
+  const { estimates, loading, error } = useEstimations();
 
-  const sampleEstimates = [
-    {
-      id: "1",
-      projectName: "Residential Villa",
-      category: "Residential",
-      estimatedCost: "KSh 8.5M",
-      dateCreated: "Oct 3, 2025",
-      location: "Rafiki",
-    },
-    {
-      id: "2",
-      projectName: "Office Complex",
-      category: "Commercial",
-      estimatedCost: "KSh 14.2M",
-      dateCreated: "Oct 1, 2025",
-      location: "Syokimau",
-    },
-    {
-      id: "3",
-      projectName: "Renovation Project",
-      category: "Residential",
-      estimatedCost: "KSh 2.3M",
-      dateCreated: "Sep 28, 2025",
-      location: "Rafiki",
-    },
-    {
-      id: "4",
-      projectName: "Residential Villa",
-      category: "Residential",
-      estimatedCost: "KSh 8.5M",
-      dateCreated: "Oct 3, 2025",
-      location: "Rafiki",
-    },
-    {
-      id: "5",
-      projectName: "Residential Villa",
-      category: "Residential",
-      estimatedCost: "KSh 8.5M",
-      dateCreated: "Oct 3, 2025",
-      location: "Rafiki",
-    },
-    {
-      id: "6",
-      projectName: "Residential Villa",
-      category: "Residential",
-      estimatedCost: "KSh 8.5M",
-      dateCreated: "Oct 3, 2025",
-      location: "Rafiki",
-    },
-  ]
+  const mapped = estimates.map((e) => ({
+    id: String((e as any).estimate_id || e.id),
+    projectName: (e as any).project_title || (e as any).project_name || "Project",
+    category: "Residential",
+    estimatedCost: `KSh ${Number((e as any).total_cost || 0).toLocaleString()}`,
+    dateCreated: e.created_at ? new Date(e.created_at).toLocaleDateString() : "",
+    location: (e as any).location || "N/A",
+  }));
+
   return (
-    <Estimations estimates={sampleEstimates} />
-  )
-}
+    <div className="p-4">
+      {loading && <div className="text-gray-500 text-sm mb-2">Loading estimates...</div>}
+      {error && <div className="text-red-500 text-sm mb-2">{error}</div>}
+      <Estimations estimates={mapped} />
+    </div>
+  );
+};
 
-export default Estimates
+export default Estimates;

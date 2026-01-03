@@ -19,19 +19,11 @@ export async function getTechnicianProfile(userId: number): Promise<TechnicianPr
 }
 
 export async function getMyTechnicianProfile(userId: number): Promise<TechnicianProfile> {
-  return getTechnicianProfile(userId);
+  return apiFetch<TechnicianProfile>("/technicians/me", { method: "GET" });
 }
 
 export async function listMyCertifications(): Promise<TechnicianCertification[]> {
   return apiFetch<TechnicianCertification[]>("/technicians/certifications", { method: "GET" });
-}
-
-export async function createCertification(payload: {
-  title: string;
-  issuer?: string | null;
-  file_url: string;
-}): Promise<TechnicianCertification> {
-  return apiFetch<TechnicianCertification>("/technicians/certifications", { method: "POST", body: payload });
 }
 
 export async function updateCertification(certId: number, payload: { title?: string; issuer?: string }): Promise<TechnicianCertification> {

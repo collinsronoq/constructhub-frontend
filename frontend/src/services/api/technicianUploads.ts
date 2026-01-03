@@ -19,6 +19,7 @@ export async function uploadTechnicianCertification(
   if (certName) form.append("cert_name", certName);
   return apiFetch<{ file_url: string; certification_id?: number; message?: string }>(
     `/technicians/${userId}/certifications/upload`,
+    
     {
       method: "POST",
       body: form,

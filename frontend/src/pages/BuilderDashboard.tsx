@@ -5,40 +5,27 @@ import AIAssistantWidget from "../components/BuilderDashboard/AIAssistantWidget"
 // import AIAssistantPanel from "../components/AIAssistantPanel";
 import Recommendations from "../components/BuilderDashboard/Recommendations";
 import LearningTips from "../components/BuilderDashboard/LearningTips";
+import { useEstimations } from "../hooks/Estimator/useEstimations";
+import { useRecommendations } from "../hooks/useRecommendations";
+import { useArticles } from "../hooks/Articles/useArticles";
 
 
 
 const BuilderDashboard = () => {
-  const sampleEstimates = [
-    {
-      id: "1",
-      projectName: "Residential Villa",
-      category: "Residential",
-      estimatedCost: "KSh 8.5M",
-      dateCreated: "Oct 3, 2025",
-      location: "Rafiki",
-    },
-    {
-      id: "2",
-      projectName: "Office Complex",
-      category: "Commercial",
-      estimatedCost: "KSh 14.2M",
-      dateCreated: "Oct 1, 2025",
-      location: "Syokimau",
-    },
-    {
-      id: "3",
-      projectName: "Renovation Project",
-      category: "Residential",
-      estimatedCost: "KSh 2.3M",
-      dateCreated: "Sep 28, 2025",
-      location: "Rafiki",
-    },
-  ]
+  const { estimates, loading: estLoading, error: estError } = useEstimations();
+  const { vendors, technicians, loading: recLoading, error: recError } = useRecommendations();
+  const { featuredArticles } = useArticles();
 
-  
   const { onToggleOpenAI } = useOutletContext<{ onToggleOpenAI: () => void }>();
 
+  const mappedEstimates = estimates.map((e) => ({
+    id: String(e.id),
+    projectName: (e as any).project_title || e.project_name || "Project",
+    category: "Residential",
+    estimatedCost: `KSh ${Number((e as any).total_cost || 0).toLocaleString()}`,
+    dateCreated: e.created_at ? new Date(e.created_at).toLocaleDateString() : "",
+    location: (e as any).location || "N/A",
+  }));
   
   return (
     <div>
@@ -46,17 +33,17 @@ const BuilderDashboard = () => {
       <WelcomeSection onOpenChat={ onToggleOpenAI } />
 
       {/* Estimation Summary */}
-      <RecentEstimations estimates={sampleEstimates} />
+      <RecentEstimations estimates={mappedEstimates.slice(0,3)} loading={estLoading} error={estError} />
 
       {/* AI Assistant Overview */}
       <AIAssistantWidget onOpenChat={ onToggleOpenAI } />
 
       
       {/* Recommended Vendors & Technicians */}
-      <Recommendations />
+      <Recommendations vendors={vendors} technicians={technicians} loading={recLoading} error={recError} />
 
       {/* Learning & Tips Section (Optional) */}
-      <LearningTips />
+      <LearningTips articles={featuredArticles} />
     </div>
   );
 };

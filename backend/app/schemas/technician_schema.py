@@ -22,6 +22,7 @@ class TechnicianProfileCreate(BaseModel):
     bio: Optional[str] = None
     short_description: Optional[str] = None
     contact: Optional[TechnicianContact] = None   # {"phone": "...", "email": "..."}
+    profile_image_url: Optional[str] = None
 
 
 # UPDATE PROFILE

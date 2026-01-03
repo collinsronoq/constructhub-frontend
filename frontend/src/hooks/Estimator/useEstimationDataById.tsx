@@ -31,9 +31,15 @@ export function useEstimationById(id?: string, useMock?: boolean) {
     }
 
     fetchEstimationById(id)
-      .then((payload) => setData(mapEstimationDetailToBreakdown(payload)))
+      .then((payload) =>
+        setData(
+          mapEstimationDetailToBreakdown(payload as any, {
+            projectName: (payload as any)?.project_title || (payload as any)?.project_name,
+          })
+        )
+      )
       .catch((err) => {
-        setData(mockEstimationData);
+        setData(null);
         setError(err);
       })
       .finally(() => setIsLoading(false));

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { login, register, logout, fetchMe } from "../../services/api/auth";
-import type { AuthResponse, LoginRequest, RegisterRequest, User } from "../../services/api/types";
+import type { LoginRequest, RegisterRequest, User } from "../../services/api/types";
 import { getAccessToken, setAccessToken } from "../../services/api/client";
 
 interface AuthState {

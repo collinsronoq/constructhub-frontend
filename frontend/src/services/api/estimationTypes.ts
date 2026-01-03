@@ -8,6 +8,10 @@ export interface SiteSurveyInput {
 
 export interface SitePreparationInput {
   plot_size_sqm: number;
+  soil_type?: string;
+  excavation_depth_m?: number;
+  include_disposal?: boolean;
+  access_difficulty?: "easy" | "normal" | "difficult";
   vegetation_density?: "light" | "medium" | "heavy";
   has_existing_structures?: boolean;
 }
@@ -16,6 +20,9 @@ export interface FoundationInput {
   soil_type: string;
   foundation_type: string;
   footprint_sqm: number;
+  floor_area_sqm?: number;
+  quality_level?: "standard" | "premium" | "luxury";
+  include_formwork?: boolean;
 }
 
 export type StructureType = "bungalow" | "two_storey" | "three_storey" | "multi_storey";
@@ -51,6 +58,15 @@ export interface RoofingInput {
 
 export interface ServicesFirstFixInput {
   floor_area_sqm: number;
+  storeys?: number;
+  bathrooms?: number;
+  kitchens?: number;
+  laundry_rooms?: number;
+  sockets_per_room?: number;
+  light_points_per_room?: number;
+  quality_level?: "standard" | "premium" | "luxury";
+  include_hot_water?: boolean;
+  include_earthing?: boolean;
   socket_points?: number;
   lighting_points?: number;
   plumbing_points?: number;
@@ -58,6 +74,17 @@ export interface ServicesFirstFixInput {
 
 export interface ServicesSecondFixInput {
   floor_area_sqm: number;
+  storeys?: number;
+  bedrooms?: number;
+  bathrooms?: number;
+  kitchens?: number;
+  living_rooms?: number;
+  dining_rooms?: number;
+  sockets_per_room?: number;
+  light_points_per_room?: number;
+  include_shower_mixers?: boolean;
+  include_instant_showers?: boolean;
+  quality_level?: "standard" | "premium" | "luxury";
   switches?: number;
   sockets?: number;
   light_fittings?: number;
@@ -66,14 +93,47 @@ export interface ServicesSecondFixInput {
 
 export interface FinishesInput {
   total_floor_area_sqm: number;
+  storeys?: number;
+  wall_height_m?: number;
+  bedrooms?: number;
+  bathrooms?: number;
+  kitchens?: number;
+  living_rooms?: number;
+  dining_rooms?: number;
+  other_rooms?: number;
+  main_floor_finish?: "tile" | "wood" | "vinyl";
+  wet_floor_finish?: "ceramic_tile" | "porcelain_tile" | "stone";
+  wet_wall_tiling?: boolean;
+  ceiling_type?: "gypsum_board" | "pvc" | "acoustic";
+  paint_system?: "standard_2_coat" | "premium_3_coat";
+  include_cornices?: boolean;
+  include_skirting?: boolean;
+  include_wardrobes?: boolean;
+  include_kitchen_cabinets?: boolean;
+  joinery_level?: "standard" | "premium" | "luxury";
+  quality_level?: "standard" | "premium" | "luxury";
   finishing_level?: "standard" | "premium" | "luxury";
 }
 
 export interface ExternalWorksInput {
+  land_size_sqm?: number;
+  floor_area_sqm?: number;
+  perimeter_wall_enabled?: boolean;
+  perimeter_wall_type?: "block_wall" | "fence" | "none";
   driveway_area_sqm?: number;
   landscaping_area_sqm?: number;
   perimeter_wall_length_m?: number;
+  perimeter_wall_height_m?: number;
+  gate_count?: number;
+  gate_width_m?: number;
+  razor_wire?: boolean;
+  paving_area_sqm?: number;
+  drainage_length_m?: number;
   include_gate?: boolean;
+  sewerage_system?: "septic_tank" | "sewer_connection" | "biodigester";
+  sewer_connection_length_m?: number;
+  biodigester_capacity_users?: number;
+  quality_level?: "standard" | "premium" | "luxury";
 }
 
 export interface EstimationRequest {

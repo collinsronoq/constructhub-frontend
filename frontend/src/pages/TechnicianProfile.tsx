@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import TechnicianHeader from "../components/TechnicianProfile/TechnicianHeader";
 import TechnicianAbout from "../components/TechnicianProfile/TechnicianAbout";
-import TechnicianSkills from "../components/TechnicianProfile/TechnicianSkills";
+import TechnicianSkills from "../components/TechnicianProfile/TechnicianCertifications";
 import TechnicianReviews from "../components/TechnicianProfile/TechnicianReviews";
 import TechnicianVerificationModal from "../components/TechnicianProfile/TechnicianVerificationModal";
 import { useAuth } from "../hooks/auth/useAuth";
@@ -13,6 +13,7 @@ import { useTechnicianReviews } from "../hooks/Technician/useTechnicianReviews";
 const TechnicianProfile = () => {
   const { user } = useAuth();
   const userId = user?.id;
+  
 
   const { profile, loading, error, createProfile, updateProfile, refresh } = useTechnicianProfile(userId);
   const { certs, updateCertification, deleteCertification, loading: certLoading } =
@@ -20,6 +21,7 @@ const TechnicianProfile = () => {
   const { reviews } = useTechnicianReviews(userId);
 
   const [isVerifyModalOpen, setIsVerifyModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   // form state
   const [form, setForm] = useState({
@@ -74,11 +76,13 @@ const TechnicianProfile = () => {
       await createProfile(payload);
     }
     await refresh();
+    setIsEditModalOpen(false);
   };
 
   const handleProfileImageUpload = async (file: File) => {
     if (!userId) return;
-    await uploadTechnicianProfileImage(userId, file);
+    
+    console.log(await uploadTechnicianProfileImage(userId, file))
     await refresh();
   };
 
@@ -109,44 +113,40 @@ const TechnicianProfile = () => {
           verified={profile.verified}
           imageUrl={profile.profile_image_url || undefined}
           isTechnicianView
-          onEditProfile={() => fileInputRef.current?.focus()}
+          onChangeAvailability={async (status) => {
+            await updateProfile({ availability: status });
+            await refresh();
+          }}
+          onEditProfile={() => setIsEditModalOpen(true)}
+          onUploadImage={() => fileInputRef.current?.click()}
         />
       )}
 
-      {/* Profile form (create/update) */}
-      <form onSubmit={handleSubmit} className="space-y-4 bg-white dark:bg-gray-900 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <input className="input" placeholder="Name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
-          <input className="input" placeholder="Specialization" value={form.specialization} onChange={(e) => setForm({ ...form, specialization: e.target.value })} required />
-          <input className="input" placeholder="Location" value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} />
-          <input className="input" placeholder="Years experience" value={form.years_experience} onChange={(e) => setForm({ ...form, years_experience: e.target.value })} />
-          <input className="input" placeholder="Skills (comma separated)" value={form.skills} onChange={(e) => setForm({ ...form, skills: e.target.value })} />
-          <input className="input" placeholder="Phone" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
-          <input className="input" placeholder="Email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
-          <select className="input" value={form.availability} onChange={(e) => setForm({ ...form, availability: e.target.value })}>
-            <option>Available</option>
-            <option>Busy</option>
-            <option>Away</option>
-          </select>
-        </div>
-        <textarea className="input" placeholder="Short description" value={form.short_description} onChange={(e) => setForm({ ...form, short_description: e.target.value })} />
-        <textarea className="input" placeholder="Bio" value={form.bio} onChange={(e) => setForm({ ...form, bio: e.target.value })} />
-        <div className="flex items-center gap-3">
-          <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-md">
-            {profile ? "Update Profile" : "Create Profile"}
-          </button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            className="text-sm"
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) handleProfileImageUpload(file);
-            }}
-          />
-        </div>
-      </form>
+      {/* Quick actions */}
+      <div className="flex flex-wrap gap-3 items-center">
+        <button
+          onClick={() => setIsEditModalOpen(true)}
+          className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium"
+        >
+          {profile ? "Edit Profile" : "Create Profile"}
+        </button>
+        <button
+          onClick={() => fileInputRef.current?.click()}
+          className="px-4 py-2 bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-md text-sm font-medium"
+        >
+          Upload Photo
+        </button>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) handleProfileImageUpload(file);
+          }}
+        />
+      </div>
 
       {/* Verification prompt */}
       {profile && !profile.verified && (
@@ -187,25 +187,9 @@ const TechnicianProfile = () => {
       {/* Existing UI sections (bio/skills/reviews) use profile data when available */}
       {profile && (
         <>
-          <TechnicianHeader
-            name={profile.name}
-            specialization={profile.specialization || ""}
-            location={profile.location || ""}
-            experience={experienceText}
-            rating={profile.average_rating || 0}
-            availability={profile.availability || "Available"}
-            contact={contactText || undefined}
-            email={emailText || undefined}
-            verified={profile.verified}
-            imageUrl={profile.profile_image_url || undefined}
-            isTechnicianView
-            onChangeAvailability={async (status) => {
-              await updateProfile({ availability: status });
-              await refresh();
-            }}
-          />
           <TechnicianAbout
             bio={profile.bio || ""}
+            summary={profile.short_description || ""}
             skills={profile.skills || []}
             specialization={profile.specialization || ""}
             verified={profile.verified}
@@ -227,6 +211,139 @@ const TechnicianProfile = () => {
         specialization={form.specialization || profile?.specialization || ""}
         existingCertifications={certs.map((c) => c.title || "Certification")}
       />
+
+      {/* Edit Profile Modal */}
+      {isEditModalOpen && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center px-4">
+          <div className="bg-white dark:bg-gray-900 rounded-lg shadow-xl w-full max-w-3xl p-6 space-y-5 border border-gray-200 dark:border-gray-700">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                  {profile ? "Edit profile" : "Create profile"}
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Keep your public profile up to date for builders and admins.
+                </p>
+              </div>
+              <button onClick={() => setIsEditModalOpen(false)} className="text-sm text-gray-500 hover:text-gray-800 dark:hover:text-gray-200">
+                Close
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-sm text-gray-700 dark:text-gray-300">Name</label>
+                  <input
+                    className="w-full rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Your full name"
+                    value={form.name}
+                    onChange={(e) => setForm({ ...form, name: e.target.value })}
+                    required
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-sm text-gray-700 dark:text-gray-300">Specialization</label>
+                  <input
+                    className="w-full rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="e.g. Electrical, Plumbing"
+                    value={form.specialization}
+                    onChange={(e) => setForm({ ...form, specialization: e.target.value })}
+                    required
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-sm text-gray-700 dark:text-gray-300">Location</label>
+                  <input
+                    className="w-full rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="City / Region"
+                    value={form.location}
+                    onChange={(e) => setForm({ ...form, location: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-sm text-gray-700 dark:text-gray-300">Years experience</label>
+                  <input
+                    className="w-full rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="e.g. 5"
+                    value={form.years_experience}
+                    onChange={(e) => setForm({ ...form, years_experience: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-sm text-gray-700 dark:text-gray-300">Skills</label>
+                  <input
+                    className="w-full rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Comma separated skills"
+                    value={form.skills}
+                    onChange={(e) => setForm({ ...form, skills: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-sm text-gray-700 dark:text-gray-300">Availability</label>
+                  <select
+                    className="w-full rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    value={form.availability}
+                    onChange={(e) => setForm({ ...form, availability: e.target.value })}
+                  >
+                    <option>Available</option>
+                    <option>Busy</option>
+                    <option>Away</option>
+                  </select>
+                </div>
+                <div className="space-y-1">
+                  <label className="text-sm text-gray-700 dark:text-gray-300">Phone</label>
+                  <input
+                    className="w-full rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Contact number"
+                    value={form.phone}
+                    onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-sm text-gray-700 dark:text-gray-300">Email</label>
+                  <input
+                    className="w-full rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Contact email"
+                    value={form.email}
+                    onChange={(e) => setForm({ ...form, email: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-sm text-gray-700 dark:text-gray-300">Short description</label>
+                <textarea
+                  className="w-full rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  rows={2}
+                  placeholder="One-liner about your services"
+                  value={form.short_description}
+                  onChange={(e) => setForm({ ...form, short_description: e.target.value })}
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-sm text-gray-700 dark:text-gray-300">Bio</label>
+                <textarea
+                  className="w-full rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  rows={4}
+                  placeholder="Share more about your experience and projects"
+                  value={form.bio}
+                  onChange={(e) => setForm({ ...form, bio: e.target.value })}
+                />
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2">
+                <button type="button" onClick={() => setIsEditModalOpen(false)} className="px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 text-sm text-gray-700 dark:text-gray-200">
+                  Cancel
+                </button>
+                <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-semibold">
+                  {profile ? "Update Profile" : "Create Profile"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </section>
   );
 };

@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     DEBUG: bool = True
 
     DATABASE_URL: str = "sqlite+aiosqlite:///./dev.db"
+    MEDIA_BASE_URL: str = "http://localhost:8000/static"
  
     SECRET_KEY: str = "ehbdhe"
     JWT_ALGORITHM: str = "HS256"

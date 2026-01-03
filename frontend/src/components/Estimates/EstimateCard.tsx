@@ -2,12 +2,12 @@ import { Link } from "react-router-dom"
 
 
 export interface EstimateCardProps {
-  id: string
-  projectName: string
-  category: string
-  estimatedCost: string
-  dateCreated: string
-  location: string
+  id: string;
+  projectName: string;
+  category: string;
+  estimatedCost: string;
+  dateCreated: string;
+  location: string;
 }
 
 
@@ -17,8 +17,8 @@ const EstimateCard: React.FC<EstimateCardProps> = ({
   category,
   estimatedCost,
   dateCreated,
-  location
-})=>{
+  location,
+}) => {
 
   return(
     <div

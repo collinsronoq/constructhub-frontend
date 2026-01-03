@@ -27,8 +27,8 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         {/* Layout routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
+        <Route path="/" element={<Navigate to="/login" replace />} />
         <Route element={<DashboardLayout />}>
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/estimates" element={<Estimates />} />
           <Route path="/estimate" element={<GetEstimate />} />

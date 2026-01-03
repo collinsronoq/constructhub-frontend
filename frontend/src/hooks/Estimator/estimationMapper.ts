@@ -48,8 +48,14 @@ export function mapEstimationDetailToBreakdown(
       };
     });
 
-    const materialTotal = materials.reduce((sum, m) => sum + (m.subtotal || 0), 0);
-    const labourTotal = labour.reduce((sum, l) => sum + (l.subtotal || 0), 0);
+    const materialTotal = materials.reduce(
+      (sum: number, m: { subtotal?: number }) => sum + (m.subtotal ?? 0),
+      0
+    );
+    const labourTotal = labour.reduce(
+      (sum: number, l: { subtotal?: number }) => sum + (l.subtotal ?? 0),
+      0
+    );
     const subtotal = Number(phase.totals?.phase_total ?? phase.subtotal ?? phase.total ?? materialTotal + labourTotal);
 
     return {

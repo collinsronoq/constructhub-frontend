@@ -11,7 +11,7 @@ const SignUpCard = ({ onSignUp, onSwitch }: SignUpCardProps) =>{
     username: "",
     email: "",
     password: "",
-    role: "",
+    role: "builder",
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>{
@@ -73,6 +73,7 @@ const SignUpCard = ({ onSignUp, onSwitch }: SignUpCardProps) =>{
             <option value="builder">Builder</option>
             <option value="technician">Technician</option>
             <option value="vendor">Vendor</option>
+            <option value="admin">Admin</option>
 
           </select>
         </div>

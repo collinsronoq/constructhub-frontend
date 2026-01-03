@@ -42,6 +42,7 @@ async def create_profile(
             bio=payload.bio,
             short_description=payload.short_description,
             contact=payload.contact.model_dump() if payload.contact else None,
+            profile_image_url=payload.profile_image_url,
             availability="Available"
         )
 
@@ -103,6 +104,7 @@ async def my_profile(
         if not profile:
             raise HTTPException(status_code=404, detail="Profile not found")
 
+        
         return profile
     except HTTPException:
         raise
@@ -125,7 +127,7 @@ async def get_public_profile(
 
         if not profile:
             raise HTTPException(status_code=404, detail="Technician not found")
-
+        logger.info(profile.contact)
         return profile
     except HTTPException:
         raise

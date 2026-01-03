@@ -1,14 +1,16 @@
 import React from "react"
 
 interface TechnicianAboutProps {
-  bio?: string
-  skills?: string[]
-  specialization?: string
-  verified?: boolean
+  bio?: string;
+  summary?: string;
+  skills?: string[];
+  specialization?: string;
+  verified?: boolean;
 }
 
 const TechnicianAbout: React.FC<TechnicianAboutProps> = ({
   bio,
+  summary,
   skills = [],
   specialization,
   verified = false,
@@ -22,6 +24,9 @@ const TechnicianAbout: React.FC<TechnicianAboutProps> = ({
 
       {/* Bio Section */}
       <div className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+        {summary && (
+          <p className="mb-3 text-gray-800 dark:text-gray-200 font-medium">{summary}</p>
+        )}
         {bio ? (
           <p>{bio}</p>
         ) : (
@@ -33,6 +38,18 @@ const TechnicianAbout: React.FC<TechnicianAboutProps> = ({
           </p>
         )}
       </div>
+      
+      {/* Specialization Highlight */}
+      {specialization && (
+        <div className="mt-6">
+          <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+            Specialization
+          </h4>
+          <p className="text-gray-700 dark:text-gray-300">
+            {specialization}
+          </p>
+        </div>
+      )}
 
       {/* Skills Section */}
       <div>
@@ -57,17 +74,7 @@ const TechnicianAbout: React.FC<TechnicianAboutProps> = ({
         )}
       </div>
 
-      {/* Specialization Highlight */}
-      {specialization && (
-        <div className="mt-6">
-          <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
-            Specialization
-          </h4>
-          <p className="text-gray-700 dark:text-gray-300">
-            {specialization}
-          </p>
-        </div>
-      )}
+      
 
 
     </section>
