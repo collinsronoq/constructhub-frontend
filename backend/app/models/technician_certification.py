@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import Integer, String, ForeignKey, DateTime, Boolean, Text
-from datetime import datetime
+from datetime import datetime, timezone
 from app.models.base import Base
 
 
@@ -21,7 +21,7 @@ class TechnicianCertification(Base):
     rejected: Mapped[bool] = mapped_column(Boolean, default=False)
     admin_comment: Mapped[str] = mapped_column(Text, nullable=True)
 
-    uploaded_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+    uploaded_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now(timezone.utc).date())
     verified_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)
 
     technician_profile = relationship("TechnicianProfile", back_populates="certifications")

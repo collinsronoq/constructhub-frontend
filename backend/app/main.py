@@ -21,6 +21,7 @@ from app.routers.estimation import router as estimation_router
 from app.routers.recommendations import router as recommendations_router
 from app.routers.article_routes import router as article_router
 from app.routers.marketplace_routes import router as marketplace_router
+from app.routers.ai_router import router as ai_router
 
 logger = setup_logger("app.main")
 
@@ -65,6 +66,10 @@ app.include_router(vendor_profile_router)
 app.include_router(vendor_directory_router)
 app.include_router(vendor_items_router)
 app.include_router(vendor_uploads_router)
+
+
+# ai router
+app.include_router(ai_router)
 
 os.makedirs("app/static/uploads/technicians/profile_images", exist_ok=True)
 os.makedirs("app/static/uploads/technicians/certifications", exist_ok=True)

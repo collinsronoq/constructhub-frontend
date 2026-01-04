@@ -12,7 +12,7 @@ class Article(Base):
     category: Mapped[str] = mapped_column(String(120), nullable=False)
     content: Mapped[str] = mapped_column(Text, nullable=False)  # plain text
     author: Mapped[str] = mapped_column(String(200), nullable=False)
-    publish_date: Mapped[date] = mapped_column(Date, default=date.today)
+    publish_date: Mapped[date] = mapped_column(Date, default=date.today())
     read_time: Mapped[str] = mapped_column(String(50), nullable=True)
     tags: Mapped[dict] = mapped_column(JSON, nullable=True)  # list stored as JSON
     is_featured: Mapped[bool] = mapped_column(Boolean, default=False)

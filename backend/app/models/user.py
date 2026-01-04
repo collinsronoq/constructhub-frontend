@@ -1,7 +1,7 @@
     
 # create enum to represent the diff types of users
 # app/models/user.py
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy import String, Integer, Boolean, DateTime
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.models.base import Base
@@ -20,12 +20,11 @@ class User(Base):
     role: Mapped[UserRole] = mapped_column(String(50), nullable=False, default=UserRole.builder)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     is_admin: Mapped[bool] = mapped_column(Boolean, default=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now(timezone.utc).date())
     updated_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)
 
     # Optional one-to-one relationships
     vendor_profile = relationship("VendorProfile", back_populates="user", uselist=False)
-    vendor = relationship("Vendor", back_populates="user", uselist=False)
     technician_profile = relationship("TechnicianProfile", back_populates="user", uselist=False)
 
     # reviews written by this user
