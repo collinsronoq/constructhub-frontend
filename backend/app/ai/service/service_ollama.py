@@ -11,6 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.ai import AIThread, AIMessage, AIToolCall
 from app.ai.schemas.schemas import ChatRequest, AssistantPayload, Card, NextAction, Citation, Usage
+from app.ai.prompts import get_prompt
 from app.ai.tools.tools import get_estimate_summary, search_material_listings, search_technicians, rough_cost_estimate
 from app.core.logging import setup_logger
 
@@ -25,9 +26,16 @@ def _int_env(name: str, default: int) -> int:
         return default
 
 
-AI_MAX_TOOL_CALLS = _int_env("AI_MAX_TOOL_CALLS", 2)
+AI_MAX_TOOL_CALLS = _int_env("AI_MAX_TOOL_CALLS", 4)
 AI_MAX_HISTORY_MESSAGES = _int_env("AI_MAX_HISTORY_MESSAGES", 12)
 logger = setup_logger("ai.service.ollama")
+ALLOWED_TOOLS = {
+    "get_estimate_summary",
+    "get_project_summary",
+    "search_material_listings",
+    "search_technicians",
+    "rough_cost_estimate",
+}
 
 
 SYSTEM_PROMPT = f"""
@@ -54,6 +62,26 @@ FINAL ANSWER:
   "cards": [{{"type":"string","title":"string","subtitle":null,"data":{{}}}}],
   "next_actions": [{{"label":"string","action":"string","payload":{{}}}}]
 }}
+
+Tool arg rules (ask a short clarification if missing; do NOT call tools with missing required args):
+- get_estimate_summary: requires project_id (estimate_id).
+- search_material_listings: requires material; optional location, max_price, limit.
+- search_technicians: requires profession; optional location, verified_only, limit.
+- rough_cost_estimate: needs floor_area_sqm OR bedrooms/bathrooms; optional quality, location.
+
+Tool JSON must use key "tool_name" (not "type_name").
+
+Examples of valid tool calls:
+- {{ "type": "tool_call", "tool_name": "get_estimate_summary", "args": {{ "project_id": "bd74f501-8d93-4d50-9f8f-75a715aa69bb" }} }}
+- {{ "type": "tool_call", "tool_name": "search_technicians", "args": {{ "profession": "plumber", "location": "Nakuru" }} }}
+- {{ "type": "tool_call", "tool_name": "rough_cost_estimate", "args": {{ "bedrooms": 3, "location": "Kiambu" }} }}
+
+Common requests and preferred actions:
+- "summarize my estimate" -> call get_estimate_summary with project_id/estimate_id if provided; else ask for it.
+- "find masons in Nakuru" -> call search_technicians with profession + location.
+- "find cement deals in Nairobi under 800" -> call search_material_listings with material + location + max_price.
+- "rough cost for 3-bedroom" -> call rough_cost_estimate with bedrooms (or floor_area_sqm if provided).
+- For general guidance (permits, tips), respond with FINAL without tools.
 
 Constraints:
 - Keep answers practical for builders in Kenya.
@@ -107,7 +135,7 @@ async def _log_tool_call(
 
 
 async def _run_tool(tool_name: str, tool_args: dict, *, db: AsyncSession, user_id: str) -> dict:
-    if tool_name == "get_estimate_summary":
+    if tool_name in ("get_estimate_summary", "get_project_summary"):
         project_id = tool_args.get("project_id")
         if not project_id:
             return {"error": "project_id is required for get_estimate_summary"}
@@ -241,7 +269,21 @@ async def handle_chat(db: AsyncSession, *, user_id: str, payload: ChatRequest) -
     tool_context_messages: list[dict[str, Any]] = []
 
     while True:
-        model_messages = history + tool_context_messages + [{"role": "user", "content": payload.message}]
+        # Build user content with optional prompt template and context
+        user_content_parts = []
+        if payload.prompt_id:
+            prompt = get_prompt(payload.prompt_id)
+            if prompt and prompt.get("template"):
+                user_content_parts.append(prompt["template"])
+        user_content_parts.append(payload.message)
+        if payload.context:
+            try:
+                user_content_parts.append(f"Context: {payload.context.model_dump(exclude_none=True)}")
+            except Exception:
+                pass
+        user_content = "\n".join([part for part in user_content_parts if part])
+
+        model_messages = history + tool_context_messages + [{"role": "user", "content": user_content}]
         try:
             llm = await provider.generate(system_prompt=SYSTEM_PROMPT, messages=model_messages, tools=None)
         except Exception:
@@ -305,8 +347,49 @@ async def handle_chat(db: AsyncSession, *, user_id: str, payload: ChatRequest) -
                 thread.updated_at = datetime.utcnow()
                 return assistant_msg.id, stop_payload, Usage(**usage_acc)
 
+            # Normalize/validate tool name
             tool_name = parsed.get("tool_name")
+            if not tool_name and parsed.get("type_name"):
+                tool_name = parsed.get("type_name")
             tool_args = parsed.get("args") or {}
+
+            if not tool_name or str(tool_name) not in ALLOWED_TOOLS:
+                stop_payload = AssistantPayload(
+                    text="I couldn't tell which tool to use. Please say if you want an estimate summary (with project_id), technician search (with profession/location), material search (with material/location), or a rough cost.",
+                    confidence=0.0,
+                    citations=[],
+                    cards=[],
+                    next_actions=[],
+                )
+                thread.last_message_at = datetime.utcnow()
+                thread.updated_at = datetime.utcnow()
+                return assistant_msg.id, stop_payload, Usage(**usage_acc)
+
+            # Required-arg preflight to avoid useless tool calls
+            required_args: dict[str, list[str]] = {
+                "get_estimate_summary": ["project_id"],
+                "get_project_summary": ["project_id"],
+                "search_material_listings": ["material"],
+                "search_technicians": ["profession"],
+            }
+            # Fill missing project_id from context if present
+            if tool_name in ("get_estimate_summary", "get_project_summary") and not tool_args.get("project_id"):
+                ctx_pid = getattr(payload.context, "project_id", None) if payload.context else None
+                if ctx_pid:
+                    tool_args["project_id"] = ctx_pid
+
+            missing = [a for a in required_args.get(str(tool_name), []) if tool_args.get(a) in (None, "", [])]
+            if missing:
+                stop_payload = AssistantPayload(
+                    text=f"I need {', '.join(missing)} to proceed. Please provide it and I'll continue.",
+                    confidence=0.0,
+                    citations=[],
+                    cards=[],
+                    next_actions=[],
+                )
+                thread.last_message_at = datetime.utcnow()
+                thread.updated_at = datetime.utcnow()
+                return assistant_msg.id, stop_payload, Usage(**usage_acc)
 
             # Execute tool
             try:

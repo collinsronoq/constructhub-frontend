@@ -83,6 +83,7 @@ def build_tool_schemas() -> list[dict]:
                         "quality": {"type": "string", "enum": ["basic", "standard", "premium"], "default": "standard"},
                         "location": {"type": "string"},
                     },
+                    "required": [],
                 },
             },
         },
@@ -110,8 +111,11 @@ async def _save_message(db: AsyncSession, *, thread_id: str, role: str, text: st
 
 
 async def _run_tool(tool_name: str, tool_args: dict, *, db: AsyncSession, user_id: str) -> dict:
-    if tool_name == "get_estimate_summary":
-        return await get_estimate_summary(project_id=tool_args["project_id"], db=db, user_id=user_id)
+    if tool_name in ("get_estimate_summary", "get_project_summary"):
+        project_id = tool_args.get("project_id")
+        if not project_id:
+            return {"error": "project_id is required for get_estimate_summary"}
+        return await get_estimate_summary(project_id=project_id, db=db, user_id=user_id)
     if tool_name == "search_material_listings":
         return await search_material_listings(
             material=tool_args["material"],

@@ -1,5 +1,5 @@
 # app/ai/router.py
-from datetime import datetime
+from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
@@ -11,6 +11,7 @@ from app.ai.schemas.schemas import (
 )
 from app.models.ai import AIThread, AIMessage, AIFeedback
 from app.ai.service.service_ollama import handle_chat
+from app.ai.prompts import list_prompts
 from app.core.database import get_db  # adapt to your project
 from app.auth.dependencies import get_current_user
 from app.core.logging import setup_logger
@@ -66,6 +67,11 @@ async def chat(payload: ChatRequest, db: AsyncSession = Depends(get_db), user=De
         raise HTTPException(status_code=500, detail="AI chat failed")
 
 
+@router.get("/prompts")
+async def prompts(role: str | None = None):
+    return list_prompts(role)
+
+
 @router.get("/threads/{thread_id}/messages", response_model=ThreadMessagesResponse)
 async def get_messages(thread_id: str, limit: int = 50, db: AsyncSession = Depends(get_db), user=Depends(get_current_user)):
     # Verify ownership
@@ -104,7 +110,7 @@ async def feedback(payload: FeedbackRequest, db: AsyncSession = Depends(get_db),
         rating=payload.rating,
         tags=payload.tags,
         comment=payload.comment,
-        created_at=datetime.utcnow(),
+        created_at=datetime.now(timezone.utc),
     )
     db.add(fb)
     await db.commit()

@@ -28,6 +28,7 @@ class ChatRequest(BaseModel):
     context: Optional[ChatContext] = None
     response_mode: Literal["text", "structured"] = "structured"
     client_trace_id: Optional[str] = None
+    prompt_id: Optional[str] = None
 
 
 class Citation(BaseModel):
