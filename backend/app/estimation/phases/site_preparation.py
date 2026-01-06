@@ -23,15 +23,18 @@ def estimate_site_preparation(data: SitePreparationInput) -> PhaseEstimate:
     access_multiplier = 1.3 if data.access_difficulty == "difficult" else 1.0
 
     #  Duration logic 
-    base_days = 2 if data.plot_size_sqm <= 500 else 4
-    excavation_days = int(base_days * soil_multiplier)
+    base_hours = 10 if data.plot_size_sqm <= 500 else 24
+    excavation_hours = int(base_hours * soil_multiplier)
+    excavation_days = int(excavation_hours/24)
+
+    rate_per_hour = 5000
 
     #  Machinery 
     excavator_cost = LabourCost(
         role="Excavator (Machine)",
-        rate_per_day=18000,
+        rate_per_day=excavation_hours*rate_per_hour,
         days=excavation_days,
-        total=18000 * excavation_days,
+        total=(excavation_hours*rate_per_hour) * excavation_days,
     )
 
     #  Labour 
@@ -47,11 +50,27 @@ def estimate_site_preparation(data: SitePreparationInput) -> PhaseEstimate:
     #  Other costs 
     other_costs = []
 
+    # disposal logic
+    # estimate the disposal quantity in volume
+
+    excavation_land_size = data.plot_size_sqm
+    excavation_land_depth = data.excavation_depth_m
+    soil_density_kg_m3 = 1500 if data.soil_type == "soft" else 1800
+
+    excavation_volume_m3 = excavation_land_size * excavation_land_depth
+    disposal_mass_kg = excavation_volume_m3 * soil_density_kg_m3
+
+    cost_per_truck = 8000
+    truck_disposal_kg = 15000
+
+    disposal_cost = (disposal_mass_kg/truck_disposal_kg)*cost_per_truck
+
+
     if data.include_disposal:
         other_costs.append(
             OtherCost(
                 name="Excavated Soil Disposal",
-                amount=8000 * excavation_days,
+                amount=disposal_cost,
             )
         )
 

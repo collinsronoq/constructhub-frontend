@@ -61,7 +61,7 @@ def quantify_superstructure(
 
     #  SLABS adjust pia thickness ya slab to maybe 20-30 cm
     slab_area = total_floor_area_sqm
-    slab_volume = round(slab_area * 0.125, 2)  # 125mm slab
+    slab_volume = round(slab_area * 0.300, 2)  # 30cm slab
 
     # Concrete mix heuristics (reuse foundation ratios)
     cement_bags_per_m3 = 6.5

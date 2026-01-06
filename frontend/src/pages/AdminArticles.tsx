@@ -3,17 +3,27 @@ import { useArticles, useArticleMutations } from "../hooks/Articles/useArticles"
 import ArticleForm from "../components/Articles/ArticleForm";
 import { useAuth } from "../hooks/auth/useAuth";
 import { Trash2, Edit } from "lucide-react";
+import type { Article } from "../services/api/articles";
 
 const AdminArticlesPage: React.FC = () => {
   const { articles, loading, error, refetch } = useArticles();
   const { create, update, remove } = useArticleMutations();
   const { user } = useAuth();
 
-  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editingId, setEditingId] = useState<Article["id"] | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  const editingArticle = useMemo(() => articles.find((a) => a.id === editingId), [articles, editingId]);
+  const toNumericId = (id: Article["id"] | null) => {
+    if (id === null) return null;
+    const numeric = typeof id === "string" ? Number(id) : id;
+    return Number.isNaN(numeric) ? null : numeric;
+  };
+
+  const editingArticle = useMemo(
+    () => (editingId == null ? undefined : articles.find((a) => String(a.id) === String(editingId))),
+    [articles, editingId]
+  );
 
   if (!user || user.role !== "admin") {
     return <div className="p-6 text-red-500">Unauthorized: admin access required.</div>;
@@ -31,10 +41,11 @@ const AdminArticlesPage: React.FC = () => {
   };
 
   const handleUpdate = async (payload: any) => {
-    if (!editingId) return;
+    const numericId = toNumericId(editingId);
+    if (numericId === null) return;
     setSubmitting(true);
     try {
-      await update(editingId, payload);
+      await update(numericId, payload);
       await refetch();
       setEditingId(null);
       setShowForm(false);
@@ -43,9 +54,11 @@ const AdminArticlesPage: React.FC = () => {
     }
   };
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: Article["id"]) => {
+    const numericId = toNumericId(id);
+    if (numericId === null) return;
     if (!window.confirm("Delete this article?")) return;
-    await remove(id);
+    await remove(numericId);
     await refetch();
   };
 

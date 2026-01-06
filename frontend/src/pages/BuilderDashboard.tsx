@@ -8,6 +8,7 @@ import LearningTips from "../components/BuilderDashboard/LearningTips";
 import { useEstimations } from "../hooks/Estimator/useEstimations";
 import { useRecommendations } from "../hooks/useRecommendations";
 import { useArticles } from "../hooks/Articles/useArticles";
+import { useAuth } from "../hooks/auth/useAuth";
 
 
 
@@ -15,7 +16,7 @@ const BuilderDashboard = () => {
   const { estimates, loading: estLoading, error: estError } = useEstimations();
   const { vendors, technicians, loading: recLoading, error: recError } = useRecommendations();
   const { featuredArticles } = useArticles();
-
+  const {user} = useAuth();
   const { onToggleOpenAI } = useOutletContext<{ onToggleOpenAI: () => void }>();
 
   const mappedEstimates = estimates.map((e) => ({
@@ -30,7 +31,7 @@ const BuilderDashboard = () => {
   return (
     <div>
       {/* Welcome & Quick Actions */}
-      <WelcomeSection onOpenChat={ onToggleOpenAI } />
+      <WelcomeSection onOpenChat={ onToggleOpenAI } builderName={user?.name}/>
 
       {/* Estimation Summary */}
       <RecentEstimations estimates={mappedEstimates.slice(0,3)} loading={estLoading} error={estError} />

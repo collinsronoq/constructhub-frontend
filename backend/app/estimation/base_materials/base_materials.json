@@ -5,42 +5,7 @@
     "source": "Kenya market averages + QS heuristics"
   },
 
-  "materials": [
-    {
-      "id": "cement",
-      "name": "Cement",
-      "unit": "bag_50kg",
-      "base_price": 750,
-      "category": "Structural",
-      "phases": ["foundation", "superstructure"],
-      "usage_per_m2": {
-        "foundation": 0.18,
-        "superstructure": 0.25
-      },
-      "quality_multiplier": {
-        "standard": 1.0,
-        "premium": 1.1
-      }
-    },
-
-    {
-      "id": "sand",
-      "name": "River Sand",
-      "unit": "ton",
-      "base_price": 2200,
-      "category": "Aggregates",
-      "phases": ["foundation", "finishes"],
-      "usage_per_m2": {
-        "foundation": 0.35,
-        "finishes": 0.15
-      },
-      "quality_multiplier": {
-        "standard": 1.0,
-        "premium": 1.05
-      }
-    }
-  ],
-
+  
 
   "site_survey_data":
   {
@@ -55,93 +20,23 @@
   },
 
 
-  "materials_2":{
-    "materials": {
-      "cement": {
-        "name": "Cement",
-        "unit": "bag",
-        "base_price": 750,
-        "quality_multiplier": {
-          "standard": 1.0,
-          "premium": 1.15
-        },
-        "phases": ["foundation", "superstructure", "finishes"]
-      },
-
-      "sand": {
-        "name": "River Sand",
-        "unit": "m3",
-        "base_price": 2800,
-        "quality_multiplier": {
-          "standard": 1.0,
-          "washed": 1.1
-        },
-        "phases": ["foundation", "superstructure"]
-      },
-
-      "ballast": {
-        "name": "Ballast",
-        "unit": "m3",
-        "base_price": 3000,
-        "quality_multiplier": {
-          "standard": 1.0,
-          "machine_crushed": 1.2
-        },
-        "phases": ["foundation"]
-      },
-
-      "hardcore": {
-        "name": "Hardcore",
-        "unit": "m3",
-        "base_price": 2500,
-        "quality_multiplier": {
-          "standard": 1.0
-        },
-        "phases": ["earthworks", "foundation"]
-      }
+  "hardcore": {
+    "name": "Hardcore",
+    "unit": "m3",
+    "base_price": 2500,
+    "quality_multiplier": {
+      "standard": 1.0
     }
-  },
-
-  "material_3":{
-    "blockwork": {
-      "burnt_bricks": {
-        "unit": "piece",
-        "price": 45
-      },
-      "concrete_blocks": {
-        "unit": "piece",
-        "price": 75
-      },
-      "machine_cut_blocks": {
-        "unit": "piece",
-        "price": 65
-      }
-    },
-    "cement": {
-      "unit": "bag",
-      "price": 720
-    },
-    "sand": {
-      "unit": "tonne",
-      "price": 1800
-    },
-    "ballast": {
-      "unit": "tonne",
-      "price": 2200
-    },
-    "reinforcement": {
-      "unit": "kg",
-      "price": 160
-    }
-  },
+   },
+  
 
   "superstructure_materials": {
     "blockwork": {
-      "burnt_bricks": { "unit": "piece", "price": 45 },
-      "concrete_blocks": { "unit": "piece", "price": 75 },
-      "machine_cut_blocks": { "unit": "piece", "price": 65 }
+      "burnt_bricks": { "unit": "piece", "price": 15 },
+      "concrete_blocks": { "unit": "piece", "price": 35 },
+      "machine_cut_blocks": { "unit": "piece", "price": 20 }
     },
-    "cement": { "unit": "bag", "price": 720 },
+    "cement": { "unit": "bag", "price": 750 },
     "sand": { "unit": "tonne", "price": 1800 },
     "ballast": { "unit": "tonne", "price": 2200 },
     "reinforcement": { "unit": "kg", "price": 160 }
@@ -152,7 +47,7 @@
       "mabati": { "unit": "sqm", "price": 1200 },
       "tile": { "unit": "sqm", "price": 1800 }
     },
-    "timber": { "unit": "m3", "price": 65000 },
+    "timber": { "unit": "m3", "price": 6500 },
     "nails": { "unit": "kg", "price": 250 },
     "ridge_cap": { "unit": "m", "price": 1200 },
     "cement": { "unit": "bag", "price": 750 },
@@ -176,11 +71,11 @@
     "switch": { "price": 350 },
     "socket": { "price": 550 },
     "light_fitting": { "price": 1500 },
-    "toilet_set": { "price": 14000 },
+    "toilet_set": { "price": 7500 },
     "basin": { "price": 5000 },
-    "kitchen_sink": { "price": 8500 },
-    "shower_mixer": { "price": 9500 },
-    "instant_shower": { "price": 12000 }
+    "kitchen_sink": { "price": 4500 },
+    "shower_mixer": { "price": 5500 },
+    "instant_shower": { "price": 4000 }
   },
 
   "finishes_materials": {
