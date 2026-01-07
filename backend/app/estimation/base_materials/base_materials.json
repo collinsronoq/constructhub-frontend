@@ -71,11 +71,11 @@
     "switch": { "price": 350 },
     "socket": { "price": 550 },
     "light_fitting": { "price": 1500 },
-    "toilet_set": { "price": 7500 },
-    "basin": { "price": 5000 },
+    "toilet_set": { "price": 5500 },
+    "basin": { "price": 3500 },
     "kitchen_sink": { "price": 4500 },
     "shower_mixer": { "price": 5500 },
-    "instant_shower": { "price": 4000 }
+    "instant_shower": { "price": 3500 }
   },
 
   "finishes_materials": {
@@ -110,7 +110,7 @@
   },
 
   "external_works_materials": {
-    "paving_block": { "price": 1500 },
+    "paving_block": { "price": 500 },
     "kerbstone": { "price": 300 },
     "drainage_pipe": { "price": 500 },
     "landscaping_topsoil": { "price": 250 },
@@ -127,7 +127,7 @@
     "gate_standard": { "price": 42000 },
 
     "sewer_pipe": { "price": 480 },
-    "manhole": { "price": 7500 },
+    "manhole": { "price": 2500 },
     "biodigester_unit": { "price": 95000 }
   }
 

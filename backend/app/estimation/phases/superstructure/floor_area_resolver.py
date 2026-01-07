@@ -90,6 +90,15 @@ def resolve_floor_area_from_rooms(
 
     fits = final_total <= max_allowable_floor_area_sqm
 
+    print(f'''floor area details: \n
+          rooms: {resolved_rooms}   \n
+          base room area: {base_area}   \n
+          circulation area: {circulation_area} \n
+          total floor area: {final_total} \n 
+          land constraints: {fits}  
+          
+        ''')
+
     return FloorAreaResolution(
         rooms=resolved_rooms,
         base_room_area_sqm=round(base_area, 2),

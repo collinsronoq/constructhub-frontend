@@ -4,11 +4,11 @@ from app.estimation.common_schemas import LabourCost, PhaseEstimate, PhaseTotals
 from app.estimation.schemas.external import ExternalWorksInput, ExternalWorksQuantities
 
 
-MASON_RATE = 2200
-FENCE_CREW_RATE = 2000
-PAVER_RATE = 2000
+MASON_RATE = 1200
+FENCE_CREW_RATE = 1500
+PAVER_RATE = 1500
 LANDSCAPER_RATE = 2000
-HELPER_RATE = 1200
+HELPER_RATE = 800
 
 QUALITY_FACTOR = {
     "standard": 1.0,

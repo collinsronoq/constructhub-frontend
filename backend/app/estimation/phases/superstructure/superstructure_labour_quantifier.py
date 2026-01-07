@@ -7,11 +7,11 @@ from app.estimation.phases.superstructure.superstructure_quantifier import Super
 
 
 LABOUR_RATES = {
-    "mason": 1500,
-    "mason_helper": 1000,
-    "steel_fixer": 1800,
-    "carpenter": 1700,
-    "general_labourer": 1000,
+    "mason": 1200,
+    "mason_helper": 700,
+    "steel_fixer": 1500,
+    "carpenter": 1500,
+    "general_labourer": 800,
     "foreman": 2500,
 }
 

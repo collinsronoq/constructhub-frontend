@@ -4,12 +4,12 @@ from app.estimation.common_schemas import LabourCost, PhaseEstimate, PhaseTotals
 from app.estimation.schemas.finishes import FinishesInput, FinishesQuantities
 
 
-TILER_RATE = 2500
-PAINTER_RATE = 2000
+TILER_RATE = 1500
+PAINTER_RATE = 1200
 CEILING_FIXER_RATE = 2300
 CARPENTER_RATE = 2500
-JOINER_RATE = 2600
-HELPER_RATE = 1200
+JOINER_RATE = 2000
+HELPER_RATE = 800
 
 QUALITY_FACTOR = {
     "standard": 1.0,

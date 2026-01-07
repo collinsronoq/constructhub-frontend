@@ -56,6 +56,17 @@ def resolve_land_feasibility(
 
     effective_per_floor = total_allowable_floor_area / floors
 
+    print(f'''
+          here are the details to regarding land: \n 
+          land size: {land_size_sqm} \n 
+          floors: {floors} \n 
+          max site coverage: {max_site_coverage_ratio} \n 
+          buildable footprint: {buildable_footprint} \n
+          allowable floor area: {total_allowable_floor_area} \n
+          effective floor area: {effective_per_floor} \n
+
+    ''')
+
     return LandFeasibilityResult(
         land_size_sqm=land_size_sqm,
         structure_type=structure_type,

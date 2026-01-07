@@ -1,5 +1,3 @@
-# app/estimation/phases/roofing/roofing_labour.py
-
 from app.estimation.common_schemas import (
     LabourCost,
     PhaseEstimate,
@@ -36,23 +34,23 @@ def estimate_roofing_labour(
         "mabati": {
             "base_days": 5,
             "crew": [
-                ("Roofing Fundi", 1, 2500),
-                ("Helper", 2, 1200),
+                ("Roofing Fundi", 1, 1500),
+                ("Helper", 2, 800),
             ],
         },
         "tiles": {
             "base_days": 7,
             "crew": [
-                ("Roofing Fundi", 2, 2800),
-                ("Helper", 3, 1200),
+                ("Roofing Fundi", 2, 1800),
+                ("Helper", 3, 800),
             ],
         },
         "flat_slab": {
             "base_days": 10,
             "crew": [
-                ("Foreman", 1, 3500),
-                ("Mason", 4, 2800),
-                ("Helper", 3, 1200),
+                ("Foreman", 1, 2500),
+                ("Mason", 4, 1200),
+                ("Helper", 3, 800),
             ],
         },
     }
@@ -66,7 +64,7 @@ def estimate_roofing_labour(
 
     model = roofing_models[labour_model_key]
 
-    # --- Duration adjustment ---
+    #  Duration adjustment 
     adjustment = _area_adjustment_factor(roof_area_sqm)
     days = round(model["base_days"] * adjustment)
 
