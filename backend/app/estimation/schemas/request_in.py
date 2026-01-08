@@ -48,9 +48,20 @@ class EstimationRequestIn(BaseModel):
 
         declared_floor_area = None
         if self.superstructure:
-            declared_floor_area = self.superstructure.get("declared_floor_area_sqm")
-        if declared_floor_area is None or declared_floor_area <= 0:
-            declared_floor_area = plot_size * 0.4  # heuristic fallback
+            raw_declared = self.superstructure.get("declared_floor_area_sqm")
+            try:
+                if raw_declared and float(raw_declared) > 0:
+                    declared_floor_area = float(raw_declared)
+            except (TypeError, ValueError):
+                declared_floor_area = None
+
+        default_floor_area = declared_floor_area if declared_floor_area is not None else plot_size * 0.4
+
+        roof_type_value = _pick_literal(
+            (self.roofing or {}).get("roof_type") or (self.superstructure or {}).get("roof_type"),
+            ("gable", "hip", "flat", "mono_pitch"),
+            "gable",
+        )
 
         # Site survey
         ss = SiteSurveyInput(
@@ -75,23 +86,25 @@ class EstimationRequestIn(BaseModel):
             land_size_sqm=float((self.superstructure or {}).get("land_size_sqm", plot_size) or plot_size),
             structure_type=_pick_literal((self.superstructure or {}).get("structure_type"), ("bungalow", "two_storey", "three_storey", "multi_storey"), "bungalow"),
             blockwork_type=_pick_literal((self.superstructure or {}).get("blockwork_type"), ("burnt_bricks", "concrete_blocks", "machine_cut_blocks"), "concrete_blocks"),
-            declared_floor_area_sqm=float(declared_floor_area),
+            roof_type=roof_type_value,
+            declared_floor_area_sqm=declared_floor_area,
             bedrooms=int((self.superstructure or {}).get("bedrooms", 3) or 3),
             bathrooms=int((self.superstructure or {}).get("bathrooms", 2) or 2),
             master_bedrooms=int((self.superstructure or {}).get("master_bedrooms", 0) or 0),
             living_rooms=int((self.superstructure or {}).get("living_rooms", 1) or 1),
             dining_rooms=int((self.superstructure or {}).get("dining_rooms", 1) or 1),
             kitchens=int((self.superstructure or {}).get("kitchens", 1) or 1),
+            stores=int((self.superstructure or {}).get("stores", 2) or 2),
             additional_rooms=(self.superstructure or {}).get("additional_rooms", {}),
             room_size_preference=_pick_literal((self.superstructure or {}).get("room_size_preference"), ("compact", "standard", "spacious"), "standard"),
             finishing_level=_pick_literal((self.superstructure or {}).get("finishing_level"), ("standard", "premium", "luxury"), "standard"),
         )
 
         # Foundation (use declared floor area as default footprint)
-        footprint = float((self.foundation or {}).get("footprint_sqm", declared_floor_area) or declared_floor_area)
+        footprint = float((self.foundation or {}).get("footprint_sqm", default_floor_area) or default_floor_area)
         foundation = FoundationInput(
             foundation_type=_pick_literal((self.foundation or {}).get("foundation_type"), ("strip", "raft"), "strip"),
-            floor_area_sqm=float((self.foundation or {}).get("floor_area_sqm", declared_floor_area) or declared_floor_area),
+            floor_area_sqm=float((self.foundation or {}).get("floor_area_sqm", default_floor_area) or default_floor_area),
             soil_type=_pick_literal((self.foundation or {}).get("soil_type"), ("soft", "medium", "rocky"), sp.soil_type),
             quality_level=_pick_literal((self.foundation or {}).get("quality_level"), ("standard", "premium"), "standard"),
             include_formwork=bool((self.foundation or {}).get("include_formwork", True)),
@@ -99,7 +112,7 @@ class EstimationRequestIn(BaseModel):
 
         # Roofing
         roofing = RoofingInput(
-            roof_type=_pick_literal((self.roofing or {}).get("roof_type"), ("gable", "hip", "flat", "mono_pitch"), "gable"),
+            roof_type=roof_type_value,
             roof_covering=_pick_literal((self.roofing or {}).get("roof_covering"), ("corrugated_mabati", "box_profile_mabati", "stone_coated_tiles", "clay_tiles"), "corrugated_mabati"),
             roof_pitch=_pick_literal((self.roofing or {}).get("roof_pitch"), ("low", "medium", "steep"), "medium"),
             building_footprint_sqm=float((self.roofing or {}).get("building_footprint_sqm", footprint) or footprint),
@@ -108,7 +121,7 @@ class EstimationRequestIn(BaseModel):
         )
 
         # Services - use floor area
-        services_floor = float((self.services_first_fix or {}).get("floor_area_sqm", declared_floor_area) or declared_floor_area)
+        services_floor = float((self.services_first_fix or {}).get("floor_area_sqm", default_floor_area) or default_floor_area)
         sff = ServicesFirstFixInput(
             floor_area_sqm=services_floor,
             storeys=int((self.services_first_fix or {}).get("storeys", roofing.storeys) or roofing.storeys),

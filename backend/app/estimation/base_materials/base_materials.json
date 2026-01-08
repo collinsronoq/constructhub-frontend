@@ -47,13 +47,13 @@
       "mabati": { "unit": "sqm", "price": 1200 },
       "tile": { "unit": "sqm", "price": 1800 }
     },
-    "timber": { "unit": "m3", "price": 6500 },
+    "timber": { "unit": "m", "price": 200 },
     "nails": { "unit": "kg", "price": 250 },
     "ridge_cap": { "unit": "m", "price": 1200 },
     "cement": { "unit": "bag", "price": 750 },
     "reinforcement": { "unit": "kg", "price": 160 },
     "waterproofing": { "unit": "sqm", "price": 850 },
-    "formwork": { "unit": "sqm", "price": 1200 }
+    "formwork": { "unit": "sqm", "price": 600 }
   },
 
   "services_first_fix_materials": {
@@ -110,7 +110,7 @@
   },
 
   "external_works_materials": {
-    "paving_block": { "price": 500 },
+    "paving_block": { "price": 250 },
     "kerbstone": { "price": 300 },
     "drainage_pipe": { "price": 500 },
     "landscaping_topsoil": { "price": 250 },

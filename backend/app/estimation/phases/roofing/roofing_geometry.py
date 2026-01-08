@@ -47,6 +47,13 @@ def derive_roof_geometry(data: RoofingInput) -> RoofGeometry:
 
     ridge_length = math.sqrt(footprint) if data.roof_type in {"gable", "hip"} else None
 
+    print(f'''Roof geometry details: \n
+          footprintarea: {footprint} \n 
+          roof_area_sqm: {roof_area} \n,
+          ridge_length_m: {ridge_length} \n,
+          slope factor: {slope_factor} \n
+    
+    ''')
     return RoofGeometry(
         footprint_area=footprint,
         roof_area_sqm=round(roof_area, 2),

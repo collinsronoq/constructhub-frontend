@@ -12,9 +12,14 @@ def quantify_finishes(data: FinishesInput) -> FinishesQuantities:
     footprint_per_storey = data.floor_area_sqm / data.storeys
     perimeter_m = 4 * sqrt(footprint_per_storey)
 
-    wall_area = perimeter_m * data.wall_height_m * data.storeys
-    net_wall_area = wall_area * 0.85  # openings allowance
+    internal_wall_area_rate = 1.4
 
+    wall_area = perimeter_m * data.wall_height_m * data.storeys 
+    net_wall_area_1 = wall_area * 0.85  # openings allowance for the outer walls for windows
+
+    # add the internal walls which may add up to 40% to total wall area
+    net_wall_area *= 1.4
+    
     # Floor areas
     main_floor_area = data.floor_area_sqm * 0.8
     wet_floor_area = data.floor_area_sqm * 0.2
@@ -27,7 +32,7 @@ def quantify_finishes(data: FinishesInput) -> FinishesQuantities:
     # Wall tiling in wet areas
     wall_tile_area = 0
     if data.wet_wall_tiling:
-        wall_tile_area = (data.bathrooms * 12) + (data.kitchens * 6)
+        wall_tile_area = (data.bathrooms * 6) + (data.kitchens * 12)
         wall_tile_area *= 1.08
 
     # Plaster / skim (non-tiled wall areas)

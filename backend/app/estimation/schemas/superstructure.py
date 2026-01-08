@@ -25,6 +25,8 @@ class SuperstructureInput(BaseModel):
     land_size_sqm: float = Field(..., gt=0)
     structure_type: StructureType
     blockwork_type: BlockworkType
+    roof_type: Literal["gable", "hip", "flat", "mono_pitch"]
+    
 
     # Optional manual override
     declared_floor_area_sqm: Optional[float] = Field(None, gt=0)

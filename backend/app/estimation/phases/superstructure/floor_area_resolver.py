@@ -1,9 +1,11 @@
 from dataclasses import dataclass
 from typing import Dict, List
 
+from app.estimation.base_materials.loader import load_base_rooms
+
 
 # Reference room sizes (sqm)
-ROOM_SIZE_REFERENCE = {
+DEFAULT_ROOM_SIZES = {
     "bedroom": 12,
     "master_bedroom": 18,
     "bathroom": 4,
@@ -15,6 +17,44 @@ ROOM_SIZE_REFERENCE = {
     "laundry": 4,
     "study": 8,
 }
+
+DEFAULT_SIZE_TIERS = {
+    "compact": 0.9,
+    "standard": 1.0,
+    "spacious": 1.15,
+}
+
+DEFAULT_CIRCULATION_RATIO = 0.12
+
+
+def _load_room_catalog() -> tuple[Dict[str, float], Dict[str, float], float]:
+    base = load_base_rooms() or {}
+    rooms = base.get("rooms", {}) if isinstance(base, dict) else {}
+    tiers = base.get("room_size_tiers", {}) if isinstance(base, dict) else {}
+    planning = base.get("planning_assumptions", {}) if isinstance(base, dict) else {}
+
+    room_sizes: Dict[str, float] = {}
+    for key, value in rooms.items():
+        if not isinstance(value, dict):
+            continue
+        size = value.get("average_size_sqm") or value.get("min_size_sqm")
+        if size:
+            room_sizes[key] = float(size)
+
+    merged_sizes = DEFAULT_ROOM_SIZES.copy()
+    merged_sizes.update(room_sizes)
+
+    merged_tiers = DEFAULT_SIZE_TIERS.copy()
+    if isinstance(tiers, dict):
+        for key, value in tiers.items():
+            if isinstance(value, (int, float)) and value > 0:
+                merged_tiers[key] = float(value)
+
+    circulation_ratio = planning.get("circulation_factor", DEFAULT_CIRCULATION_RATIO)
+    if not isinstance(circulation_ratio, (int, float)) or circulation_ratio <= 0:
+        circulation_ratio = DEFAULT_CIRCULATION_RATIO
+
+    return merged_sizes, merged_tiers, float(circulation_ratio)
 
 
 @dataclass
@@ -39,7 +79,8 @@ class FloorAreaResolution:
 def resolve_floor_area_from_rooms(
     room_quantities: Dict[str, int],
     max_allowable_floor_area_sqm: float,
-    circulation_ratio: float = 0.12,
+    circulation_ratio: float | None = None,
+    size_tier: str = "standard",
     min_scale: float = 0.85,
     max_scale: float = 1.15,
 ) -> FloorAreaResolution:
@@ -50,12 +91,16 @@ def resolve_floor_area_from_rooms(
     resolved_rooms: List[ResolvedRoom] = []
     base_area = 0.0
 
+    room_sizes, size_tiers, default_circulation = _load_room_catalog()
+    size_multiplier = size_tiers.get(size_tier, size_tiers["standard"])
+    circulation_ratio = default_circulation if circulation_ratio is None else circulation_ratio
+
     # Step 1: calculate base room area
     for room, qty in room_quantities.items():
-        if room not in ROOM_SIZE_REFERENCE or qty <= 0:
+        if room not in room_sizes or qty <= 0:
             continue
 
-        room_size = ROOM_SIZE_REFERENCE[room]
+        room_size = room_sizes[room] * size_multiplier
         room_total = room_size * qty
         base_area += room_total
 
@@ -67,6 +112,16 @@ def resolve_floor_area_from_rooms(
                 adjusted_size_sqm=room_size,
                 total_area_sqm=room_total,
             )
+        )
+
+    if base_area <= 0:
+        return FloorAreaResolution(
+            rooms=[],
+            base_room_area_sqm=0,
+            circulation_area_sqm=0,
+            total_floor_area_sqm=0,
+            scale_factor=1.0,
+            fits_land_constraints=True,
         )
 
     # Step 2: add circulation
@@ -95,7 +150,8 @@ def resolve_floor_area_from_rooms(
           base room area: {base_area}   \n
           circulation area: {circulation_area} \n
           total floor area: {final_total} \n 
-          land constraints: {fits}  
+          land constraints: {fits}  \n 
+          scale factor: {scale_factor}
           
         ''')
 

@@ -39,7 +39,7 @@ def quantify_external_works(data: ExternalWorksInput) -> ExternalWorksQuantities
             column_spacing = 3.0
             column_count = max(4, ceil(wall_length / column_spacing))
             column_conc = round(column_count * 0.25 * 0.25 * data.perimeter_wall_height_m, 2)
-            column_reinf = round(column_conc * 110, 1)  # kg
+            column_reinf = round(column_conc * 15, 1)  # kg
 
             plaster_area = round(wall_area * 1.1, 1)  # one side + allowance
 
@@ -66,7 +66,7 @@ def quantify_external_works(data: ExternalWorksInput) -> ExternalWorksQuantities
 
     if data.sewerage_system == "septic_tank":
         septic_conc = max(5.0, round(data.floor_area_sqm * 0.03, 2))
-        septic_reinf = round(septic_conc * 80, 1)
+        septic_reinf = round(septic_conc * 15, 1)
         sewer_pipe = 20
         manhole_count = 1
     elif data.sewerage_system == "biodigester":
@@ -76,6 +76,13 @@ def quantify_external_works(data: ExternalWorksInput) -> ExternalWorksQuantities
     elif data.sewerage_system == "sewer_connection":
         sewer_pipe = max(data.sewer_connection_length_m, 5)
         manhole_count = max(1, ceil(sewer_pipe / 15))
+
+    print(f''' external works details: \n 
+          wall length: {wall_length} \n
+          paving area: {paving_area} \n
+          
+          
+          ''')
 
     return ExternalWorksQuantities(
         paving_area_sqm=round(paving_area, 1),

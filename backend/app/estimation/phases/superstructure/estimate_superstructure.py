@@ -66,6 +66,7 @@ def estimate_superstructure(
     floor_area = resolve_floor_area_from_rooms(
         room_quantities=room_quantities,
         max_allowable_floor_area_sqm=footprint.total_allowable_floor_area_sqm,
+        size_tier=data.room_size_preference,
     )
 
     
@@ -73,10 +74,12 @@ def estimate_superstructure(
     
     effective_floor_area = data.declared_floor_area_sqm or floor_area.total_floor_area_sqm
 
+    print(f"effective floor area: {effective_floor_area}")
+
     quantities = quantify_superstructure(
+        data=data,
         total_floor_area_sqm=effective_floor_area,
         number_of_storeys=footprint.floors,
-        blockwork_type=data.blockwork_type,
     )
 
     

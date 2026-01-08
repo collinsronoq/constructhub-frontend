@@ -28,7 +28,7 @@ def quantify_services_second_fix(data: ServicesSecondFixInput) -> ServicesSecond
 
     # Sanitary fixtures
     toilet_sets = max(1, data.bathrooms)
-    basins = data.bathrooms + data.kitchens  # include kitchen sinks as basins-equivalent
+    basins = data.bathrooms + data.dining_rooms  # include basin in dining room
     kitchen_sinks = max(1, data.kitchens)
 
     shower_mixers = data.bathrooms if data.include_shower_mixers else 0
@@ -46,6 +46,18 @@ def quantify_services_second_fix(data: ServicesSecondFixInput) -> ServicesSecond
     shower_mixers = ceil(shower_mixers * storey_factor)
     instant_showers = ceil(instant_showers * storey_factor)
 
+    print(f''' second service fix details: \n 
+          switches: {switches} \n,
+          sockets: {sockets} \n,
+          light_fittings: {light_fittings} \n,
+          toilet_sets: {toilet_sets} \n,
+          basins: {basins} \n,
+          kitchen_sinks: {kitchen_sinks} \n,
+          shower_mixers: {shower_mixers} \n,
+          instant_showers: {instant_showers}
+  
+          ''')
+    
     return ServicesSecondFixQuantities(
         switches=switches,
         sockets=sockets,

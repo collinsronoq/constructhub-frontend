@@ -46,6 +46,20 @@ def quantify_services_first_fix(
 
     earthing_rods = 1 if data.include_earthing else 0
 
+
+    print(f""" services first fix quantifier details: \n 
+          habitable rooms: {habitable_rooms} \n 
+          total_socket_points: {total_socket_points} \n,
+          conduit_m: {conduit_m} \n,
+          lighting_cable_m: {lighting_cable_m} \n,
+          power_cable_m: {power_cable_m} \n,
+          junction_boxes: {junction_boxes} \n,
+          cold_water_pipe_m: {cold_water_pipe_m} \n,
+          hot_water_pipe_m: {hot_water_pipe_m} \n,
+          waste_pipe_m: {waste_pipe_m} \n,
+
+        """)
+
     return ServicesFirstFixQuantities(
         total_light_points=total_light_points,
         total_socket_points=total_socket_points,

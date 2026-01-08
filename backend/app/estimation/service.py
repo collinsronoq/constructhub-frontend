@@ -36,39 +36,39 @@ async def generate_estimation(payload: EstimationRequest, db: AsyncSession, user
 
     logger.info("Starting estimation: site_survey")
     phases.append(estimate_site_survey(payload.site_survey))
-    logger.info(f"\n\n site survey information:\n {phases}")
+    # logger.info(f"\n\n site survey information:\n {phases}")
 
-    logger.info("Starting estimation: site_preparation")
+    # logger.info("Starting estimation: site_preparation")
     phases.append(estimate_site_preparation(payload.site_preparation))
-    logger.info(f"\n\n site preparation information:\n {phases[1]}")
+    # logger.info(f"\n\n site preparation information:\n {phases[1]}")
 
-    logger.info("Starting estimation: foundation")
+    # logger.info("Starting estimation: foundation")
     phases.append(estimate_foundation(payload.foundation))
-    logger.info(f"\n\n foundation information:\n {phases[2]}")
+    # logger.info(f"\n\n foundation information:\n {phases[2]}")
 
-    logger.info("Starting estimation: superstructure")
+    # logger.info("Starting estimation: superstructure")
     phases.append(estimate_superstructure(payload.superstructure, vendor_prices=vendor_prices))
-    logger.info(f"\n\n superstrucutre information:\n {phases[3]}")
+    # logger.info(f"\n\n superstrucutre information:\n {phases[3]}")
 
-    logger.info("Starting estimation: roofing")
+    # logger.info("Starting estimation: roofing")
     phases.append(estimate_roofing_phase(payload.roofing, vendor_prices=vendor_prices))
-    logger.info(f"\n\n roofing information:\n {phases[4]}")
+    # logger.info(f"\n\n roofing information:\n {phases[4]}")
 
-    logger.info("Starting estimation: services_first_fix")
+    # logger.info("Starting estimation: services_first_fix")
     phases.append(estimate_services_first_fix(payload.services_first_fix, vendor_prices=vendor_prices))
-    logger.info(f"\n\n service first fix information:\n {phases[5]}")
+    # logger.info(f"\n\n service first fix information:\n {phases[5]}")
 
-    logger.info("Starting estimation: services_second_fix")
+    # logger.info("Starting estimation: services_second_fix")
     phases.append(estimate_services_second_fix(payload.services_second_fix, vendor_prices=vendor_prices))
-    logger.info(f"\n\n service second fix information:\n {phases[6]}")
+    # logger.info(f"\n\n service second fix information:\n {phases[6]}")
 
-    logger.info("Starting estimation: finishes")
+    # logger.info("Starting estimation: finishes")
     phases.append(estimate_finishes(payload.finishes, vendor_prices=vendor_prices))
-    logger.info(f"\n\n finishes information:\n {phases[7]}")
+    # logger.info(f"\n\n finishes information:\n {phases[7]}")
 
-    logger.info("Starting estimation: external_works")
+    # logger.info("Starting estimation: external_works")
     phases.append(estimate_external_works(payload.external_works, vendor_prices=vendor_prices))
-    logger.info(f"\n\n external works information:\n {phases[8]}")
+    # logger.info(f"\n\n external works information:\n {phases[8]}")
 
     material_total = sum(p.totals.materials for p in phases)
     labour_total = sum(p.totals.labour for p in phases)

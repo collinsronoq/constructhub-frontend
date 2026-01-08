@@ -53,7 +53,7 @@ def estimate_site_preparation(data: SitePreparationInput) -> PhaseEstimate:
     # disposal logic
     # estimate the disposal quantity in volume
 
-    excavation_land_size = data.plot_size_sqm
+    excavation_land_size = data.plot_size_sqm * 0.8
     excavation_land_depth = data.excavation_depth_m
     soil_density_kg_m3 = 1500 if data.soil_type == "soft" else 1800
 
@@ -61,7 +61,7 @@ def estimate_site_preparation(data: SitePreparationInput) -> PhaseEstimate:
     disposal_mass_kg = excavation_volume_m3 * soil_density_kg_m3
 
     cost_per_truck = 8000
-    truck_disposal_kg = 15000
+    truck_disposal_kg = 25000
 
     disposal_cost = (disposal_mass_kg/truck_disposal_kg)*cost_per_truck
 
