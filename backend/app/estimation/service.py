@@ -31,6 +31,7 @@ async def generate_estimation(payload: EstimationRequest, db: AsyncSession, user
     """
 
     vendor_prices = payload.vendor_prices or {}
+    location_hint = getattr(payload.site_survey, "location", None)
 
     phases = []
 
@@ -81,6 +82,16 @@ async def generate_estimation(payload: EstimationRequest, db: AsyncSession, user
         "other_cost": other_total,
         "phases_count": len(phases),
     }
+    project_details = {
+        "project_name": payload.project_name or location_hint,
+        "location": location_hint,
+        "bedrooms": payload.superstructure.bedrooms,
+        "bathrooms": payload.superstructure.bathrooms,
+        "floor_area_sqm": payload.superstructure.declared_floor_area_sqm
+        or payload.superstructure.land_size_sqm,
+        "structure_type": payload.superstructure.structure_type,
+        "finishing_level": payload.superstructure.finishing_level,
+    }
 
     permits = [
         Permit(
@@ -123,9 +134,6 @@ async def generate_estimation(payload: EstimationRequest, db: AsyncSession, user
 
     breakdown = [p.model_dump() for p in phases]
 
-    # Location hint from site survey for contextual recommendations
-    location_hint = getattr(payload.site_survey, "location", None)
-
     recs = await get_recommendations(
         db=db,
         location=location_hint,
@@ -139,6 +147,7 @@ async def generate_estimation(payload: EstimationRequest, db: AsyncSession, user
     response = {
         "id": estimate_id,
         "summary": summary,
+        "project_details": project_details,
         "breakdown": breakdown,
         "permits": [p.model_dump() for p in permits],
         "recommendations": recs,

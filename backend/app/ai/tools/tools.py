@@ -105,6 +105,7 @@ async def get_estimate_summary(project_id: str, *, db: AsyncSession, user_id: in
     return {
         "estimate_id": estimate_id,
         "summary": summary,
+        "project_details": blob.get("project_details") or {},
         "breakdown": breakdown,
         "phase_insights": _build_phase_insights(breakdown, total_cost),
         "permits": blob.get("permits") or [],

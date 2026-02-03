@@ -12,7 +12,6 @@ def estimate_site_preparation(data: SitePreparationInput) -> PhaseEstimate:
     """
     Estimate site preparation & earthworks costs.
     """
-
     #  Excavation difficulty multiplier 
     soil_multiplier = {
         "soft": 1.0,

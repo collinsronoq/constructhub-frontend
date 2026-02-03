@@ -158,6 +158,26 @@ export interface EstimationListItem {
   created_at?: string | null;
 }
 
+export interface ProjectDetails {
+  project_name?: string | null;
+  location?: string | null;
+  bedrooms?: number;
+  bathrooms?: number;
+  floor_area_sqm?: number | null;
+  structure_type?: StructureType;
+  finishing_level?: "standard" | "premium" | "luxury";
+}
+
+export interface Permit {
+  id: string;
+  name: string;
+  cost?: number | null;
+  where?: string | null;
+  significance?: string | null;
+  duration_days?: number | null;
+  status?: string | null;
+}
+
 export interface EstimationDetail {
   id: string;
   summary: {
@@ -167,7 +187,8 @@ export interface EstimationDetail {
     other_cost: number;
     phases_count: number;
   };
+  project_details?: ProjectDetails;
   breakdown: any[];
-  permits: any[];
+  permits: Permit[];
   recommendations: any[];
 }

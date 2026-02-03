@@ -8,10 +8,14 @@ export const mockEstimationData: EstimationBreakdown = {
   projectTitle: "3-Bedroom Bungalow",
   floorArea: 130,
   quality: "Standard",
+  bedrooms: 3,
+  bathrooms: 2,
+  structureType: "bungalow",
   totalCost: 4950000,
   phases: [],
   recommendations: { vendors: [], technicians: [] },
   other: 0,
+  permits: [],
 };
 
 export function useEstimationData() {

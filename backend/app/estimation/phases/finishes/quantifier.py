@@ -18,7 +18,7 @@ def quantify_finishes(data: FinishesInput) -> FinishesQuantities:
     net_wall_area_1 = wall_area * 0.85  # openings allowance for the outer walls for windows
 
     # add the internal walls which may add up to 40% to total wall area
-    net_wall_area *= 1.4
+    net_wall_area = net_wall_area_1 * internal_wall_area_rate
     
     # Floor areas
     main_floor_area = data.floor_area_sqm * 0.8

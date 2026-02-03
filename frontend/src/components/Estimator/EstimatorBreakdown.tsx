@@ -42,6 +42,20 @@ function generateAIInsights(data: EstimationBreakdown) {
   };
 }
 
+function formatNumber(value?: number | null, suffix?: string) {
+  if (value === null || value === undefined || Number.isNaN(value) || value <= 0) {
+    return "N/A";
+  }
+  return suffix ? `${value} ${suffix}` : String(value);
+}
+
+function formatLabel(value?: string | null) {
+  if (!value) return "N/A";
+  return value
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (match) => match.toUpperCase());
+}
+
 export default function EstimatorBreakdown({ data, onBackToSummary }: BreakdownnProps) {
   console.info("[EstimatorBreakdown] received data", data);
   const totals = computeTotals(data);
@@ -88,9 +102,7 @@ export default function EstimatorBreakdown({ data, onBackToSummary }: Breakdownn
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Estimate Breakdown</h2>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            {data.projectTitle} · Floor area: {data.floorArea} sqm · Quality: {data.quality}
-          </p>
+          <p className="text-sm text-gray-600 dark:text-gray-400">Project: {data.projectTitle}</p>
         </div>
         {onBackToSummary && (
           <button
@@ -100,6 +112,39 @@ export default function EstimatorBreakdown({ data, onBackToSummary }: Breakdownn
             Back to Summary
           </button>
         )}
+      </div>
+
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+        <div className="p-3 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+          <div className="text-xs text-gray-500 dark:text-gray-400">Bedrooms</div>
+          <div className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+            {formatNumber(data.bedrooms)}
+          </div>
+        </div>
+        <div className="p-3 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+          <div className="text-xs text-gray-500 dark:text-gray-400">Bathrooms</div>
+          <div className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+            {formatNumber(data.bathrooms)}
+          </div>
+        </div>
+        <div className="p-3 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+          <div className="text-xs text-gray-500 dark:text-gray-400">Floor Area</div>
+          <div className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+            {formatNumber(data.floorArea, "sqm")}
+          </div>
+        </div>
+        <div className="p-3 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+          <div className="text-xs text-gray-500 dark:text-gray-400">Structure Type</div>
+          <div className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+            {formatLabel(data.structureType)}
+          </div>
+        </div>
+        <div className="p-3 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+          <div className="text-xs text-gray-500 dark:text-gray-400">Quality</div>
+          <div className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+            {formatLabel(data.quality)}
+          </div>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -205,6 +250,37 @@ export default function EstimatorBreakdown({ data, onBackToSummary }: Breakdownn
           {insights.materialVsLabour && <li>{insights.materialVsLabour}</li>}
         </ul>
       </div>
+
+      {data.permits.length > 0 && (
+        <div className="p-4 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+          <div className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2">Permits and Approvals</div>
+          <div className="space-y-3">
+            {data.permits.map((permit) => (
+              <div
+                key={permit.id}
+                className="p-3 rounded border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900"
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <div className="text-sm font-semibold text-gray-800 dark:text-gray-200">{permit.name}</div>
+                  {permit.status && (
+                    <span className="text-xs px-2 py-1 rounded bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                      {formatLabel(permit.status)}
+                    </span>
+                  )}
+                </div>
+                <div className="mt-2 text-xs text-gray-600 dark:text-gray-400 space-y-1">
+                  {permit.cost !== null && permit.cost !== undefined && (
+                    <div>Cost: KSh {Number(permit.cost).toLocaleString()}</div>
+                  )}
+                  {permit.durationDays ? <div>Duration: {permit.durationDays} days</div> : null}
+                  {permit.where ? <div>Where: {permit.where}</div> : null}
+                  {permit.significance ? <div>{permit.significance}</div> : null}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Phases */}
       <div className="space-y-3">

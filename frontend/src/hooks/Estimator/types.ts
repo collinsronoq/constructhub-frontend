@@ -27,10 +27,23 @@ export interface PhaseData {
   subtotal: number;
 }
 
+export interface PermitItem {
+  id: string;
+  name: string;
+  cost?: number | null;
+  where?: string | null;
+  significance?: string | null;
+  durationDays?: number | null;
+  status?: string | null;
+}
+
 export interface EstimationBreakdown {
   projectTitle: string;
   floorArea: number;
   quality: string;
+  bedrooms?: number;
+  bathrooms?: number;
+  structureType?: string;
   totalCost: number;
   phases: PhaseData[];
   recommendations: {
@@ -38,4 +51,5 @@ export interface EstimationBreakdown {
     technicians: TechnicianCardProps[];
   };
   other: number;
+  permits: PermitItem[];
 }

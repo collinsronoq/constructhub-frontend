@@ -16,6 +16,7 @@ export function mapEstimationDetailToBreakdown(
   meta?: EstimationMeta
 ): EstimationBreakdown {
   const request = meta?.request;
+  const projectDetails = backend.project_details ?? {};
   const phases = (backend.breakdown || []).map((phase: any, idx: number) => {
     const materials = (phase.materials || []).map((m: any, i: number) => {
       const qty = Number(m.quantity ?? m.qty ?? m.amount ?? 0);
@@ -71,15 +72,33 @@ export function mapEstimationDetailToBreakdown(
   const floorArea =
     Number(
       request?.superstructure.declared_floor_area_sqm ??
+        projectDetails.floor_area_sqm ??
         request?.superstructure.land_size_sqm ??
         meta?.landSize ??
         0
-    ) || 1;
+    ) || 0;
+
+  const bedrooms = request?.superstructure.bedrooms ?? projectDetails.bedrooms;
+  const bathrooms = request?.superstructure.bathrooms ?? projectDetails.bathrooms;
+  const structureType = request?.superstructure.structure_type ?? projectDetails.structure_type;
+
+  const permits = (backend.permits || []).map((permit: any, idx: number) => ({
+    id: String(permit?.id ?? `permit-${idx}`),
+    name: permit?.name ?? `Permit ${idx + 1}`,
+    cost: permit?.cost ?? null,
+    where: permit?.where ?? null,
+    significance: permit?.significance ?? null,
+    durationDays: permit?.duration_days ?? permit?.durationDays ?? null,
+    status: permit?.status ?? null,
+  }));
 
   return {
-    projectTitle: meta?.projectName ?? request?.project_name ?? "Project",
+    projectTitle: meta?.projectName ?? request?.project_name ?? projectDetails.project_name ?? "Project",
     floorArea,
-    quality: request?.superstructure.finishing_level ?? meta?.finishing ?? "Standard",
+    quality: request?.superstructure.finishing_level ?? projectDetails.finishing_level ?? meta?.finishing ?? "Standard",
+    bedrooms,
+    bathrooms,
+    structureType,
     totalCost: Number(backend.summary?.total_cost ?? phases.reduce((sum, p) => sum + (p.subtotal || 0), 0)),
     phases,
     recommendations: {
@@ -87,5 +106,6 @@ export function mapEstimationDetailToBreakdown(
       technicians: [],
     },
     other: Number(backend.summary?.other_cost ?? 0),
+    permits,
   };
 }

@@ -34,7 +34,10 @@ export function useEstimationById(id?: string, useMock?: boolean) {
       .then((payload) =>
         setData(
           mapEstimationDetailToBreakdown(payload as any, {
-            projectName: (payload as any)?.project_title || (payload as any)?.project_name,
+            projectName:
+              (payload as any)?.project_title ||
+              (payload as any)?.project_name ||
+              (payload as any)?.project_details?.project_name,
           })
         )
       )
