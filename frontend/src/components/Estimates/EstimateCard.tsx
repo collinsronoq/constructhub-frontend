@@ -55,7 +55,7 @@ const EstimateCard: React.FC<EstimateCardProps> = ({
         <h3>{projectName}</h3>
       </div>
 
-      <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 ml-2">
+      <p className="hidden text-xs md:text-sm text-gray-500 dark:text-gray-400 ml-2">
         <span
           className={`inline-block px-2 py-1 text-xs rounded-full font-medium ${
             category === "Residential"
@@ -78,7 +78,7 @@ const EstimateCard: React.FC<EstimateCardProps> = ({
               clipRule="evenodd"
             />
           </svg>
-          <p>
+          <p className="font-semibold">
             Location:
             <span className="font-medium ml-2">{location}</span>
           </p>
@@ -93,9 +93,9 @@ const EstimateCard: React.FC<EstimateCardProps> = ({
             />
             <path d="M13 11.75a.75.75 0 0 0-1.5 0v.179c0 .15-.138.28-.306.255A65.277 65.277 0 0 0 1.75 11.5a.75.75 0 0 0 0 1.5c3.135 0 6.215.228 9.227.668A1.764 1.764 0 0 0 13 11.928v-.178Z" />
           </svg>
-          <p>
+          <p className="font-semibold">
             Estimated Cost:
-            <span className="font-medium ml-2">{estimatedCost}</span>
+            <span className="font-bold ml-2">{estimatedCost}</span>
           </p>
         </div>
 
@@ -107,27 +107,27 @@ const EstimateCard: React.FC<EstimateCardProps> = ({
               clipRule="evenodd"
             />
           </svg>
-          <p className=" text-gray-500 dark:text-gray-400 mt-1">Created on: {dateCreated}</p>
+          <p className="font-semibold text-gray-500 dark:text-gray-400 mt-1">Created on: {dateCreated}</p>
         </div>
       </div>
 
-      <div className="mt-4 flex flex-col gap-2">
+      <div className="mt-4 grid gird-cols-1 md:grid-cols-2 gap-2">
         <Link
           to={`/estimation/${id}`}
-          className="inline-block px-4 py-2 bg-blue-600 text-white text-xs md:text-sm rounded-lg hover:bg-blue-700 transition text-center"
+          className=" px-4 py-2 bg-blue-600 text-center text-white text-xs md:text-sm rounded-lg hover:bg-blue-700 transition "
         >
           View Details
         </Link>
         <button
           onClick={handleAiSummary}
           disabled={aiLoading}
-          className="px-4 py-2 bg-emerald-600 text-white text-xs md:text-sm rounded-lg hover:bg-emerald-700 transition disabled:opacity-60"
+          className="px-4 py-2 bg-emerald-600 text-white text-xs md:text-sm rounded-lg hover:bg-emerald-700 transition disabled:opacity-60 "
         >
           {aiLoading ? "Asking AI..." : "Ask AI for Summary"}
         </button>
         {aiError && <p className="text-xs text-red-600">{aiError}</p>}
         {aiStatus && (
-          <div className="text-xs md:text-sm text-gray-800 dark:text-gray-100 bg-white/60 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 rounded p-3">
+          <div className="text-xs md:text-sm text-gray-800 text-center dark:text-gray-100 bg-white/60 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 rounded p-3">
             {aiStatus}
           </div>
         )}

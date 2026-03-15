@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { Outlet } from "react-router-dom"
-import NavBar from "../components/NavBar"
+import NavBar from "../components/Navbar"
 import SideBar from "../components/SideBar"
 import AIAssistantPanel from "../components/AIAssistantPanel"
 
@@ -31,7 +31,7 @@ const DashboardLayout = () => {
 
         {/* SCROLLABLE MAIN CONTENT */}
         <main
-          className={`flex-1 overflow-auto p-6 transition-all duration-300 md:ml-64 ${
+          className={`flex-1 overflow-auto p-4  transition-all duration-300 md:ml-64 ${
             isAIOpen ? "md:mr-96" : ""
           }`}
         >

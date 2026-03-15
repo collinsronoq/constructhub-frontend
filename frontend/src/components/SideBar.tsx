@@ -13,7 +13,7 @@ const SideBar = ({ onLinkClick }: SideBarProps) => {
   const { logout, user } = useAuth();
 
   const linkClass = (path: string) =>
-    `inline-flex items-center w-full text-sm md:text-lg font-medium border-b border-slate-200 dark:border-slate-200/10 gap-x-4 px-4 py-4 hover:bg-gray-200 dark:hover:bg-gray-700 rounded ${location.pathname === path ? "bg-blue-200 dark:bg-blue-600 text-gray-800 dark:text-gray-100 font-bold" : ""}`;
+    `inline-flex items-center w-full text-xs md:text-sm font-medium border-b border-slate-200 dark:border-slate-200/10 gap-x-4 px-4 py-4 hover:bg-gray-200 dark:hover:bg-gray-700 rounded ${location.pathname === path ? "bg-blue-200 dark:bg-blue-600 text-gray-800 dark:text-gray-100 font-bold" : ""}`;
 
   const navItems = useMemo(() => {
     if (user?.role === "technician") {
@@ -22,7 +22,7 @@ const SideBar = ({ onLinkClick }: SideBarProps) => {
           to: "/technician/profile",
           label: "Profile",
           icon: (
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="size-4 md:size-5">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="size-4 ">
               <path d="M5.5 21h13a2 2 0 0 0 2-2 7 7 0 0 0-7-7h-3a7 7 0 0 0-7 7 2 2 0 0 0 2 2Z" />
               <circle cx="12" cy="7" r="4" />
             </svg>
@@ -32,7 +32,7 @@ const SideBar = ({ onLinkClick }: SideBarProps) => {
           to: "/technicians",
           label: "Technician Directory",
           icon: (
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="size-5">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="size-4">
               <path d="M10 13a5 5 0 1 0-8 0" />
               <circle cx="4" cy="6" r="3" />
               <path d="M22 13a5 5 0 0 0-8 0" />
@@ -46,7 +46,7 @@ const SideBar = ({ onLinkClick }: SideBarProps) => {
           to: "/marketplace",
           label: "Marketplace",
           icon: (
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="size-4 md:size-5">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="size-4 ">
               <path d="M15 21v-5a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v5" />
               <path d="M17.774 10.31a1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.451 0 1.12 1.12 0 0 0-1.548 0 2.5 2.5 0 0 1-3.452 0 1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.77-3.248l2.889-4.184A2 2 0 0 1 7 2h10a2 2 0 0 1 1.653.873l2.895 4.192a2.5 2.5 0 0 1-3.774 3.244" />
               <path d="M4 10.95V19a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8.05" />
@@ -57,7 +57,7 @@ const SideBar = ({ onLinkClick }: SideBarProps) => {
           to: "/articles",
           label: "Read Articles",
           icon: (
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="size-4 md:size-5">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="size-4 ">
               <path d="M15 21v-5a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v5" />
               <path d="M17.774 10.31a1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.451 0 1.12 1.12 0 0 0-1.548 0 2.5 2.5 0 0 1-3.452 0 1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.77-3.248l2.889-4.184A2 2 0 0 1 7 2h10a2 2 0 0 1 1.653.873l2.895 4.192a2.5 2.5 0 0 1-3.774 3.244" />
               <path d="M4 10.95V19a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8.05" />
@@ -72,7 +72,7 @@ const SideBar = ({ onLinkClick }: SideBarProps) => {
           to: "/vendor/profile",
           label: "Profile",
           icon: (
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="size-4 md:size-5">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="size-4 ">
               <path d="M5.5 21h13a2 2 0 0 0 2-2 7 7 0 0 0-7-7h-3a7 7 0 0 0-7 7 2 2 0 0 0 2 2Z" />
               <circle cx="12" cy="7" r="4" />
             </svg>
@@ -83,7 +83,7 @@ const SideBar = ({ onLinkClick }: SideBarProps) => {
           to: "/marketplace",
           label: "Marketplace",
           icon: (
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="size-4 md:size-5">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="size-4 ">
               <path d="M15 21v-5a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v5" />
               <path d="M17.774 10.31a1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.451 0 1.12 1.12 0 0 0-1.548 0 2.5 2.5 0 0 1-3.452 0 1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.77-3.248l2.889-4.184A2 2 0 0 1 7 2h10a2 2 0 0 1 1.653.873l2.895 4.192a2.5 2.5 0 0 1-3.774 3.244" />
               <path d="M4 10.95V19a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8.05" />
@@ -94,7 +94,7 @@ const SideBar = ({ onLinkClick }: SideBarProps) => {
           to: "/articles",
           label: "Read Articles",
           icon: (
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="size-4 md:size-5">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="size-4 ">
               <path d="M15 21v-5a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v5" />
               <path d="M17.774 10.31a1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.451 0 1.12 1.12 0 0 0-1.548 0 2.5 2.5 0 0 1-3.452 0 1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.77-3.248l2.889-4.184A2 2 0 0 1 7 2h10a2 2 0 0 1 1.653.873l2.895 4.192a2.5 2.5 0 0 1-3.774 3.244" />
               <path d="M4 10.95V19a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8.05" />
@@ -109,7 +109,7 @@ const SideBar = ({ onLinkClick }: SideBarProps) => {
         to: "/dashboard",
         label: "Dashboard",
         icon: (
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="size-4 md:size-5">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="size-4 ">
             <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
             <path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
           </svg>
@@ -122,7 +122,7 @@ const SideBar = ({ onLinkClick }: SideBarProps) => {
         to: "/technicians",
         label: "Technicians",
         icon: (
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="size-5">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="size-4">
             <path d="M10 13a5 5 0 1 0-8 0" />
             <circle cx="4" cy="6" r="3" />
             <path d="M22 13a5 5 0 0 0-8 0" />
@@ -136,7 +136,7 @@ const SideBar = ({ onLinkClick }: SideBarProps) => {
         to: "/marketplace",
         label: "Marketplace",
         icon: (
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="size-4 md:size-5">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="size-4 ">
             <path d="M15 21v-5a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v5" />
             <path d="M17.774 10.31a1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.451 0 1.12 1.12 0 0 0-1.548 0 2.5 2.5 0 0 1-3.452 0 1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.77-3.248l2.889-4.184A2 2 0 0 1 7 2h10a2 2 0 0 1 1.653.873l2.895 4.192a2.5 2.5 0 0 1-3.774 3.244" />
             <path d="M4 10.95V19a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8.05" />
@@ -147,7 +147,7 @@ const SideBar = ({ onLinkClick }: SideBarProps) => {
         to: "/articles",
         label: "Read Articles",
         icon: (
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="size-4 md:size-5">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="size-4 ">
             <path d="M15 21v-5a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v5" />
             <path d="M17.774 10.31a1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.451 0 1.12 1.12 0 0 0-1.548 0 2.5 2.5 0 0 1-3.452 0 1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.77-3.248l2.889-4.184A2 2 0 0 1 7 2h10a2 2 0 0 1 1.653.873l2.895 4.192a2.5 2.5 0 0 1-3.774 3.244" />
             <path d="M4 10.95V19a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8.05" />
@@ -159,7 +159,7 @@ const SideBar = ({ onLinkClick }: SideBarProps) => {
 
   return (
     <aside className="w-64 bg-surface-light dark:bg-surface-dark border-l-1 h-full relative rounded-lg md:rounded-none">
-      <div className="flex items-center border-b border-slate-200 dark:border-slate-200/10 px-4 py-2 h-16 sm:text-xl font-bold text-brand-light dark:text-brand-dark">
+      <div className="flex items-center border-b border-slate-200 dark:border-slate-200/10 px-4 py-2 h-16 text-base font-bold text-brand-light dark:text-brand-dark">
         MENU
       </div>
       <div>
@@ -186,9 +186,9 @@ const SideBar = ({ onLinkClick }: SideBarProps) => {
             if (onLinkClick) onLinkClick();
             navigate("/login");
           }}
-          className="inline-flex items-center w-full text-sm md:text-lg font-medium border-b border-slate-200 dark:border-slate-200/10 gap-x-4 px-4 py-4 hover:bg-gray-200 dark:hover:bg-gray-700 rounded text-red-600"
+          className="inline-flex items-center w-full text-xs md:text-sm font-medium border-b border-slate-200 dark:border-slate-200/10 gap-x-4 px-4 py-4 hover:bg-gray-200 dark:hover:bg-gray-700 rounded text-red-600"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-log-out size-4 md:size-5">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-log-out size-4 md:size-5">
             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
             <polyline points="16 17 21 12 16 7" />
             <line x1="21" y1="12" x2="9" y2="12" />

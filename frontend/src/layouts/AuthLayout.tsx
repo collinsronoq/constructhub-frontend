@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import LoginCard from "../components/LoginCard";
 import SignUpCard from "../components/SignUpCard";
-import NavBar from "../components/NavBar";
+import NavBar from "../components/Navbar";
 import { useAuth } from "../hooks/auth/useAuth";
 import { useNavigate } from "react-router-dom";
 
