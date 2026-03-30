@@ -251,36 +251,6 @@ export default function EstimatorBreakdown({ data, onBackToSummary }: Breakdownn
         </ul>
       </div>
 
-      {data.permits.length > 0 && (
-        <div className="p-4 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-          <div className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2">Permits and Approvals</div>
-          <div className="space-y-3">
-            {data.permits.map((permit) => (
-              <div
-                key={permit.id}
-                className="p-3 rounded border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900"
-              >
-                <div className="flex items-center justify-between gap-2">
-                  <div className="text-sm font-semibold text-gray-800 dark:text-gray-200">{permit.name}</div>
-                  {permit.status && (
-                    <span className="text-xs px-2 py-1 rounded bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-                      {formatLabel(permit.status)}
-                    </span>
-                  )}
-                </div>
-                <div className="mt-2 text-xs text-gray-600 dark:text-gray-400 space-y-1">
-                  {permit.cost !== null && permit.cost !== undefined && (
-                    <div>Cost: KSh {Number(permit.cost).toLocaleString()}</div>
-                  )}
-                  {permit.durationDays ? <div>Duration: {permit.durationDays} days</div> : null}
-                  {permit.where ? <div>Where: {permit.where}</div> : null}
-                  {permit.significance ? <div>{permit.significance}</div> : null}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
 
       {/* Phases */}
       <div className="space-y-3">
@@ -410,7 +380,38 @@ export default function EstimatorBreakdown({ data, onBackToSummary }: Breakdownn
           );
         })}
       </div>
-
+      
+      
+      {data.permits.length > 0 && (
+        <div className="p-4 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+          <div className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2">Permits and Approvals</div>
+          <div className="space-y-3">
+            {data.permits.map((permit) => (
+              <div
+                key={permit.id}
+                className="p-3 rounded border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900"
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <div className="text-sm font-semibold text-gray-800 dark:text-gray-200">{permit.name}</div>
+                  {permit.status && (
+                    <span className="text-xs px-2 py-1 rounded bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                      {formatLabel(permit.status)}
+                    </span>
+                  )}
+                </div>
+                <div className="mt-2 text-xs text-gray-600 dark:text-gray-400 space-y-1">
+                  {permit.cost !== null && permit.cost !== undefined && (
+                    <div>Cost: KSh {Number(permit.cost).toLocaleString()}</div>
+                  )}
+                  {permit.durationDays ? <div>Duration: {permit.durationDays} days</div> : null}
+                  {permit.where ? <div>Where: {permit.where}</div> : null}
+                  {permit.significance ? <div>{permit.significance}</div> : null}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="p-4 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
           <div className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2">Recommendations</div>
