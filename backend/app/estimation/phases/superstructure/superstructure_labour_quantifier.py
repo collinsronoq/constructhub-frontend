@@ -1,3 +1,5 @@
+from math import ceil
+
 from app.estimation.common_schemas import (
     PhaseEstimate,
     LabourCost,
@@ -7,17 +9,17 @@ from app.estimation.phases.superstructure.superstructure_quantifier import Super
 
 
 LABOUR_RATES = {
-    "mason": 1200,
-    "mason_helper": 700,
-    "steel_fixer": 1500,
-    "carpenter": 1500,
-    "general_labourer": 800,
-    "foreman": 2500,
+    "mason": 1800,
+    "mason_helper": 1000,
+    "steel_fixer": 1800,
+    "carpenter": 1900,
+    "general_labourer": 1000,
+    "foreman": 3500,
 }
 
-BLOCKWORK_PRODUCTIVITY = 8  # sqm per mason per day
-FORMWORK_PRODUCTIVITY = 12  # sqm/day
-STEEL_FIXING_PRODUCTIVITY = 0.5  # tonnes/day (assumed later)
+BLOCKWORK_PRODUCTIVITY = 6  # sqm per mason per day
+FORMWORK_PRODUCTIVITY = 10  # sqm/day
+STEEL_FIXING_PRODUCTIVITY = 0.35  # tonnes/day (assumed later)
 
 
 FINISHING_MULTIPLIER = {
@@ -30,6 +32,12 @@ STOREY_MULTIPLIER = {
     1: 1.0,
     2: 1.15,
 }
+
+
+def _crew_days(quantity: float, productivity: float, multiplier: float) -> int:
+    if quantity <= 0:
+        return 0
+    return max(1, ceil((quantity / productivity) * multiplier))
 
 
 def estimate_superstructure_labour(
@@ -49,14 +57,13 @@ def estimate_superstructure_labour(
     labour_items = []
 
     # --- BLOCKWORK ---
-    mason_days = quantities.net_wall_area_sqm / BLOCKWORK_PRODUCTIVITY
-    mason_days *= complexity_factor
+    mason_days = _crew_days(quantities.net_wall_area_sqm, BLOCKWORK_PRODUCTIVITY, complexity_factor)
 
     labour_items.append(
         LabourCost(
             role="Mason",
             rate_per_day=LABOUR_RATES["mason"],
-            days=round(mason_days),
+            days=mason_days,
             total=round(mason_days * LABOUR_RATES["mason"]),
         )
     )
@@ -65,57 +72,59 @@ def estimate_superstructure_labour(
         LabourCost(
             role="Mason Helper",
             rate_per_day=LABOUR_RATES["mason_helper"],
-            days=round(mason_days),
+            days=mason_days,
             total=round(mason_days * LABOUR_RATES["mason_helper"]),
         )
     )
 
     # --- FORMWORK (Beams + Slabs) ---
     formwork_area = quantities.slab_area_sqm
-    carpenter_days = (formwork_area / FORMWORK_PRODUCTIVITY) * complexity_factor
+    carpenter_days = _crew_days(formwork_area, FORMWORK_PRODUCTIVITY, complexity_factor)
 
-    labour_items.append(
-        LabourCost(
-            role="Carpenter",
-            rate_per_day=LABOUR_RATES["carpenter"],
-            days=round(carpenter_days),
-            total=round(carpenter_days * LABOUR_RATES["carpenter"]),
+    if carpenter_days > 0:
+        labour_items.append(
+            LabourCost(
+                role="Carpenter",
+                rate_per_day=LABOUR_RATES["carpenter"],
+                days=carpenter_days,
+                total=round(carpenter_days * LABOUR_RATES["carpenter"]),
+            )
         )
-    )
 
     # --- STEEL FIXING ---
     estimated_steel_tonnes = quantities.slab_concrete_volume_m3 * 0.1
-    steel_days = (estimated_steel_tonnes / STEEL_FIXING_PRODUCTIVITY) * complexity_factor
+    steel_days = _crew_days(estimated_steel_tonnes, STEEL_FIXING_PRODUCTIVITY, complexity_factor)
 
-    labour_items.append(
-        LabourCost(
-            role="Steel Fixer",
-            rate_per_day=LABOUR_RATES["steel_fixer"],
-            days=round(steel_days),
-            total=round(steel_days * LABOUR_RATES["steel_fixer"]),
+    if steel_days > 0:
+        labour_items.append(
+            LabourCost(
+                role="Steel Fixer",
+                rate_per_day=LABOUR_RATES["steel_fixer"],
+                days=steel_days,
+                total=round(steel_days * LABOUR_RATES["steel_fixer"]),
+            )
         )
-    )
 
     # --- GENERAL LABOUR ---
-    general_labour_days = (mason_days + carpenter_days) * 0.5
+    general_labour_days = max(1, ceil((mason_days + carpenter_days + steel_days) * 0.65))
 
     labour_items.append(
         LabourCost(
             role="General Labourers (2)",
             rate_per_day=2 * LABOUR_RATES["general_labourer"],
-            days=round(general_labour_days),
+            days=general_labour_days,
             total=round(general_labour_days * 2 * LABOUR_RATES["general_labourer"]),
         )
     )
 
     # --- FOREMAN ---
-    foreman_days = max(mason_days, carpenter_days) * 0.3
+    foreman_days = max(1, ceil(max(mason_days, carpenter_days, steel_days) * 0.8))
 
     labour_items.append(
         LabourCost(
             role="Site Foreman",
             rate_per_day=LABOUR_RATES["foreman"],
-            days=round(foreman_days),
+            days=foreman_days,
             total=round(foreman_days * LABOUR_RATES["foreman"]),
         )
     )

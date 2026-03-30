@@ -3,22 +3,41 @@ from math import ceil, sqrt
 from app.estimation.schemas.finishes import FinishesInput, FinishesQuantities
 
 
+def _estimate_room_count(data: FinishesInput) -> int:
+    return max(
+        4,
+        data.bedrooms
+        + data.bathrooms
+        + data.kitchens
+        + data.living_rooms
+        + data.dining_rooms
+        + data.other_rooms,
+    )
+
+
 def quantify_finishes(data: FinishesInput) -> FinishesQuantities:
     """
     Convert finishes selections and areas into material quantities.
     """
 
     # Basic derived geometry
-    footprint_per_storey = data.floor_area_sqm / data.storeys
+    storeys = max(data.storeys, 1)
+    footprint_per_storey = max(data.floor_area_sqm / storeys, 1)
     perimeter_m = 4 * sqrt(footprint_per_storey)
+    room_count = _estimate_room_count(data)
 
-    internal_wall_area_rate = 1.4
+    external_wall_area = perimeter_m * data.wall_height_m * storeys
+    external_openings_area = max(external_wall_area * 0.18, room_count * 1.6)
 
-    wall_area = perimeter_m * data.wall_height_m * data.storeys 
-    net_wall_area_1 = wall_area * 0.85  # openings allowance for the outer walls for windows
+    # Use room count plus building perimeter to approximate partition density.
+    internal_partition_length_per_floor = (perimeter_m * 0.45) + (room_count * 3.0)
+    internal_wall_area = internal_partition_length_per_floor * data.wall_height_m * 2 * storeys
+    internal_door_openings_area = max(room_count - 1, 1) * 1.89 * storeys
 
-    # add the internal walls which may add up to 40% to total wall area
-    net_wall_area = net_wall_area_1 * internal_wall_area_rate
+    interior_wall_area = max(external_wall_area - external_openings_area, 0) + max(
+        internal_wall_area - internal_door_openings_area,
+        0,
+    )
     
     # Floor areas
     main_floor_area = data.floor_area_sqm * 0.8
@@ -32,14 +51,16 @@ def quantify_finishes(data: FinishesInput) -> FinishesQuantities:
     # Wall tiling in wet areas
     wall_tile_area = 0
     if data.wet_wall_tiling:
-        wall_tile_area = (data.bathrooms * 6) + (data.kitchens * 12)
-        wall_tile_area *= 1.08
+        bathroom_wall_tile_area = data.bathrooms * max(10.0, data.wall_height_m * 5.5)
+        kitchen_wall_tile_area = data.kitchens * 6.0
+        wall_tile_area = (bathroom_wall_tile_area + kitchen_wall_tile_area) * 1.08
+        wall_tile_area = min(wall_tile_area, interior_wall_area * 0.35)
 
     # Plaster / skim (non-tiled wall areas)
-    plaster_area = max(net_wall_area - wall_tile_area, 0) * 1.05
+    plaster_area = max(interior_wall_area - wall_tile_area, 0) * 1.05
 
     # Ceilings
-    ceiling_area = data.floor_area_sqm * data.storeys
+    ceiling_area = data.floor_area_sqm
     if data.ceiling_type != "exposed":
         ceiling_area *= 1.05
     else:
@@ -48,7 +69,7 @@ def quantify_finishes(data: FinishesInput) -> FinishesQuantities:
     # Painting areas
     paint_wall_area = plaster_area
     paint_ceiling_area = ceiling_area
-    paint_exterior_area = (perimeter_m * data.wall_height_m * data.storeys * 0.6) * 1.05
+    paint_exterior_area = max(external_wall_area - external_openings_area, 0) * 1.05
 
     # Joinery and trims
     internal_doors = max(
@@ -74,12 +95,13 @@ def quantify_finishes(data: FinishesInput) -> FinishesQuantities:
     tile_grout_bags = ceil(total_tiled_area / 8)
 
     coats_wall = 2 if data.paint_system == "standard_2_coat" else 3
-    coats_ceiling = 2
+    coats_ceiling = 2 if data.paint_system == "standard_2_coat" else 3
+    coats_exterior = 2
 
-    primer_liters = paint_wall_area / 12
-    paint_liters_interior = (paint_wall_area / 10) * coats_wall
-    paint_liters_ceiling = (paint_ceiling_area / 10) * coats_ceiling
-    paint_liters_exterior = (paint_exterior_area / 10) * 2
+    primer_liters = (paint_wall_area + paint_ceiling_area) / 12
+    paint_liters_interior = (paint_wall_area / 11) * coats_wall
+    paint_liters_ceiling = (paint_ceiling_area / 12) * coats_ceiling
+    paint_liters_exterior = (paint_exterior_area / 9) * coats_exterior
 
     return FinishesQuantities(
         main_floor_area_sqm=round(main_floor_area, 1),

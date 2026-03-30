@@ -37,7 +37,7 @@ const AuthLayout = ({ description }: AuthLayoutProps) => {
         sidebarOpen={false}
         setSidebarOpen={() => {}}
         isLogged={!!user}
-        className="bg-white/90 dark:bg-gray-950/90 backdrop-blur border-b border-gray-200 dark:border-gray-800"
+        className="bg-gray-500 dark:bg-gray-950/90 backdrop-blur border-b border-gray-200 dark:border-gray-800"
       />
       <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2 bg-gradient-to-br from-blue-50 via-white to-slate-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
         {/* Hero / marketing */}

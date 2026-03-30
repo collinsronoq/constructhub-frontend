@@ -1,4 +1,6 @@
 # app/estimations/phases/site_preparation.py
+from math import ceil
+
 from app.estimation.schemas.site_preparation import SitePreparationInput
 from app.estimation.common_schemas import (
     PhaseEstimate,
@@ -21,27 +23,29 @@ def estimate_site_preparation(data: SitePreparationInput) -> PhaseEstimate:
 
     access_multiplier = 1.3 if data.access_difficulty == "difficult" else 1.0
 
-    #  Duration logic 
+    #  Duration logic
     base_hours = 10 if data.plot_size_sqm <= 500 else 24
-    excavation_hours = int(base_hours * soil_multiplier)
-    excavation_days = int(excavation_hours/24)
+    excavation_hours = max(1, ceil(base_hours * soil_multiplier))
+    working_hours_per_day = 8
+    excavation_days = max(1, ceil(excavation_hours / working_hours_per_day))
 
-    rate_per_hour = 5000
+    excavator_rate_per_day = 18000
+    labourer_rate_per_day = 1200
 
-    #  Machinery 
+    #  Machinery
     excavator_cost = LabourCost(
         role="Excavator (Machine)",
-        rate_per_day=excavation_hours*rate_per_hour,
+        rate_per_day=excavator_rate_per_day,
         days=excavation_days,
-        total=(excavation_hours*rate_per_hour) * excavation_days,
+        total=excavator_rate_per_day * excavation_days,
     )
 
-    #  Labour 
+    #  Labour
     labourers = LabourCost(
         role="General Labourers (4)",
-        rate_per_day=4 * 1200,
+        rate_per_day=4 * labourer_rate_per_day,
         days=excavation_days,
-        total=4 * 1200 * excavation_days,
+        total=4 * labourer_rate_per_day * excavation_days,
     )
 
     labour_items = [excavator_cost, labourers]
@@ -62,22 +66,38 @@ def estimate_site_preparation(data: SitePreparationInput) -> PhaseEstimate:
     cost_per_truck = 8000
     truck_disposal_kg = 25000
 
-    disposal_cost = (disposal_mass_kg/truck_disposal_kg)*cost_per_truck
-
+    disposal_cost = (disposal_mass_kg / truck_disposal_kg) * cost_per_truck
 
     if data.include_disposal:
         other_costs.append(
             OtherCost(
                 name="Excavated Soil Disposal",
-                amount=disposal_cost,
+                amount=round(disposal_cost),
             )
         )
 
-    #  Totals 
+    if access_multiplier != 1.0:
+        labour_items = [
+            LabourCost(
+                role=item.role,
+                rate_per_day=round(item.rate_per_day * access_multiplier),
+                days=item.days,
+                total=round(item.total * access_multiplier),
+            )
+            for item in labour_items
+        ]
+        other_costs = [
+            OtherCost(
+                name=item.name,
+                amount=round(item.amount * access_multiplier),
+            )
+            for item in other_costs
+        ]
+
+    #  Totals
     labour_total = sum(l.total for l in labour_items)
     other_total = sum(o.amount for o in other_costs)
-
-    phase_total = (labour_total + other_total) * access_multiplier
+    phase_total = labour_total + other_total
 
     totals = PhaseTotals(
         materials=0,

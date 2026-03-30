@@ -18,11 +18,18 @@ export interface LabourLine {
   subtotal: number;
 }
 
+export interface OtherCostLine {
+  id: string;
+  name: string;
+  amount: number;
+}
+
 export interface PhaseData {
   id: string;
   title: string;
   materials: MaterialLine[];
   labour: LabourLine[];
+  otherCosts: OtherCostLine[];
   technicians: string[];
   subtotal: number;
 }

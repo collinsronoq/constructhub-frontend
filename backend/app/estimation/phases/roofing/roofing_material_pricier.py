@@ -32,17 +32,17 @@ def price_roofing_materials(
 
     if roof_type == "flat":
         concrete_price = resolve_material_price(
-            "cement",
+            "concrete_m3",
             None,
             base_prices,
-            vendor_prices.get("cement"),
+            vendor_prices.get("concrete_m3"),
         )
 
         materials.append(
             MaterialCost(
                 name="Roof Slab Concrete",
                 quantity=quantities.concrete_volume_m3,
-                unit="mA3",
+                unit="m3",
                 unit_cost=concrete_price,
                 total=round(quantities.concrete_volume_m3 * concrete_price),
             )
@@ -129,7 +129,7 @@ def price_roofing_materials(
             MaterialCost(
                 name="Roof Timber",
                 quantity=quantities.timber_cubic_m,
-                unit="mA3",
+                unit="m3",
                 unit_cost=timber_price,
                 total=round(quantities.timber_cubic_m * timber_price),
             )

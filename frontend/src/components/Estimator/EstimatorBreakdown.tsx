@@ -20,13 +20,19 @@ function sumLabour(phase: EstimationBreakdown["phases"][number]) {
   return phase.labour.reduce((sum, l) => sum + (l.subtotal || 0), 0);
 }
 
+function sumOther(phase: EstimationBreakdown["phases"][number]) {
+  return phase.otherCosts.reduce((sum, item) => sum + (item.amount || 0), 0);
+}
+
 function computeTotals(data: EstimationBreakdown) {
   const materialTotal = data.phases.reduce((sum, p) => sum + sumMaterials(p), 0);
   const labourTotal = data.phases.reduce((sum, p) => sum + sumLabour(p), 0);
+  const otherTotal = data.phases.reduce((sum, p) => sum + sumOther(p), 0);
   return {
     materialTotal,
     labourTotal,
-    total: data.totalCost || materialTotal + labourTotal + (data.other || 0),
+    otherTotal: otherTotal || data.other || 0,
+    total: data.totalCost || materialTotal + labourTotal + otherTotal,
   };
 }
 
@@ -66,10 +72,13 @@ export default function EstimatorBreakdown({ data, onBackToSummary }: Breakdownn
   const phaseIcons: Record<string, ReactNode> = {
     site_survey: <MapPin size={18} />,
     site_preparation: <CopyPlus size={18} />,
+    site_preparation_and_earthworks: <CopyPlus size={18} />,
     foundation: <BrickWall size={18} />,
     superstructure: <House size={18} />,
     roofing: <HousePlug size={18} />,
     services: <LampCeiling size={18} />,
+    services_first_fix: <LampCeiling size={18} />,
+    services_second_fix: <LampCeiling size={18} />,
     finishes: <Paintbrush size={18} />,
     external_works: <Fence size={18} />,
   };
@@ -87,6 +96,7 @@ export default function EstimatorBreakdown({ data, onBackToSummary }: Breakdownn
         value: p.subtotal,
         materials: sumMaterials(p),
         labour: sumLabour(p),
+        other: sumOther(p),
       })),
     [data.phases]
   );
@@ -147,7 +157,7 @@ export default function EstimatorBreakdown({ data, onBackToSummary }: Breakdownn
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="p-4 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
           <div className="text-xs text-gray-500 dark:text-gray-400">Total Cost</div>
           <div className="text-lg font-semibold text-gray-900 dark:text-gray-100">
@@ -164,6 +174,12 @@ export default function EstimatorBreakdown({ data, onBackToSummary }: Breakdownn
           <div className="text-xs text-gray-500 dark:text-gray-400">Labour</div>
           <div className="text-lg font-semibold text-gray-900 dark:text-gray-100">
             KSh {totals.labourTotal.toLocaleString()}
+          </div>
+        </div>
+        <div className="p-4 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+          <div className="text-xs text-gray-500 dark:text-gray-400">Other Costs</div>
+          <div className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+            KSh {totals.otherTotal.toLocaleString()}
           </div>
         </div>
       </div>
@@ -213,7 +229,7 @@ export default function EstimatorBreakdown({ data, onBackToSummary }: Breakdownn
         </div>
 
         <div className="p-4 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 h-80">
-          <div className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2">Materials vs Labour</div>
+          <div className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2">Cost Composition by Phase</div>
 
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
@@ -225,6 +241,7 @@ export default function EstimatorBreakdown({ data, onBackToSummary }: Breakdownn
                 <Legend />
                 <Bar dataKey="materials" stackId="a" fill="#0ea5e9" name="Materials" />
                 <Bar dataKey="labour" stackId="a" fill="#f59e0b" name="Labour" />
+                <Bar dataKey="other" stackId="a" fill="#34d399" name="Other Costs" />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -237,6 +254,10 @@ export default function EstimatorBreakdown({ data, onBackToSummary }: Breakdownn
             <div className="flex items-center space-x-2">
               <span className="inline-block w-3 h-3 rounded-sm" style={{ backgroundColor: "#f59e0b" }} />
               <span className="truncate">Labour</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <span className="inline-block w-3 h-3 rounded-sm" style={{ backgroundColor: "#34d399" }} />
+              <span className="truncate">Other Costs</span>
             </div>
           </div>
         </div>
@@ -258,6 +279,7 @@ export default function EstimatorBreakdown({ data, onBackToSummary }: Breakdownn
           const isOpen = expandedPhases.includes(phase.id);
           const matTotal = sumMaterials(phase);
           const labTotal = sumLabour(phase);
+          const otherTotal = sumOther(phase);
           return (
             <div key={phase.id} className="border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800">
               <button
@@ -283,7 +305,7 @@ export default function EstimatorBreakdown({ data, onBackToSummary }: Breakdownn
               {isOpen && (
                 <div className="px-4 pb-4 space-y-3 text-sm text-gray-700 dark:text-gray-300">
                   {/* Cards */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
                     <div className="p-3 rounded border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 flex items-center space-x-2">
                       <Layers size={18} />
                       <div>
@@ -296,6 +318,13 @@ export default function EstimatorBreakdown({ data, onBackToSummary }: Breakdownn
                       <div>
                         <div className="text-xs text-gray-500">Labour</div>
                         <div className="font-semibold">KSh {labTotal.toLocaleString()}</div>
+                      </div>
+                    </div>
+                    <div className="p-3 rounded border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 flex items-center space-x-2">
+                      <Fence size={18} />
+                      <div>
+                        <div className="text-xs text-gray-500">Other Costs</div>
+                        <div className="font-semibold">KSh {otherTotal.toLocaleString()}</div>
                       </div>
                     </div>
                     <div className="p-3 rounded border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 flex items-center space-x-2">
@@ -374,6 +403,34 @@ export default function EstimatorBreakdown({ data, onBackToSummary }: Breakdownn
                       </div>
                     )}
                   </div>
+
+                  <div>
+                    <div className="flex items-center space-x-2 text-sm font-semibold mb-2">
+                      <Fence size={16} />
+                      <span>Other Costs</span>
+                    </div>
+                    {phase.otherCosts.length === 0 && <div className="text-xs text-gray-500">No other costs</div>}
+                    {phase.otherCosts.length > 0 && (
+                      <div className="overflow-auto">
+                        <table className="min-w-full text-xs md:text-sm border border-gray-200 dark:border-gray-700">
+                          <thead className="bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-300">
+                            <tr>
+                              <th className="px-2 py-1 text-left">Name</th>
+                              <th className="px-2 py-1 text-left">Amount</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {phase.otherCosts.map((item) => (
+                              <tr key={item.id} className="border-t border-gray-200 dark:border-gray-700">
+                                <td className="px-2 py-1">{item.name}</td>
+                                <td className="px-2 py-1 font-semibold">KSh {item.amount.toLocaleString()}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
@@ -422,7 +479,9 @@ export default function EstimatorBreakdown({ data, onBackToSummary }: Breakdownn
             <Fence size={16} />
             <span>Other</span>
           </div>
-          <div className="text-sm text-gray-700 dark:text-gray-300">Other costs: KSh {data.other.toLocaleString()}</div>
+          <div className="text-sm text-gray-700 dark:text-gray-300">
+            Other costs: KSh {totals.otherTotal.toLocaleString()}
+          </div>
         </div>
       </div>
     </div>

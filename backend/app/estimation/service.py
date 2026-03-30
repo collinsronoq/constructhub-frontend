@@ -25,6 +25,21 @@ from uuid import uuid4
 
 logger = setup_logger("estimation_aggregator")
 
+def _resolve_project_floor_area(payload: EstimationRequest) -> float | None:
+    candidates = (
+        payload.superstructure.declared_floor_area_sqm,
+        payload.finishes.floor_area_sqm,
+        payload.services_second_fix.floor_area_sqm,
+        payload.services_first_fix.floor_area_sqm,
+        payload.foundation.floor_area_sqm,
+    )
+
+    for candidate in candidates:
+        if candidate and candidate > 0:
+            return float(candidate)
+
+    return None
+
 async def generate_estimation(payload: EstimationRequest, db: AsyncSession, user_id: int) -> Dict[str, Any]:
     """
     Run all estimation phases and aggregate summary + breakdown.
@@ -75,6 +90,8 @@ async def generate_estimation(payload: EstimationRequest, db: AsyncSession, user
     labour_total = sum(p.totals.labour for p in phases)
     other_total = sum(p.totals.other for p in phases)
 
+    resolved_floor_area_sqm = _resolve_project_floor_area(payload)
+
     summary = {
         "total_cost": material_total + labour_total + other_total,
         "material_cost": material_total,
@@ -87,8 +104,7 @@ async def generate_estimation(payload: EstimationRequest, db: AsyncSession, user
         "location": location_hint,
         "bedrooms": payload.superstructure.bedrooms,
         "bathrooms": payload.superstructure.bathrooms,
-        "floor_area_sqm": payload.superstructure.declared_floor_area_sqm
-        or payload.superstructure.land_size_sqm,
+        "floor_area_sqm": resolved_floor_area_sqm,
         "structure_type": payload.superstructure.structure_type,
         "finishing_level": payload.superstructure.finishing_level,
     }
@@ -175,8 +191,7 @@ async def generate_estimation(payload: EstimationRequest, db: AsyncSession, user
             user_id=user_id,
             project_title=payload.project_name or location_hint,
             location=location_hint,
-            floor_area=payload.superstructure.declared_floor_area_sqm
-            or payload.superstructure.land_size_sqm,
+            floor_area=resolved_floor_area_sqm,
             quality=payload.superstructure.finishing_level,
             total_cost=summary["total_cost"],
             blob_path=blob_path_str,

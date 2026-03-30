@@ -4,12 +4,14 @@ from app.estimation.common_schemas import LabourCost, PhaseEstimate, PhaseTotals
 from app.estimation.schemas.finishes import FinishesInput, FinishesQuantities
 
 
-TILER_RATE = 1500
-PAINTER_RATE = 1200
-CEILING_FIXER_RATE = 2300
-CARPENTER_RATE = 2500
-JOINER_RATE = 2000
-HELPER_RATE = 800
+TILER_RATE = 1800
+PLASTERER_RATE = 1700
+PAINTER_RATE = 1500
+CEILING_FIXER_RATE = 2400
+CARPENTER_RATE = 2600
+JOINER_RATE = 2400
+HELPER_RATE = 1000
+FOREMAN_RATE = 3500
 
 QUALITY_FACTOR = {
     "standard": 1.0,
@@ -26,10 +28,11 @@ def estimate_finishes_labour(
     Labour estimation for finishes trades.
     """
 
-    storey_factor = 1 + 0.1 * max(0, data.storeys - 1)
+    storey_factor = 1 + 0.12 * max(0, data.storeys - 1)
     quality_factor = QUALITY_FACTOR.get(data.quality_level, 1.0)
 
     labour_items: list[LabourCost] = []
+    core_trade_days: list[int] = []
 
     # Tiling (floors + walls)
     total_tile_area = (
@@ -38,9 +41,10 @@ def estimate_finishes_labour(
         + quantities.stairs_area_sqm
         + quantities.wall_tile_area_sqm
     )
-    tiler_days = ceil((total_tile_area / 22) * storey_factor * quality_factor)
+    tiler_days = ceil((total_tile_area / 18) * storey_factor * quality_factor)
 
     if tiler_days > 0:
+        core_trade_days.append(tiler_days)
         labour_items.append(
             LabourCost(
                 role="Tiler",
@@ -58,12 +62,38 @@ def estimate_finishes_labour(
             )
         )
 
+    # Plastering and skim coat
+    plaster_days = ceil((quantities.plaster_area_sqm / 28) * storey_factor * quality_factor)
+    if plaster_days > 0:
+        core_trade_days.append(plaster_days)
+        labour_items.append(
+            LabourCost(
+                role="Plasterer (Fundi)",
+                rate_per_day=PLASTERER_RATE,
+                days=plaster_days,
+                total=PLASTERER_RATE * plaster_days,
+            )
+        )
+        labour_items.append(
+            LabourCost(
+                role="Plastering Helper",
+                rate_per_day=HELPER_RATE,
+                days=plaster_days,
+                total=HELPER_RATE * plaster_days,
+            )
+        )
+
     # Painting
     coat_factor = 1.0 if data.paint_system == "standard_2_coat" else 1.2
-    paint_area = quantities.paint_wall_area_sqm + quantities.paint_ceiling_area_sqm
-    painter_days = ceil((paint_area / 45) * storey_factor * quality_factor * coat_factor)
+    paint_area = (
+        quantities.paint_wall_area_sqm
+        + quantities.paint_ceiling_area_sqm
+        + quantities.paint_exterior_area_sqm
+    )
+    painter_days = ceil((paint_area / 40) * storey_factor * quality_factor * coat_factor)
 
     if painter_days > 0:
+        core_trade_days.append(painter_days)
         labour_items.append(
             LabourCost(
                 role="Painter",
@@ -76,14 +106,15 @@ def estimate_finishes_labour(
             LabourCost(
                 role="Painter Helper",
                 rate_per_day=HELPER_RATE,
-                days=ceil(painter_days * 0.6),
-                total=HELPER_RATE * ceil(painter_days * 0.6),
+                days=ceil(painter_days * 0.75),
+                total=HELPER_RATE * ceil(painter_days * 0.75),
             )
         )
 
     # Ceilings
     if quantities.ceiling_area_sqm > 0:
-        ceiling_days = ceil((quantities.ceiling_area_sqm / 35) * storey_factor * quality_factor)
+        ceiling_days = ceil((quantities.ceiling_area_sqm / 30) * storey_factor * quality_factor)
+        core_trade_days.append(ceiling_days)
         labour_items.append(
             LabourCost(
                 role="Ceiling Fixer",
@@ -103,6 +134,7 @@ def estimate_finishes_labour(
 
     # Doors and trims
     door_days = ceil(max(1, (quantities.internal_doors / 3) * storey_factor * quality_factor))
+    core_trade_days.append(door_days)
     labour_items.append(
         LabourCost(
             role="Carpenter (Doors/Trims)",
@@ -115,7 +147,8 @@ def estimate_finishes_labour(
     # Joinery (wardrobes + cabinets)
     joinery_run_m = quantities.wardrobes_m + quantities.kitchen_cabinets_m
     if joinery_run_m > 0:
-        joinery_days = ceil((joinery_run_m / 4) * storey_factor * quality_factor)
+        joinery_days = ceil((joinery_run_m / 3.5) * storey_factor * quality_factor)
+        core_trade_days.append(joinery_days)
         labour_items.append(
             LabourCost(
                 role="Joiner (Cabinetry)",
@@ -130,6 +163,17 @@ def estimate_finishes_labour(
                 rate_per_day=HELPER_RATE,
                 days=joinery_days,
                 total=HELPER_RATE * joinery_days,
+            )
+        )
+
+    if core_trade_days:
+        foreman_days = ceil(max(core_trade_days) * 0.75)
+        labour_items.append(
+            LabourCost(
+                role="Finishes Foreman",
+                rate_per_day=FOREMAN_RATE,
+                days=foreman_days,
+                total=FOREMAN_RATE * foreman_days,
             )
         )
 

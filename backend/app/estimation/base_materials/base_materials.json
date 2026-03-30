@@ -44,12 +44,13 @@
 
   "roofing_materials":{
     "roofing_sheet": {
-      "mabati": { "unit": "sqm", "price": 1200 },
-      "tile": { "unit": "sqm", "price": 1800 }
+      "mabati": { "unit": "sqm", "price": 600 },
+      "tile": { "unit": "sqm", "price": 750 }
     },
-    "timber": { "unit": "m", "price": 200 },
+    "timber": { "unit": "m3", "price": 6000 },
     "nails": { "unit": "kg", "price": 250 },
     "ridge_cap": { "unit": "m", "price": 1200 },
+    "concrete_m3": { "unit": "m3", "price": 8500 },
     "cement": { "unit": "bag", "price": 750 },
     "reinforcement": { "unit": "kg", "price": 160 },
     "waterproofing": { "unit": "sqm", "price": 850 },
@@ -91,7 +92,7 @@
 
     "plaster_mortar": { "price": 550 },
 
-    "gypsum_board": { "price": 1250 },
+    "gypsum_board": { "price": 600 },
     "acoustic_board": { "price": 1450 },
     "tng_board": { "price": 1800 },
     "ceiling_frame": { "price": 650 },
@@ -103,7 +104,7 @@
     "paint_exterior": { "price": 650 },
     "primer": { "price": 480 },
 
-    "door_internal_set": { "price": 14500 },
+    "door_internal_set": { "price": 7000 },
     "wardrobe_per_m": { "price": 8500 },
     "kitchen_cabinet_per_m": { "price": 12000 },
     "countertop_per_m": { "price": 8500 }
@@ -115,9 +116,9 @@
     "drainage_pipe": { "price": 500 },
     "landscaping_topsoil": { "price": 250 },
 
-    "wall_block": { "price": 70 },
+    "wall_block": { "price": 25 },
     "mortar": { "price": 650 },
-    "concrete_m3": { "price": 8500 },
+    "concrete_m3": { "price": 4500 },
     "reinforcement": { "price": 160 },
     "plaster_mortar": { "price": 550 },
     "chain_link_mesh": { "price": 380 },

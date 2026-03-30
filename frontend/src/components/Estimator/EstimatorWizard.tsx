@@ -61,7 +61,6 @@ const EstimatorWizard: React.FC = () => {
     return mapEstimationDetailToBreakdown(result as any, {
       request,
       projectName: request.project_name,
-      landSize: request.site_survey.plot_size_sqm,
       finishing: request.superstructure.finishing_level,
     });
   }, [result, request]);
@@ -75,6 +74,10 @@ const EstimatorWizard: React.FC = () => {
       );
       const labourTotal = uiBreakdown.phases.reduce(
         (sum, p) => sum + p.labour.reduce((lSum, l) => lSum + (l.subtotal || 0), 0),
+        0
+      );
+      const otherTotal = uiBreakdown.phases.reduce(
+        (sum, p) => sum + p.otherCosts.reduce((oSum, o) => oSum + (o.amount || 0), 0),
         0
       );
       return (
@@ -101,7 +104,7 @@ const EstimatorWizard: React.FC = () => {
               </button>
             </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="p-4 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
               <div className="text-xs text-gray-500 dark:text-gray-400">Total Cost</div>
               <div className="text-lg font-semibold text-gray-900 dark:text-gray-100">
@@ -118,6 +121,12 @@ const EstimatorWizard: React.FC = () => {
               <div className="text-xs text-gray-500 dark:text-gray-400">Labour</div>
               <div className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                 KSh {labourTotal.toLocaleString()}
+              </div>
+            </div>
+            <div className="p-4 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+              <div className="text-xs text-gray-500 dark:text-gray-400">Other Costs</div>
+              <div className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                KSh {otherTotal.toLocaleString()}
               </div>
             </div>
           </div>
@@ -243,7 +252,6 @@ const EstimatorWizard: React.FC = () => {
               value={request.site_preparation.access_difficulty || "normal"}
               onChange={(e) => handleSection("site_preparation", "access_difficulty", e.target.value as any)}
             >
-              <option value="easy">Easy</option>
               <option value="normal">Normal</option>
               <option value="difficult">Difficult</option>
             </select>
@@ -336,20 +344,19 @@ const EstimatorWizard: React.FC = () => {
             <select
               className="w-full border rounded p-2"
               value={request.foundation.foundation_type}
-              onChange={(e) => handleSection("foundation", "foundation_type", e.target.value)}
+              onChange={(e) => handleSection("foundation", "foundation_type", e.target.value as any)}
             >
               <option value="strip">Strip</option>
               <option value="raft">Raft</option>
-              <option value="pile">Pile</option>
             </select>
           </div>
           <div>
-            <label className="text-sm font-medium">Footprint (sqm)</label>
+            <label className="text-sm font-medium">Foundation Floor Area (sqm)</label>
             <input
               type="number"
               className="w-full border rounded p-2"
-              value={request.foundation.footprint_sqm}
-              onChange={(e) => handleSection("foundation", "footprint_sqm", Number(e.target.value || 0))}
+              value={request.foundation.floor_area_sqm}
+              onChange={(e) => handleSection("foundation", "floor_area_sqm", Number(e.target.value || 0))}
             />
           </div>
           <div className="flex items-center space-x-2 mt-6">
@@ -461,9 +468,9 @@ const EstimatorWizard: React.FC = () => {
             <input
               type="number"
               className="w-full border rounded p-2"
-              value={request.finishes.total_floor_area_sqm}
+              value={request.finishes.floor_area_sqm}
               onChange={(e) =>
-                handleSection("finishes", "total_floor_area_sqm", Number(e.target.value || 0))
+                handleSection("finishes", "floor_area_sqm", Number(e.target.value || 0))
               }
             />
           </div>
@@ -484,8 +491,9 @@ const EstimatorWizard: React.FC = () => {
               onChange={(e) => handleSection("finishes", "main_floor_finish", e.target.value as any)}
             >
               <option value="tile">Tile</option>
-              <option value="wood">Wood</option>
-              <option value="vinyl">Vinyl</option>
+              <option value="laminate">Laminate</option>
+              <option value="parquet">Parquet</option>
+              <option value="polished_screed">Polished screed</option>
             </select>
           </div>
           <div>
@@ -497,7 +505,6 @@ const EstimatorWizard: React.FC = () => {
             >
               <option value="ceramic_tile">Ceramic tile</option>
               <option value="porcelain_tile">Porcelain tile</option>
-              <option value="stone">Stone</option>
             </select>
           </div>
           <div className="flex items-center space-x-2 mt-6">
@@ -516,8 +523,9 @@ const EstimatorWizard: React.FC = () => {
               onChange={(e) => handleSection("finishes", "ceiling_type", e.target.value as any)}
             >
               <option value="gypsum_board">Gypsum board</option>
-              <option value="pvc">PVC</option>
-              <option value="acoustic">Acoustic</option>
+              <option value="acoustic_board">Acoustic board</option>
+              <option value="tng">T&amp;G</option>
+              <option value="exposed">Exposed</option>
             </select>
           </div>
           <div>

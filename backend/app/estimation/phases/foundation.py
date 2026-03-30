@@ -87,24 +87,32 @@ def estimate_foundation(data: FoundationInput) -> PhaseEstimate:
 
     # 4. Labour Estimation
 
-    productivity_m3_per_day = 6
+    productivity_m3_per_day = 4.5
     concrete_days = math.ceil(concrete_volume / productivity_m3_per_day)
 
     fundi = LabourCost(
         role="Mason (Fundi)",
-        rate_per_day=2500,
+        rate_per_day=3000,
         days=concrete_days,
-        total=2500 * concrete_days,
+        total=3000 * concrete_days,
     )
 
     labourers = LabourCost(
         role="General Labourers (4)",
-        rate_per_day=4 * 1200,
+        rate_per_day=4 * 1300,
         days=concrete_days,
-        total=4 * 1200 * concrete_days,
+        total=4 * 1300 * concrete_days,
     )
 
-    labour_items = [fundi, labourers]
+    foreman_days = max(1, math.ceil(concrete_days * 0.75))
+    foreman = LabourCost(
+        role="Site Foreman",
+        rate_per_day=3500,
+        days=foreman_days,
+        total=3500 * foreman_days,
+    )
+
+    labour_items = [fundi, labourers, foreman]
 
 
     # 5. Other Costs
