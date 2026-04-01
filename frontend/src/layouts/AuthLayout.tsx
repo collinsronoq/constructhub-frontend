@@ -39,7 +39,7 @@ const AuthLayout = ({ description }: AuthLayoutProps) => {
         isLogged={!!user}
         className="bg-gray-500 dark:bg-gray-950/90 backdrop-blur border-b border-gray-200 dark:border-gray-800"
       />
-      <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2 bg-gradient-to-br from-blue-50 via-white to-slate-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
+      <div className="min-h-[calc(100vh-4rem)] grid grid-cols-1 lg:grid-cols-2 bg-gradient-to-br from-blue-50 via-white to-slate-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
         {/* Hero / marketing */}
         <div className="relative p-8 lg:p-12 flex flex-col justify-center text-gray-900 dark:text-gray-50 overflow-hidden">
           <div className="absolute inset-0 opacity-10 pointer-events-none bg-[radial-gradient(circle_at_top_left,_#60a5fa,_transparent_40%),radial-gradient(circle_at_bottom_right,_#c084fc,_transparent_40%)]" />
@@ -72,7 +72,7 @@ const AuthLayout = ({ description }: AuthLayoutProps) => {
         </div>
 
         {/* Auth card */}
-        <div className="bg-white/90 dark:bg-gray-900/80 backdrop-blur flex items-center justify-center p-6 lg:p-12 border-l border-gray-200 dark:border-gray-800">
+        <div className="bg-transparent backdrop-blur flex items-center justify-center p-6 lg:p-12">
           <div className="w-full max-w-md space-y-5">
             <div className="flex gap-2 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
               <button
@@ -137,5 +137,3 @@ const AuthLayout = ({ description }: AuthLayoutProps) => {
 };
 
 export default AuthLayout;
-
-

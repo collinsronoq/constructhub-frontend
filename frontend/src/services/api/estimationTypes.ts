@@ -175,6 +175,7 @@ export interface EstimationDetail {
     total_cost: number;
     material_cost: number;
     labour_cost: number;
+    equipment_cost?: number;
     other_cost: number;
     phases_count: number;
   };

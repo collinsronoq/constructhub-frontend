@@ -79,6 +79,8 @@ class EstimationRequestIn(BaseModel):
             excavation_depth_m=float((self.site_preparation or {}).get("excavation_depth_m", 1) or 1),
             include_disposal=bool((self.site_preparation or {}).get("include_disposal", True)),
             access_difficulty=_pick_literal((self.site_preparation or {}).get("access_difficulty"), ("normal", "difficult"), "normal"),
+            vegetation_density=_pick_literal((self.site_preparation or {}).get("vegetation_density"), ("light", "medium", "heavy"), "medium"),
+            has_existing_structures=bool((self.site_preparation or {}).get("has_existing_structures", False)),
         )
 
         # Superstructure

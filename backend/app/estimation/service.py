@@ -4,6 +4,7 @@ from app.estimation.phases.site_survey import estimate_site_survey
 from app.estimation.phases.site_preparation import estimate_site_preparation
 from app.estimation.phases.foundation import estimate_foundation
 from app.estimation.phases.superstructure.estimate_superstructure import estimate_superstructure
+from app.estimation.geometry.building_geometry_resolver import resolve_building_geometry
 from app.estimation.phases.roofing.estimate_roofing import estimate_roofing_phase
 from app.estimation.phases.services_first_fix.estimate_services_first_fix import estimate_services_first_fix
 from app.estimation.phases.services_second_fix.estimate_services_second_fix import estimate_services_second_fix
@@ -25,21 +26,6 @@ from uuid import uuid4
 
 logger = setup_logger("estimation_aggregator")
 
-def _resolve_project_floor_area(payload: EstimationRequest) -> float | None:
-    candidates = (
-        payload.superstructure.declared_floor_area_sqm,
-        payload.finishes.floor_area_sqm,
-        payload.services_second_fix.floor_area_sqm,
-        payload.services_first_fix.floor_area_sqm,
-        payload.foundation.floor_area_sqm,
-    )
-
-    for candidate in candidates:
-        if candidate and candidate > 0:
-            return float(candidate)
-
-    return None
-
 async def generate_estimation(payload: EstimationRequest, db: AsyncSession, user_id: int) -> Dict[str, Any]:
     """
     Run all estimation phases and aggregate summary + breakdown.
@@ -47,6 +33,7 @@ async def generate_estimation(payload: EstimationRequest, db: AsyncSession, user
 
     vendor_prices = payload.vendor_prices or {}
     location_hint = getattr(payload.site_survey, "location", None)
+    resolved_geometry = resolve_building_geometry(payload)
 
     phases = []
 
@@ -59,11 +46,17 @@ async def generate_estimation(payload: EstimationRequest, db: AsyncSession, user
     # logger.info(f"\n\n site preparation information:\n {phases[1]}")
 
     # logger.info("Starting estimation: foundation")
-    phases.append(estimate_foundation(payload.foundation))
+    phases.append(estimate_foundation(payload.foundation, geometry=resolved_geometry))
     # logger.info(f"\n\n foundation information:\n {phases[2]}")
 
     # logger.info("Starting estimation: superstructure")
-    phases.append(estimate_superstructure(payload.superstructure, vendor_prices=vendor_prices))
+    phases.append(
+        estimate_superstructure(
+            payload.superstructure,
+            geometry=resolved_geometry,
+            vendor_prices=vendor_prices,
+        )
+    )
     # logger.info(f"\n\n superstrucutre information:\n {phases[3]}")
 
     # logger.info("Starting estimation: roofing")
@@ -86,16 +79,18 @@ async def generate_estimation(payload: EstimationRequest, db: AsyncSession, user
     phases.append(estimate_external_works(payload.external_works, vendor_prices=vendor_prices))
     # logger.info(f"\n\n external works information:\n {phases[8]}")
 
-    material_total = sum(p.totals.materials for p in phases)
-    labour_total = sum(p.totals.labour for p in phases)
-    other_total = sum(p.totals.other for p in phases)
+    material_total = sum(float(p.totals.materials or 0) for p in phases)
+    labour_total = sum(float(p.totals.labour or 0) for p in phases)
+    equipment_total = sum(float(getattr(p.totals, "equipment", 0) or 0) for p in phases)
+    other_total = sum(float(p.totals.other or 0) for p in phases)
 
-    resolved_floor_area_sqm = _resolve_project_floor_area(payload)
+    resolved_floor_area_sqm = resolved_geometry.total_floor_area_sqm
 
     summary = {
-        "total_cost": material_total + labour_total + other_total,
+        "total_cost": material_total + labour_total + equipment_total + other_total,
         "material_cost": material_total,
         "labour_cost": labour_total,
+        "equipment_cost": equipment_total,
         "other_cost": other_total,
         "phases_count": len(phases),
     }
@@ -105,6 +100,11 @@ async def generate_estimation(payload: EstimationRequest, db: AsyncSession, user
         "bedrooms": payload.superstructure.bedrooms,
         "bathrooms": payload.superstructure.bathrooms,
         "floor_area_sqm": resolved_floor_area_sqm,
+        "footprint_area_sqm": resolved_geometry.footprint_area_sqm,
+        "storeys": resolved_geometry.storeys,
+        "geometry_area_source": resolved_geometry.area_source,
+        "fits_plot_constraints": resolved_geometry.fits_plot_constraints,
+        "geometry_caps_applied": resolved_geometry.caps_applied,
         "structure_type": payload.superstructure.structure_type,
         "finishing_level": payload.superstructure.finishing_level,
     }

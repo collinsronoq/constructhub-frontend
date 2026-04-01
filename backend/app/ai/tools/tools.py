@@ -21,10 +21,21 @@ def _coerce_user_id(user_id: int | str) -> int:
         raise ValueError("Invalid user id for estimate lookup")
 
 
-def _extract_top_costs(items: list[dict[str, Any]], name_key: str, total_keys: list[str], limit: int = 2) -> list[dict[str, Any]]:
+def _extract_top_costs(
+    items: list[dict[str, Any]],
+    name_keys: str | list[str],
+    total_keys: list[str],
+    limit: int = 2,
+) -> list[dict[str, Any]]:
+    resolved_name_keys = [name_keys] if isinstance(name_keys, str) else name_keys
     totals: list[tuple[str, float]] = []
     for item in items or []:
-        name = item.get(name_key)
+        name = None
+        for key in resolved_name_keys:
+            candidate = item.get(key)
+            if candidate:
+                name = str(candidate)
+                break
         total_val = 0.0
         for key in total_keys:
             val = item.get(key)
@@ -47,7 +58,7 @@ def _build_phase_insights(breakdown: list[dict[str, Any]], total_cost: float | N
 
     insights: list[dict[str, Any]] = []
     for phase in breakdown:
-        phase_name = phase.get("phase") or "phase"
+        phase_name = phase.get("phase_name") or phase.get("phase") or "phase"
         totals = phase.get("totals") or {}
         phase_total = float(totals.get("phase_total") or 0)
         share = phase_total / total_cost if total_cost else 0
@@ -55,8 +66,16 @@ def _build_phase_insights(breakdown: list[dict[str, Any]], total_cost: float | N
         materials = phase.get("materials") or []
         labour = phase.get("labour") or []
 
-        top_materials = _extract_top_costs(materials, "name", ["total", "subtotal"])
-        top_labour = _extract_top_costs(labour, "role", ["total"])
+        top_materials = _extract_top_costs(
+            materials,
+            ["name", "description", "item_code"],
+            ["total", "subtotal", "amount"],
+        )
+        top_labour = _extract_top_costs(
+            labour,
+            ["role", "title", "description"],
+            ["total", "subtotal", "amount"],
+        )
 
         note: str | None = None
         if share >= 0.25 and top_materials:

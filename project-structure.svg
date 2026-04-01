@@ -1,0 +1,221 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="4240" viewBox="0 0 900 4240">
+<defs>
+<linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+<stop offset="0%" stop-color="#0b1020"/>
+<stop offset="100%" stop-color="#111827"/>
+</linearGradient>
+</defs>
+<rect x="0" y="0" width="900" height="4240" fill="url(#bg)"/>
+<text x="20" y="34" fill="#e5e7eb" font-size="14" font-family="Consolas, Menlo, monospace">
+<tspan x="20" y="34">constructhub-fronteend/</tspan>
+<tspan x="20" y="54">|-- backend/</tspan>
+<tspan x="20" y="74">|   |-- alembic/</tspan>
+<tspan x="20" y="94">|   |   |-- versions/</tspan>
+<tspan x="20" y="114">|   |   |   |-- 6296955b45c6_add_ai_update_directory_table.py</tspan>
+<tspan x="20" y="134">|   |   |   |-- 726bdc501903_add_ai_tables.py</tspan>
+<tspan x="20" y="154">|   |   |   |-- f33fd9cc72aa_add_estimation_summary_fields.py</tspan>
+<tspan x="20" y="174">|   |   |   `-- ... (1 more entries omitted)</tspan>
+<tspan x="20" y="194">|   |   |-- env.py</tspan>
+<tspan x="20" y="214">|   |   |-- README</tspan>
+<tspan x="20" y="234">|   |   |-- script.py.mako</tspan>
+<tspan x="20" y="254">|   |   `-- ... (1 more entries omitted)</tspan>
+<tspan x="20" y="274">|   |-- app/</tspan>
+<tspan x="20" y="294">|   |   |-- ai/</tspan>
+<tspan x="20" y="314">|   |   |   |-- providers/</tspan>
+<tspan x="20" y="334">|   |   |   |-- schemas/</tspan>
+<tspan x="20" y="354">|   |   |   |-- service/</tspan>
+<tspan x="20" y="374">|   |   |   |-- tools/</tspan>
+<tspan x="20" y="394">|   |   |   |-- prompts.py</tspan>
+<tspan x="20" y="414">|   |   |   `-- ... (1 more entries omitted)</tspan>
+<tspan x="20" y="434">|   |   |-- auth/</tspan>
+<tspan x="20" y="454">|   |   |   |-- auth_routes.py</tspan>
+<tspan x="20" y="474">|   |   |   |-- dependencies.py</tspan>
+<tspan x="20" y="494">|   |   |   |-- hashing.py</tspan>
+<tspan x="20" y="514">|   |   |   |-- jwt_handler.py</tspan>
+<tspan x="20" y="534">|   |   |   `-- ... (1 more entries omitted)</tspan>
+<tspan x="20" y="554">|   |   |-- core/</tspan>
+<tspan x="20" y="574">|   |   |   |-- config.py</tspan>
+<tspan x="20" y="594">|   |   |   |-- database.py</tspan>
+<tspan x="20" y="614">|   |   |   |-- logging.py</tspan>
+<tspan x="20" y="634">|   |   |   |-- security.py</tspan>
+<tspan x="20" y="654">|   |   |   |-- utils.py</tspan>
+<tspan x="20" y="674">|   |   |   `-- ... (1 more entries omitted)</tspan>
+<tspan x="20" y="694">|   |   |-- data/</tspan>
+<tspan x="20" y="714">|   |   |   `-- materials/</tspan>
+<tspan x="20" y="734">|   |   |-- estimation/</tspan>
+<tspan x="20" y="754">|   |   |   |-- base_materials/</tspan>
+<tspan x="20" y="774">|   |   |   |-- logic/</tspan>
+<tspan x="20" y="794">|   |   |   |-- phases/</tspan>
+<tspan x="20" y="814">|   |   |   |-- schemas/</tspan>
+<tspan x="20" y="834">|   |   |   |-- common_schemas.py</tspan>
+<tspan x="20" y="854">|   |   |   |-- service.py</tspan>
+<tspan x="20" y="874">|   |   |   |-- storage.py</tspan>
+<tspan x="20" y="894">|   |   |   `-- ... (1 more entries omitted)</tspan>
+<tspan x="20" y="914">|   |   |-- models/</tspan>
+<tspan x="20" y="934">|   |   |   |-- __init__.py</tspan>
+<tspan x="20" y="954">|   |   |   |-- ai.py</tspan>
+<tspan x="20" y="974">|   |   |   |-- article.py</tspan>
+<tspan x="20" y="994">|   |   |   |-- base.py</tspan>
+<tspan x="20" y="1014">|   |   |   |-- estimate.py</tspan>
+<tspan x="20" y="1034">|   |   |   |-- material.py</tspan>
+<tspan x="20" y="1054">|   |   |   |-- review.py</tspan>
+<tspan x="20" y="1074">|   |   |   |-- technician.py</tspan>
+<tspan x="20" y="1094">|   |   |   |-- technician_certification.py</tspan>
+<tspan x="20" y="1114">|   |   |   |-- user.py</tspan>
+<tspan x="20" y="1134">|   |   |   |-- vendor.py</tspan>
+<tspan x="20" y="1154">|   |   |   |-- vendor_item.py</tspan>
+<tspan x="20" y="1174">|   |   |   |-- vendor_material.py</tspan>
+<tspan x="20" y="1194">|   |   |   `-- ... (1 more entries omitted)</tspan>
+<tspan x="20" y="1214">|   |   |-- routers/</tspan>
+<tspan x="20" y="1234">|   |   |   |-- technician_routes/</tspan>
+<tspan x="20" y="1254">|   |   |   |-- vendor_routes/</tspan>
+<tspan x="20" y="1274">|   |   |   |-- admin_certification_routes.py</tspan>
+<tspan x="20" y="1294">|   |   |   |-- ai_router.py</tspan>
+<tspan x="20" y="1314">|   |   |   |-- article_routes.py</tspan>
+<tspan x="20" y="1334">|   |   |   |-- estimation.py</tspan>
+<tspan x="20" y="1354">|   |   |   |-- marketplace_routes.py</tspan>
+<tspan x="20" y="1374">|   |   |   |-- recommendations.py</tspan>
+<tspan x="20" y="1394">|   |   |   |-- root.py</tspan>
+<tspan x="20" y="1414">|   |   |   `-- ... (1 more entries omitted)</tspan>
+<tspan x="20" y="1434">|   |   |-- schemas/</tspan>
+<tspan x="20" y="1454">|   |   |   |-- article_schema.py</tspan>
+<tspan x="20" y="1474">|   |   |   |-- auth_schema.py</tspan>
+<tspan x="20" y="1494">|   |   |   |-- enums.py</tspan>
+<tspan x="20" y="1514">|   |   |   |-- marketplace_schema.py</tspan>
+<tspan x="20" y="1534">|   |   |   |-- media_schema.py</tspan>
+<tspan x="20" y="1554">|   |   |   |-- permit.py</tspan>
+<tspan x="20" y="1574">|   |   |   |-- review_schema.py</tspan>
+<tspan x="20" y="1594">|   |   |   |-- technician_certification_schema.py</tspan>
+<tspan x="20" y="1614">|   |   |   |-- technician_directory.py</tspan>
+<tspan x="20" y="1634">|   |   |   |-- technician_schema.py</tspan>
+<tspan x="20" y="1654">|   |   |   |-- token_schema.py</tspan>
+<tspan x="20" y="1674">|   |   |   |-- user_schema.py</tspan>
+<tspan x="20" y="1694">|   |   |   |-- vendor_directory_schema.py</tspan>
+<tspan x="20" y="1714">|   |   |   |-- vendor_item_schema.py</tspan>
+<tspan x="20" y="1734">|   |   |   |-- vendor_schema.py</tspan>
+<tspan x="20" y="1754">|   |   |   `-- ... (1 more entries omitted)</tspan>
+<tspan x="20" y="1774">|   |   |-- services/</tspan>
+<tspan x="20" y="1794">|   |   |   |-- article_service.py</tspan>
+<tspan x="20" y="1814">|   |   |   |-- auth_service.py</tspan>
+<tspan x="20" y="1834">|   |   |   |-- recommendation_service.py</tspan>
+<tspan x="20" y="1854">|   |   |   |-- technician_profile_service.py</tspan>
+<tspan x="20" y="1874">|   |   |   |-- technician_service.py</tspan>
+<tspan x="20" y="1894">|   |   |   |-- vendor_service.py</tspan>
+<tspan x="20" y="1914">|   |   |   `-- ... (1 more entries omitted)</tspan>
+<tspan x="20" y="1934">|   |   |-- static/</tspan>
+<tspan x="20" y="1954">|   |   |   `-- uploads/</tspan>
+<tspan x="20" y="1974">|   |   |-- uploads/</tspan>
+<tspan x="20" y="1994">|   |   |   `-- certifications/</tspan>
+<tspan x="20" y="2014">|   |   |-- utils/</tspan>
+<tspan x="20" y="2034">|   |   |   |-- file_upload.py</tspan>
+<tspan x="20" y="2054">|   |   |   `-- ... (1 more entries omitted)</tspan>
+<tspan x="20" y="2074">|   |   |-- main.py</tspan>
+<tspan x="20" y="2094">|   |   `-- ... (1 more entries omitted)</tspan>
+<tspan x="20" y="2114">|   |-- data/</tspan>
+<tspan x="20" y="2134">|   |   `-- estimations/</tspan>
+<tspan x="20" y="2154">|   |       |-- 2/</tspan>
+<tspan x="20" y="2174">|   |       `-- 6/</tspan>
+<tspan x="20" y="2194">|   |-- logs/</tspan>
+<tspan x="20" y="2214">|   |   `-- ConstructHub_api.log</tspan>
+<tspan x="20" y="2234">|   |-- .env</tspan>
+<tspan x="20" y="2254">|   |-- alembic.ini</tspan>
+<tspan x="20" y="2274">|   |-- ConstructHub_db1</tspan>
+<tspan x="20" y="2294">|   |-- ConstructHub_db1.db</tspan>
+<tspan x="20" y="2314">|   |-- README.md</tspan>
+<tspan x="20" y="2334">|   |-- requirements.txt</tspan>
+<tspan x="20" y="2354">|   `-- ... (1 more entries omitted)</tspan>
+<tspan x="20" y="2374">|-- frontend/</tspan>
+<tspan x="20" y="2394">|   |-- frontend/</tspan>
+<tspan x="20" y="2414">|   |   `-- ... (1 more entries omitted)</tspan>
+<tspan x="20" y="2434">|   |-- public/</tspan>
+<tspan x="20" y="2454">|   |   |-- image_1.jpg</tspan>
+<tspan x="20" y="2474">|   |   `-- vite.svg</tspan>
+<tspan x="20" y="2494">|   |-- src/</tspan>
+<tspan x="20" y="2514">|   |   |-- assets/</tspan>
+<tspan x="20" y="2534">|   |   |   |-- download.jfif</tspan>
+<tspan x="20" y="2554">|   |   |   |-- image_2.jpg</tspan>
+<tspan x="20" y="2574">|   |   |   |-- image_3.jpg</tspan>
+<tspan x="20" y="2594">|   |   |   |-- image_4.jpg</tspan>
+<tspan x="20" y="2614">|   |   |   |-- image_5.jpg</tspan>
+<tspan x="20" y="2634">|   |   |   `-- react.svg</tspan>
+<tspan x="20" y="2654">|   |   |-- components/</tspan>
+<tspan x="20" y="2674">|   |   |   |-- Articles/</tspan>
+<tspan x="20" y="2694">|   |   |   |-- BuilderDashboard/</tspan>
+<tspan x="20" y="2714">|   |   |   |-- Estimates/</tspan>
+<tspan x="20" y="2734">|   |   |   |-- Estimator/</tspan>
+<tspan x="20" y="2754">|   |   |   |-- MarketPlace/</tspan>
+<tspan x="20" y="2774">|   |   |   |-- TechnicianDirectory/</tspan>
+<tspan x="20" y="2794">|   |   |   |-- TechnicianProfile/</tspan>
+<tspan x="20" y="2814">|   |   |   |-- VendorDirectory/</tspan>
+<tspan x="20" y="2834">|   |   |   |-- VendorProfile/</tspan>
+<tspan x="20" y="2854">|   |   |   |-- AIAssistantPanel.tsx</tspan>
+<tspan x="20" y="2874">|   |   |   |-- AuthCard.tsx</tspan>
+<tspan x="20" y="2894">|   |   |   |-- LearningTipsCard.tsx</tspan>
+<tspan x="20" y="2914">|   |   |   |-- LeaveReviewForm.tsx</tspan>
+<tspan x="20" y="2934">|   |   |   |-- LoginCard.tsx</tspan>
+<tspan x="20" y="2954">|   |   |   |-- Navbar.tsx</tspan>
+<tspan x="20" y="2974">|   |   |   |-- PasswordInput.tsx</tspan>
+<tspan x="20" y="2994">|   |   |   |-- ReviewCard.tsx</tspan>
+<tspan x="20" y="3014">|   |   |   |-- SideBar.tsx</tspan>
+<tspan x="20" y="3034">|   |   |   |-- SignUpCard.tsx</tspan>
+<tspan x="20" y="3054">|   |   |   |-- TechnicianCard.tsx</tspan>
+<tspan x="20" y="3074">|   |   |   |-- Tooltip.tsx</tspan>
+<tspan x="20" y="3094">|   |   |   `-- VendorCard.tsx</tspan>
+<tspan x="20" y="3114">|   |   |-- hooks/</tspan>
+<tspan x="20" y="3134">|   |   |   |-- Articles/</tspan>
+<tspan x="20" y="3154">|   |   |   |-- auth/</tspan>
+<tspan x="20" y="3174">|   |   |   |-- Estimator/</tspan>
+<tspan x="20" y="3194">|   |   |   |-- MarketPlace/</tspan>
+<tspan x="20" y="3214">|   |   |   |-- Technician/</tspan>
+<tspan x="20" y="3234">|   |   |   |-- TechnicianDirectory/</tspan>
+<tspan x="20" y="3254">|   |   |   |-- VendorDirectory/</tspan>
+<tspan x="20" y="3274">|   |   |   |-- useEstimationWizard.tsx</tspan>
+<tspan x="20" y="3294">|   |   |   |-- useRecommendations.ts</tspan>
+<tspan x="20" y="3314">|   |   |   |-- useVendorItems.tsx</tspan>
+<tspan x="20" y="3334">|   |   |   |-- useVendorProfile.tsx</tspan>
+<tspan x="20" y="3354">|   |   |   `-- useVendorReviews.tsx</tspan>
+<tspan x="20" y="3374">|   |   |-- layouts/</tspan>
+<tspan x="20" y="3394">|   |   |   |-- AuthLayout.tsx</tspan>
+<tspan x="20" y="3414">|   |   |   `-- DashboardLayout.tsx</tspan>
+<tspan x="20" y="3434">|   |   |-- pages/</tspan>
+<tspan x="20" y="3454">|   |   |   |-- AdminArticles.tsx</tspan>
+<tspan x="20" y="3474">|   |   |   |-- AIChat.tsx</tspan>
+<tspan x="20" y="3494">|   |   |   |-- ArticleDetailsPage.tsx</tspan>
+<tspan x="20" y="3514">|   |   |   |-- Articles.tsx</tspan>
+<tspan x="20" y="3534">|   |   |   |-- BuilderDashboard.tsx</tspan>
+<tspan x="20" y="3554">|   |   |   |-- EstimateDetail.tsx</tspan>
+<tspan x="20" y="3574">|   |   |   |-- Estimates.tsx</tspan>
+<tspan x="20" y="3594">|   |   |   |-- GetEstimate.tsx</tspan>
+<tspan x="20" y="3614">|   |   |   |-- Login.tsx</tspan>
+<tspan x="20" y="3634">|   |   |   |-- MarketPlace.tsx</tspan>
+<tspan x="20" y="3654">|   |   |   |-- SignUp.tsx</tspan>
+<tspan x="20" y="3674">|   |   |   |-- TechnicianDirectory.tsx</tspan>
+<tspan x="20" y="3694">|   |   |   |-- TechnicianProfile.tsx</tspan>
+<tspan x="20" y="3714">|   |   |   |-- VendorDirectory.tsx</tspan>
+<tspan x="20" y="3734">|   |   |   |-- VendorItems.tsx</tspan>
+<tspan x="20" y="3754">|   |   |   `-- VendorProfile.tsx</tspan>
+<tspan x="20" y="3774">|   |   |-- services/</tspan>
+<tspan x="20" y="3794">|   |   |   `-- api/</tspan>
+<tspan x="20" y="3814">|   |   |-- styles/</tspan>
+<tspan x="20" y="3834">|   |   |-- App.css</tspan>
+<tspan x="20" y="3854">|   |   |-- App.tsx</tspan>
+<tspan x="20" y="3874">|   |   |-- index.css</tspan>
+<tspan x="20" y="3894">|   |   `-- main.tsx</tspan>
+<tspan x="20" y="3914">|   |-- .env</tspan>
+<tspan x="20" y="3934">|   |-- eslint.config.js</tspan>
+<tspan x="20" y="3954">|   |-- index.html</tspan>
+<tspan x="20" y="3974">|   |-- package-lock.json</tspan>
+<tspan x="20" y="3994">|   |-- package.json</tspan>
+<tspan x="20" y="4014">|   |-- postcss.config.js</tspan>
+<tspan x="20" y="4034">|   |-- README_local.md</tspan>
+<tspan x="20" y="4054">|   |-- tailwind.config.js</tspan>
+<tspan x="20" y="4074">|   |-- tsconfig.app.json</tspan>
+<tspan x="20" y="4094">|   |-- tsconfig.json</tspan>
+<tspan x="20" y="4114">|   |-- tsconfig.node.json</tspan>
+<tspan x="20" y="4134">|   |-- vite.config.ts</tspan>
+<tspan x="20" y="4154">|   `-- ... (1 more entries omitted)</tspan>
+<tspan x="20" y="4174">|-- .gitignore</tspan>
+<tspan x="20" y="4194">|-- README.md</tspan>
+<tspan x="20" y="4214">`-- ... (1 more entries omitted)</tspan>
+</text>
+</svg>
