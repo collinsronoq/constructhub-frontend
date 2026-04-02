@@ -1,11 +1,11 @@
 from typing import Optional, Dict, Any
 from pydantic import BaseModel
 
-from app.estimation.schemas.site_survey import SiteSurveyInput
-from app.estimation.schemas.site_preparation import SitePreparationInput
-from app.estimation.schemas.foundation import FoundationInput
-from app.estimation.schemas.superstructure import SuperstructureInput
-from app.estimation.schemas.roofing import RoofingInput
+from app.estimation.phases.site_survey.schemas import SiteSurveyInput
+from app.estimation.phases.site_preparation.schemas import SitePreparationInput
+from app.estimation.phases.foundation.schemas import FoundationInput
+from app.estimation.phases.superstructure.schemas import SuperstructureInput
+from app.estimation.phases.roofing.schemas import RoofingInput
 from app.estimation.schemas.services import ServicesFirstFixInput, ServicesSecondFixInput
 from app.estimation.schemas.finishes import FinishesInput
 from app.estimation.schemas.external import ExternalWorksInput

@@ -1,7 +1,7 @@
 import math
 
 from app.estimation.geometry.building_geometry_resolver import ResolvedGeometry
-from app.estimation.schemas.foundation import FoundationInput
+from app.estimation.phases.foundation.schemas import FoundationInput
 from app.estimation.common_schemas import (
     CostItem,
     PhaseEstimate,

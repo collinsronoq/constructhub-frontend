@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from math import sqrt
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
@@ -16,29 +16,45 @@ from app.estimation.phases.superstructure.land_feasibility import (
 from app.estimation.schemas.aggregate import EstimationRequest
 
 
+AreaSourceCategory = Literal["declared", "room_program", "fallback"]
+
+
 class ResolvedGeometry(BaseModel):
+    # Canonical context
     plot_area_sqm: float
     land_area_sqm: float
     structure_type: str
     storeys: int
-    area_source: str
 
+    # Provenance
+    area_source: AreaSourceCategory
+    area_source_detail: str
     declared_floor_area_sqm: float | None = None
     room_program_floor_area_sqm: float | None = None
     fallback_floor_area_sqm: float | None = None
-    pre_cap_total_floor_area_sqm: float
 
-    total_floor_area_sqm: float
-    footprint_area_sqm: float
-    resolved_foundation_area_sqm: float
+    # Canonical area progression
+    pre_cap_floor_area_sqm: float
+    post_cap_floor_area_sqm: float
+    ground_footprint_area_sqm: float
+    foundation_reference_area_sqm: float
     upper_floor_area_sqm: float
-    equivalent_square_perimeter_m: float
+    equivalent_plan_perimeter_m: float
 
-    buildable_max_footprint_sqm: float
+    # Buildability envelope
+    buildable_max_ground_footprint_sqm: float
     buildable_max_total_floor_area_sqm: float
     circulation_area_sqm: float
     fits_plot_constraints: bool
     caps_applied: list[str] = Field(default_factory=list)
+
+    # Compatibility aliases for existing consumers
+    pre_cap_total_floor_area_sqm: float
+    total_floor_area_sqm: float
+    footprint_area_sqm: float
+    resolved_foundation_area_sqm: float
+    equivalent_square_perimeter_m: float
+    buildable_max_footprint_sqm: float
 
     room_program_summary: dict[str, Any] = Field(default_factory=dict)
     assumptions: list[str] = Field(default_factory=list)
@@ -81,12 +97,12 @@ def _room_program_quantities(payload: EstimationRequest) -> dict[str, int]:
 def _resolve_floor_area_source(
     payload: EstimationRequest,
     floor_resolution: FloorAreaResolution,
-) -> tuple[str, float, float | None, float | None, float | None, list[str]]:
+) -> tuple[AreaSourceCategory, str, float, float | None, float | None, float | None, list[str]]:
     warnings: list[str] = []
+
     declared_floor_area = _to_positive_float(payload.superstructure.declared_floor_area_sqm)
     room_program_area = _to_positive_float(floor_resolution.total_floor_area_sqm)
-
-    fallback_source, fallback_area = _first_positive(
+    fallback_detail, fallback_area = _first_positive(
         [
             ("foundation_floor_area_sqm", payload.foundation.floor_area_sqm),
             ("finishes_floor_area_sqm", payload.finishes.floor_area_sqm),
@@ -101,6 +117,7 @@ def _resolve_floor_area_source(
 
     if declared_floor_area is not None:
         return (
+            "declared",
             "declared_floor_area_sqm",
             declared_floor_area,
             declared_floor_area,
@@ -111,7 +128,8 @@ def _resolve_floor_area_source(
 
     if room_program_area is not None:
         return (
-            "room_program_derived",
+            "room_program",
+            "room_program_derived_floor_area_sqm",
             room_program_area,
             declared_floor_area,
             room_program_area,
@@ -120,12 +138,13 @@ def _resolve_floor_area_source(
         )
 
     selected_fallback = fallback_area or 1.0
-    fallback_label = fallback_source or "fallback_floor_area_sqm"
+    detail = fallback_detail or "fallback_floor_area_sqm"
     warnings.append(
-        "Room-program area could not be resolved; geometry floor area fell back to normalized phase input defaults."
+        "No declared or room-program floor area was available; fallback floor area was applied."
     )
     return (
-        fallback_label,
+        "fallback",
+        detail,
         selected_fallback,
         declared_floor_area,
         room_program_area,
@@ -170,46 +189,59 @@ def resolve_building_geometry(payload: EstimationRequest) -> ResolvedGeometry:
 
     (
         area_source,
-        pre_cap_total_floor_area,
+        area_source_detail,
+        pre_cap_floor_area_sqm,
         declared_floor_area_sqm,
         room_program_floor_area_sqm,
         fallback_floor_area_sqm,
-        area_warnings,
+        source_warnings,
     ) = _resolve_floor_area_source(payload=payload, floor_resolution=floor_resolution)
 
-    buildable_max_footprint_sqm = max(float(land_result.buildable_footprint_sqm or 0), 1.0)
+    buildable_max_ground_footprint_sqm = max(float(land_result.buildable_footprint_sqm or 0), 1.0)
     buildable_max_total_floor_area_sqm = max(float(land_result.total_allowable_floor_area_sqm or 0), 1.0)
 
+    warnings: list[str] = list(source_warnings)
     caps_applied: list[str] = []
-    warnings: list[str] = list(area_warnings)
 
-    fits_plot_constraints = pre_cap_total_floor_area <= buildable_max_total_floor_area_sqm
-    total_floor_area_sqm = pre_cap_total_floor_area
-    if total_floor_area_sqm > buildable_max_total_floor_area_sqm:
-        total_floor_area_sqm = buildable_max_total_floor_area_sqm
+    fits_plot_constraints = pre_cap_floor_area_sqm <= buildable_max_total_floor_area_sqm
+    post_cap_floor_area_sqm = pre_cap_floor_area_sqm
+    if post_cap_floor_area_sqm > buildable_max_total_floor_area_sqm:
+        post_cap_floor_area_sqm = buildable_max_total_floor_area_sqm
         caps_applied.append("total_floor_area_capped_to_buildable_max")
         warnings.append(
-            "Resolved floor area exceeded buildability maximum and was capped to allowable floor area."
+            "Floor area was capped to buildable_max_total_floor_area_sqm after land-feasibility checks."
         )
 
-    footprint_area_sqm = max(total_floor_area_sqm / storeys, 1.0)
-    if footprint_area_sqm > buildable_max_footprint_sqm:
-        footprint_area_sqm = buildable_max_footprint_sqm
+    ground_footprint_area_sqm = max(post_cap_floor_area_sqm / storeys, 1.0)
+    if ground_footprint_area_sqm > buildable_max_ground_footprint_sqm:
+        ground_footprint_area_sqm = buildable_max_ground_footprint_sqm
         caps_applied.append("footprint_area_capped_to_buildable_max")
-        total_floor_area_sqm = min(total_floor_area_sqm, footprint_area_sqm * storeys)
+        post_cap_floor_area_sqm = min(post_cap_floor_area_sqm, ground_footprint_area_sqm * storeys)
+        warnings.append(
+            "Ground footprint was capped to buildable_max_ground_footprint_sqm to respect site coverage limits."
+        )
 
-    resolved_foundation_area_sqm = footprint_area_sqm
-    upper_floor_area_sqm = max(total_floor_area_sqm - footprint_area_sqm, 0.0)
-    equivalent_square_perimeter_m = 4 * sqrt(max(footprint_area_sqm, 1.0))
+    foundation_reference_area_sqm = ground_footprint_area_sqm
+    upper_floor_area_sqm = max(post_cap_floor_area_sqm - ground_footprint_area_sqm, 0.0)
+    equivalent_plan_perimeter_m = 4 * sqrt(max(ground_footprint_area_sqm, 1.0))
 
     assumptions = [
-        "Area source priority: declared_floor_area_sqm -> room_program_derived -> normalized fallback.",
-        "Land feasibility applies 60% site coverage and 15% circulation/setback loss before allowable floor area checks.",
-        "Footprint is resolved as total_floor_area_sqm / storeys using structure-type-derived storey count.",
-        "Equivalent-square perimeter is used as the shared baseline perimeter for structural takeoff.",
+        "Area source priority is declared -> room_program -> fallback.",
+        (
+            "Land feasibility applies max site coverage ratio "
+            f"{land_result.max_site_coverage_ratio:.2f} and circulation/setback loss ratio 0.15."
+        ),
+        "Buildable max total floor area is derived as buildable_max_ground_footprint_sqm * storeys.",
+        "Equivalent plan perimeter assumes an equivalent-square plan for early-stage quantity takeoff.",
     ]
+    if area_source == "fallback":
+        assumptions.append(
+            "Fallback floor area source was used because declared and room-program floor areas were unavailable."
+        )
     if not floor_resolution.fits_land_constraints:
-        warnings.append("Room-program area remains above allowable limit after bounded scaling and required capping.")
+        warnings.append(
+            "Room-program floor area required bounded scaling and still exceeded allowable land constraints before capping."
+        )
 
     room_summary = _room_program_summary(
         payload=payload,
@@ -223,20 +255,27 @@ def resolve_building_geometry(payload: EstimationRequest) -> ResolvedGeometry:
         structure_type=payload.superstructure.structure_type,
         storeys=storeys,
         area_source=area_source,
+        area_source_detail=area_source_detail,
         declared_floor_area_sqm=declared_floor_area_sqm,
         room_program_floor_area_sqm=room_program_floor_area_sqm,
         fallback_floor_area_sqm=fallback_floor_area_sqm,
-        pre_cap_total_floor_area_sqm=round(pre_cap_total_floor_area, 2),
-        total_floor_area_sqm=round(total_floor_area_sqm, 2),
-        footprint_area_sqm=round(footprint_area_sqm, 2),
-        resolved_foundation_area_sqm=round(resolved_foundation_area_sqm, 2),
+        pre_cap_floor_area_sqm=round(pre_cap_floor_area_sqm, 2),
+        post_cap_floor_area_sqm=round(post_cap_floor_area_sqm, 2),
+        ground_footprint_area_sqm=round(ground_footprint_area_sqm, 2),
+        foundation_reference_area_sqm=round(foundation_reference_area_sqm, 2),
         upper_floor_area_sqm=round(upper_floor_area_sqm, 2),
-        equivalent_square_perimeter_m=round(equivalent_square_perimeter_m, 2),
-        buildable_max_footprint_sqm=round(buildable_max_footprint_sqm, 2),
+        equivalent_plan_perimeter_m=round(equivalent_plan_perimeter_m, 2),
+        buildable_max_ground_footprint_sqm=round(buildable_max_ground_footprint_sqm, 2),
         buildable_max_total_floor_area_sqm=round(buildable_max_total_floor_area_sqm, 2),
         circulation_area_sqm=round(float(floor_resolution.circulation_area_sqm or 0), 2),
         fits_plot_constraints=fits_plot_constraints,
         caps_applied=caps_applied,
+        pre_cap_total_floor_area_sqm=round(pre_cap_floor_area_sqm, 2),
+        total_floor_area_sqm=round(post_cap_floor_area_sqm, 2),
+        footprint_area_sqm=round(ground_footprint_area_sqm, 2),
+        resolved_foundation_area_sqm=round(foundation_reference_area_sqm, 2),
+        equivalent_square_perimeter_m=round(equivalent_plan_perimeter_m, 2),
+        buildable_max_footprint_sqm=round(buildable_max_ground_footprint_sqm, 2),
         room_program_summary=room_summary,
         assumptions=assumptions,
         warnings=warnings,

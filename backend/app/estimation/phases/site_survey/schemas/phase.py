@@ -1,5 +1,6 @@
-from pydantic import BaseModel
 from typing import Literal
+
+from pydantic import BaseModel
 
 
 class SiteSurveyInput(BaseModel):
@@ -8,3 +9,6 @@ class SiteSurveyInput(BaseModel):
     include_soil_test: bool = False
     include_topographical_survey: bool = False
     survey_quality: Literal["standard", "premium"] = "standard"
+
+
+__all__ = ["SiteSurveyInput"]

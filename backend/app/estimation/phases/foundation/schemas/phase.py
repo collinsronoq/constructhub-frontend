@@ -1,5 +1,6 @@
-from pydantic import BaseModel, Field
 from typing import Literal
+
+from pydantic import BaseModel, Field
 
 
 class FoundationInput(BaseModel):
@@ -9,3 +10,6 @@ class FoundationInput(BaseModel):
     quality_level: Literal["standard", "premium"] = "standard"
 
     include_formwork: bool = True
+
+
+__all__ = ["FoundationInput"]

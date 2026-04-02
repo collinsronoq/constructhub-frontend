@@ -3,9 +3,9 @@ from typing import Any, Dict, List
 from app.estimation.phases.site_survey import estimate_site_survey
 from app.estimation.phases.site_preparation import estimate_site_preparation
 from app.estimation.phases.foundation import estimate_foundation
-from app.estimation.phases.superstructure.estimate_superstructure import estimate_superstructure
+from app.estimation.phases.superstructure import estimate_superstructure
 from app.estimation.geometry.building_geometry_resolver import resolve_building_geometry
-from app.estimation.phases.roofing.estimate_roofing import estimate_roofing_phase
+from app.estimation.phases.roofing import estimate_roofing_phase
 from app.estimation.phases.services_first_fix.estimate_services_first_fix import estimate_services_first_fix
 from app.estimation.phases.services_second_fix.estimate_services_second_fix import estimate_services_second_fix
 from app.estimation.phases.finishes.estimate_finishes import estimate_finishes
@@ -60,7 +60,13 @@ async def generate_estimation(payload: EstimationRequest, db: AsyncSession, user
     # logger.info(f"\n\n superstrucutre information:\n {phases[3]}")
 
     # logger.info("Starting estimation: roofing")
-    phases.append(estimate_roofing_phase(payload.roofing, vendor_prices=vendor_prices))
+    phases.append(
+        estimate_roofing_phase(
+            payload.roofing,
+            geometry=resolved_geometry,
+            vendor_prices=vendor_prices,
+        )
+    )
     # logger.info(f"\n\n roofing information:\n {phases[4]}")
 
     # logger.info("Starting estimation: services_first_fix")

@@ -1,5 +1,5 @@
 # app/estimations/phases/site_survey.py
-from app.estimation.schemas.site_survey import SiteSurveyInput
+from app.estimation.phases.site_survey.schemas import SiteSurveyInput
 from app.estimation.common_schemas import (
     PhaseEstimate,
     CostItem,
