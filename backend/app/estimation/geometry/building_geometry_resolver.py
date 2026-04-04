@@ -5,11 +5,11 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
-from app.estimation.phases.superstructure.floor_area_resolver import (
+from app.estimation.geometry.floor_area_resolver import (
     FloorAreaResolution,
     resolve_floor_area_from_rooms,
 )
-from app.estimation.phases.superstructure.land_feasibility import (
+from app.estimation.geometry.land_feasibility import (
     LandFeasibilityResult,
     resolve_land_feasibility,
 )
@@ -105,8 +105,6 @@ def _resolve_floor_area_source(
     fallback_detail, fallback_area = _first_positive(
         [
             ("foundation_floor_area_sqm", payload.foundation.floor_area_sqm),
-            ("finishes_floor_area_sqm", payload.finishes.floor_area_sqm),
-            ("services_second_fix_floor_area_sqm", payload.services_second_fix.floor_area_sqm),
             ("services_first_fix_floor_area_sqm", payload.services_first_fix.floor_area_sqm),
             (
                 "plot_area_ratio_0_40",

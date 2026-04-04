@@ -1,16 +1,17 @@
 from math import ceil
 
-from app.estimation.schemas.services import (
+from app.estimation.common_schemas import QuantityItem
+from app.estimation.phases.services_second_fix.schemas import (
     ServicesSecondFixInput,
-    ServicesSecondFixQuantities,
+    ServicesSecondFixQuantityModel,
+    ServicesSecondFixResolvedInputs,
 )
 
 
-def quantify_services_second_fix(data: ServicesSecondFixInput) -> ServicesSecondFixQuantities:
-    """
-    Derive fixture counts for second-fix services (electrical fittings + sanitary fixtures).
-    """
-
+def derive_services_second_fix_quantities(
+    data: ServicesSecondFixInput,
+    resolved_inputs: ServicesSecondFixResolvedInputs,
+) -> ServicesSecondFixQuantityModel:
     habitable_rooms = (
         data.bedrooms
         + data.living_rooms
@@ -18,24 +19,21 @@ def quantify_services_second_fix(data: ServicesSecondFixInput) -> ServicesSecond
         + data.kitchens
     )
 
-    # Electrical fittings
     total_light_points = (habitable_rooms * data.light_points_per_room) + (data.bathrooms * 2)
     total_socket_points = (habitable_rooms * data.sockets_per_room) + (data.kitchens * 4)
 
-    switches = total_light_points  # one per light point as a baseline
-    light_fittings = total_light_points
+    switches = total_light_points
     sockets = total_socket_points
+    light_fittings = total_light_points
 
-    # Sanitary fixtures
     toilet_sets = max(1, data.bathrooms)
-    basins = data.bathrooms + data.dining_rooms  # include basin in dining room
+    basins = data.bathrooms + data.dining_rooms
     kitchen_sinks = max(1, data.kitchens)
 
     shower_mixers = data.bathrooms if data.include_shower_mixers else 0
     instant_showers = data.bathrooms if data.include_instant_showers else 0
 
-    # Multi-storey adjustment: small uplift for risers and duplication
-    storey_factor = 1 + 0.1 * max(0, data.storeys - 1)
+    storey_factor = 1 + 0.1 * max(0, resolved_inputs.effective_storeys - 1)
 
     switches = ceil(switches * storey_factor)
     sockets = ceil(sockets * storey_factor)
@@ -46,25 +44,145 @@ def quantify_services_second_fix(data: ServicesSecondFixInput) -> ServicesSecond
     shower_mixers = ceil(shower_mixers * storey_factor)
     instant_showers = ceil(instant_showers * storey_factor)
 
-    print(f''' second service fix details: \n 
-          switches: {switches} \n,
-          sockets: {sockets} \n,
-          light_fittings: {light_fittings} \n,
-          toilet_sets: {toilet_sets} \n,
-          basins: {basins} \n,
-          kitchen_sinks: {kitchen_sinks} \n,
-          shower_mixers: {shower_mixers} \n,
-          instant_showers: {instant_showers}
-  
-          ''')
-    
-    return ServicesSecondFixQuantities(
-        switches=switches,
-        sockets=sockets,
-        light_fittings=light_fittings,
-        toilet_sets=toilet_sets,
-        basins=basins,
-        kitchen_sinks=kitchen_sinks,
-        shower_mixers=shower_mixers,
-        instant_showers=instant_showers,
+    return ServicesSecondFixQuantityModel(
+        habitable_rooms_count=habitable_rooms,
+        storey_factor=round(storey_factor, 3),
+        total_light_points=total_light_points,
+        total_socket_points=total_socket_points,
+        switches_count=switches,
+        sockets_count=sockets,
+        light_fittings_count=light_fittings,
+        toilet_sets_count=toilet_sets,
+        basins_count=basins,
+        kitchen_sinks_count=kitchen_sinks,
+        shower_mixers_count=shower_mixers,
+        instant_showers_count=instant_showers,
+    )
+
+
+def build_services_second_fix_quantity_items(
+    data: ServicesSecondFixInput,
+    quantities: ServicesSecondFixQuantityModel,
+    resolved_inputs: ServicesSecondFixResolvedInputs,
+) -> list[QuantityItem]:
+    return [
+        QuantityItem(
+            name="habitable_rooms_count",
+            value=float(quantities.habitable_rooms_count),
+            unit="count",
+            formula="bedrooms + living_rooms + dining_rooms + kitchens",
+        ),
+        QuantityItem(
+            name="storey_factor",
+            value=quantities.storey_factor,
+            unit="ratio",
+            formula="1 + 0.1 * max(0, effective_storeys - 1)",
+        ),
+        QuantityItem(
+            name="total_light_points",
+            value=float(quantities.total_light_points),
+            unit="point",
+            formula="(habitable_rooms_count * light_points_per_room) + (bathrooms * 2)",
+        ),
+        QuantityItem(
+            name="total_socket_points",
+            value=float(quantities.total_socket_points),
+            unit="point",
+            formula="(habitable_rooms_count * sockets_per_room) + (kitchens * 4)",
+        ),
+        QuantityItem(
+            name="switches_count",
+            value=float(quantities.switches_count),
+            unit="pcs",
+            formula="ceil(total_light_points * storey_factor)",
+        ),
+        QuantityItem(
+            name="sockets_count",
+            value=float(quantities.sockets_count),
+            unit="pcs",
+            formula="ceil(total_socket_points * storey_factor)",
+        ),
+        QuantityItem(
+            name="light_fittings_count",
+            value=float(quantities.light_fittings_count),
+            unit="pcs",
+            formula="ceil(total_light_points * storey_factor)",
+        ),
+        QuantityItem(
+            name="toilet_sets_count",
+            value=float(quantities.toilet_sets_count),
+            unit="set",
+            formula="ceil(max(1, bathrooms) * storey_factor)",
+        ),
+        QuantityItem(
+            name="basins_count",
+            value=float(quantities.basins_count),
+            unit="pcs",
+            formula="ceil((bathrooms + dining_rooms) * storey_factor)",
+        ),
+        QuantityItem(
+            name="kitchen_sinks_count",
+            value=float(quantities.kitchen_sinks_count),
+            unit="pcs",
+            formula="ceil(max(1, kitchens) * storey_factor)",
+        ),
+        QuantityItem(
+            name="shower_mixers_count",
+            value=float(quantities.shower_mixers_count),
+            unit="pcs",
+            formula="ceil((bathrooms if include_shower_mixers else 0) * storey_factor)",
+        ),
+        QuantityItem(
+            name="instant_showers_count",
+            value=float(quantities.instant_showers_count),
+            unit="pcs",
+            formula="ceil((bathrooms if include_instant_showers else 0) * storey_factor)",
+        ),
+        QuantityItem(
+            name="effective_floor_area_sqm",
+            value=resolved_inputs.effective_floor_area_sqm,
+            unit="sqm",
+            formula=(
+                "shared_geometry.total_floor_area_sqm"
+                if resolved_inputs.used_geometry_floor_area
+                else "services_second_fix.floor_area_sqm fallback"
+            ),
+        ),
+        QuantityItem(
+            name="effective_storeys",
+            value=float(resolved_inputs.effective_storeys),
+            unit="count",
+            formula=(
+                "shared_geometry.storeys"
+                if resolved_inputs.used_geometry_storeys
+                else "services_second_fix.storeys fallback"
+            ),
+        ),
+        QuantityItem(
+            name="sockets_per_room",
+            value=float(data.sockets_per_room),
+            unit="per_room",
+            formula="input",
+        ),
+        QuantityItem(
+            name="light_points_per_room",
+            value=float(data.light_points_per_room),
+            unit="per_room",
+            formula="input",
+        ),
+    ]
+
+
+def quantify_services_second_fix(data: ServicesSecondFixInput) -> ServicesSecondFixQuantityModel:
+    """
+    Transitional compatibility helper for callers that do not pass shared geometry.
+    """
+    return derive_services_second_fix_quantities(
+        data=data,
+        resolved_inputs=ServicesSecondFixResolvedInputs(
+            effective_floor_area_sqm=float(data.floor_area_sqm),
+            effective_storeys=max(1, int(data.storeys)),
+            used_geometry_floor_area=False,
+            used_geometry_storeys=False,
+        ),
     )

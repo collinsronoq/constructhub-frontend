@@ -6,9 +6,9 @@ from app.estimation.phases.foundation import estimate_foundation
 from app.estimation.phases.superstructure import estimate_superstructure
 from app.estimation.geometry.building_geometry_resolver import resolve_building_geometry
 from app.estimation.phases.roofing import estimate_roofing_phase
-from app.estimation.phases.services_first_fix.estimate_services_first_fix import estimate_services_first_fix
-from app.estimation.phases.services_second_fix.estimate_services_second_fix import estimate_services_second_fix
-from app.estimation.phases.finishes.estimate_finishes import estimate_finishes
+from app.estimation.phases.services_first_fix import estimate_services_first_fix
+from app.estimation.phases.services_second_fix import estimate_services_second_fix
+from app.estimation.phases.finishes import estimate_finishes
 from app.estimation.phases.external_works.estimate_external_works import estimate_external_works
 
 from app.estimation.schemas.aggregate import EstimationRequest
@@ -70,15 +70,33 @@ async def generate_estimation(payload: EstimationRequest, db: AsyncSession, user
     # logger.info(f"\n\n roofing information:\n {phases[4]}")
 
     # logger.info("Starting estimation: services_first_fix")
-    phases.append(estimate_services_first_fix(payload.services_first_fix, vendor_prices=vendor_prices))
+    phases.append(
+        estimate_services_first_fix(
+            payload.services_first_fix,
+            geometry=resolved_geometry,
+            vendor_prices=vendor_prices,
+        )
+    )
     # logger.info(f"\n\n service first fix information:\n {phases[5]}")
 
     # logger.info("Starting estimation: services_second_fix")
-    phases.append(estimate_services_second_fix(payload.services_second_fix, vendor_prices=vendor_prices))
+    phases.append(
+        estimate_services_second_fix(
+            payload.services_second_fix,
+            geometry=resolved_geometry,
+            vendor_prices=vendor_prices,
+        )
+    )
     # logger.info(f"\n\n service second fix information:\n {phases[6]}")
 
     # logger.info("Starting estimation: finishes")
-    phases.append(estimate_finishes(payload.finishes, vendor_prices=vendor_prices))
+    phases.append(
+        estimate_finishes(
+            payload.finishes,
+            geometry=resolved_geometry,
+            vendor_prices=vendor_prices,
+        )
+    )
     # logger.info(f"\n\n finishes information:\n {phases[7]}")
 
     # logger.info("Starting estimation: external_works")

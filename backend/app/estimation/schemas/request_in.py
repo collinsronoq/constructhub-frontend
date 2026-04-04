@@ -8,8 +8,9 @@ from app.estimation.phases.site_preparation.schemas import SitePreparationInput
 from app.estimation.phases.foundation.schemas import FoundationInput
 from app.estimation.phases.superstructure.schemas import SuperstructureInput
 from app.estimation.phases.roofing.schemas import RoofingInput
-from app.estimation.schemas.services import ServicesFirstFixInput, ServicesSecondFixInput
-from app.estimation.schemas.finishes import FinishesInput
+from app.estimation.phases.services_first_fix.schemas import ServicesFirstFixInput
+from app.estimation.phases.services_second_fix.schemas import ServicesSecondFixInput
+from app.estimation.phases.finishes.schemas import FinishesInput
 from app.estimation.schemas.external import ExternalWorksInput
 
 
@@ -153,15 +154,18 @@ class EstimationRequestIn(BaseModel):
 
         # Finishes
         finishes_floor = float((self.finishes or {}).get("floor_area_sqm", services_floor) or services_floor)
+        default_stores = int((self.superstructure or {}).get("stores", 0) or 0)
         fin = FinishesInput(
             floor_area_sqm=finishes_floor,
             storeys=int((self.finishes or {}).get("storeys", roofing.storeys) or roofing.storeys),
             wall_height_m=float((self.finishes or {}).get("wall_height_m", 3.0) or 3.0),
             bedrooms=int((self.finishes or {}).get("bedrooms", ss_struct.bedrooms) or ss_struct.bedrooms),
+            master_bedrooms=int((self.finishes or {}).get("master_bedrooms", ss_struct.master_bedrooms) or ss_struct.master_bedrooms),
             bathrooms=int((self.finishes or {}).get("bathrooms", ss_struct.bathrooms) or ss_struct.bathrooms),
             kitchens=int((self.finishes or {}).get("kitchens", ss_struct.kitchens) or ss_struct.kitchens),
             living_rooms=int((self.finishes or {}).get("living_rooms", ss_struct.living_rooms) or ss_struct.living_rooms),
             dining_rooms=int((self.finishes or {}).get("dining_rooms", ss_struct.dining_rooms) or ss_struct.dining_rooms),
+            stores=int((self.finishes or {}).get("stores", default_stores) or default_stores),
             other_rooms=int((self.finishes or {}).get("other_rooms", 0) or 0),
             main_floor_finish=_pick_literal((self.finishes or {}).get("main_floor_finish"), ("tile", "laminate", "parquet", "polished_screed"), "tile"),
             wet_floor_finish=_pick_literal((self.finishes or {}).get("wet_floor_finish"), ("ceramic_tile", "porcelain_tile"), "ceramic_tile"),
@@ -172,6 +176,8 @@ class EstimationRequestIn(BaseModel):
             include_skirting=bool((self.finishes or {}).get("include_skirting", True)),
             include_wardrobes=bool((self.finishes or {}).get("include_wardrobes", True)),
             include_kitchen_cabinets=bool((self.finishes or {}).get("include_kitchen_cabinets", True)),
+            include_bathroom_cabinetry=bool((self.finishes or {}).get("include_bathroom_cabinetry", True)),
+            include_store_cabinetry=bool((self.finishes or {}).get("include_store_cabinetry", True)),
             joinery_level=_pick_literal((self.finishes or {}).get("joinery_level"), ("standard", "premium"), "standard"),
             quality_level=_pick_literal((self.finishes or {}).get("quality_level"), ("standard", "premium", "luxury"), "standard"),
         )

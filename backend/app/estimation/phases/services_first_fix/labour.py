@@ -1,12 +1,19 @@
+from __future__ import annotations
+
 from math import ceil
 
-from app.estimation.common_schemas import LabourCost, PhaseEstimate, PhaseTotals
-from app.estimation.schemas.services import ServicesFirstFixQuantities, ServicesFirstFixInput
+from app.estimation.common_schemas import CostItem, PhaseEstimate, build_phase_totals
+from app.estimation.phases.services_first_fix.schemas import (
+    ServicesFirstFixInput,
+    ServicesFirstFixQuantityModel,
+    ServicesFirstFixResolvedInputs,
+)
 
-ELECTRICIAN_RATE = 2700
-ELECTRICAL_HELPER_RATE = 1500
-PLUMBER_RATE = 2600
-PLUMBING_HELPER_RATE = 1500
+
+ELECTRICIAN_RATE = 2700.0
+ELECTRICAL_HELPER_RATE = 1500.0
+PLUMBER_RATE = 2600.0
+PLUMBING_HELPER_RATE = 1500.0
 
 
 def _normalize_quality(level: str | None) -> str:
@@ -15,81 +22,95 @@ def _normalize_quality(level: str | None) -> str:
     return str(level).strip().lower()
 
 
-def estimate_services_first_fix_labour(
+def build_services_first_fix_labour_items(
     data: ServicesFirstFixInput,
-    quantities: ServicesFirstFixQuantities,
-) -> PhaseEstimate:
-    """
-    Labour model for electrical + plumbing rough-in (first fix).
+    quantities: ServicesFirstFixQuantityModel,
+    resolved_inputs: ServicesFirstFixResolvedInputs,
+) -> list[CostItem]:
+    points = quantities.total_light_points + quantities.total_socket_points
+    wet_rooms = quantities.wet_rooms_count
 
-    Driven primarily by:
-      - number of electrical points
-      - number of wet rooms (bathrooms/kitchens/laundry)
-      - storeys factor
-      - quality factor (premium tends to require more careful routing/finish prep)
-    """
+    storey_factor = 1 + 0.15 * max(0, resolved_inputs.effective_storeys - 1)
 
-    points = (quantities.total_light_points or 0) + (quantities.total_socket_points or 0)
-    wet_rooms = (data.bathrooms or 0) + (data.kitchens or 0) + (data.laundry_rooms or 0)
-
-    storeys = data.storeys or 1
-    storey_factor = 1 + 0.15 * max(0, storeys - 1)
-
-    quality = _normalize_quality(getattr(data, "quality_level", None))
+    quality = _normalize_quality(data.quality_level)
     quality_factor = 1.10 if quality in {"premium", "luxury"} else 1.00
 
-    # Electrical duration driven by number of points
-    #  - baseline: 2 days mobilization + setup
-    #  - + 1 day per ~25 points (rough heuristic)
     base_elec_days = 2 + (points / 25.0)
     elec_days = max(1, ceil(base_elec_days * storey_factor * quality_factor))
 
-    # Plumbing duration driven by wet rooms
-    #  - baseline: 1 day mobilization + setup
-    #  - + ~0.8 day per wet room
     base_plumb_days = 1 + (wet_rooms * 0.8)
     plumb_days = max(1, ceil(base_plumb_days * storey_factor * quality_factor))
 
-    labour_items = [
-        LabourCost(
-            role="Electrician",
-            rate_per_day=ELECTRICIAN_RATE,
-            days=elec_days,
-            total=ELECTRICIAN_RATE * elec_days,
+    return [
+        CostItem(
+            item_code="electrician",
+            description="Electrician",
+            unit="day",
+            quantity=float(elec_days),
+            unit_rate=ELECTRICIAN_RATE,
+            total=round(ELECTRICIAN_RATE * elec_days),
+            category="labour",
+            source="assumed",
+            confidence="medium",
         ),
-        LabourCost(
-            role="Electrical Helper",
-            rate_per_day=ELECTRICAL_HELPER_RATE,
-            days=elec_days,
-            total=ELECTRICAL_HELPER_RATE * elec_days,
+        CostItem(
+            item_code="electrical_helper",
+            description="Electrical Helper",
+            unit="day",
+            quantity=float(elec_days),
+            unit_rate=ELECTRICAL_HELPER_RATE,
+            total=round(ELECTRICAL_HELPER_RATE * elec_days),
+            category="labour",
+            source="assumed",
+            confidence="medium",
         ),
-        LabourCost(
-            role="Plumber",
-            rate_per_day=PLUMBER_RATE,
-            days=plumb_days,
-            total=PLUMBER_RATE * plumb_days,
+        CostItem(
+            item_code="plumber",
+            description="Plumber",
+            unit="day",
+            quantity=float(plumb_days),
+            unit_rate=PLUMBER_RATE,
+            total=round(PLUMBER_RATE * plumb_days),
+            category="labour",
+            source="assumed",
+            confidence="medium",
         ),
-        LabourCost(
-            role="Plumbing Helper",
-            rate_per_day=PLUMBING_HELPER_RATE,
-            days=plumb_days,
-            total=PLUMBING_HELPER_RATE * plumb_days,
+        CostItem(
+            item_code="plumbing_helper",
+            description="Plumbing Helper",
+            unit="day",
+            quantity=float(plumb_days),
+            unit_rate=PLUMBING_HELPER_RATE,
+            total=round(PLUMBING_HELPER_RATE * plumb_days),
+            category="labour",
+            source="assumed",
+            confidence="medium",
         ),
     ]
 
-    labour_total = sum(item.total for item in labour_items)
 
-    totals = PhaseTotals(
-        materials=0,
-        labour=labour_total,
-        other=0,
-        phase_total=labour_total,
+def estimate_services_first_fix_labour(
+    data: ServicesFirstFixInput,
+    quantities: ServicesFirstFixQuantityModel,
+) -> PhaseEstimate:
+    """
+    Transitional compatibility helper for legacy module callers.
+    """
+
+    items = build_services_first_fix_labour_items(
+        data=data,
+        quantities=quantities,
+        resolved_inputs=ServicesFirstFixResolvedInputs(
+            effective_floor_area_sqm=float(data.floor_area_sqm),
+            effective_storeys=max(1, int(data.storeys)),
+            used_geometry_floor_area=False,
+            used_geometry_storeys=False,
+        ),
     )
-
     return PhaseEstimate(
         phase="services_first_fix",
         materials=[],
-        labour=labour_items,
+        labour=items,
         other_costs=[],
-        totals=totals,
+        totals=build_phase_totals(materials=[], labour=items, equipment=[], other_costs=[]),
     )

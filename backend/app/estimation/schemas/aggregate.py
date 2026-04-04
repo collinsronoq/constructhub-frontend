@@ -6,8 +6,9 @@ from app.estimation.phases.site_preparation.schemas import SitePreparationInput
 from app.estimation.phases.foundation.schemas import FoundationInput
 from app.estimation.phases.superstructure.schemas import SuperstructureInput
 from app.estimation.phases.roofing.schemas import RoofingInput
-from app.estimation.schemas.services import ServicesFirstFixInput, ServicesSecondFixInput
-from app.estimation.schemas.finishes import FinishesInput
+from app.estimation.phases.services_first_fix.schemas import ServicesFirstFixInput
+from app.estimation.phases.services_second_fix.schemas import ServicesSecondFixInput
+from app.estimation.phases.finishes.schemas import FinishesInput
 from app.estimation.schemas.external import ExternalWorksInput
 
 

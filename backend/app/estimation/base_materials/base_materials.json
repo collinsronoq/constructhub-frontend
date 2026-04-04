@@ -91,6 +91,9 @@
     "tile_grout_bag": { "price": 750 },
 
     "plaster_mortar": { "price": 550 },
+    "cement_bag": { "price": 750 },
+    "sand_tonne": { "price": 1800 },
+    "skim_coat_bag": { "price": 1450 },
 
     "gypsum_board": { "price": 600 },
     "acoustic_board": { "price": 1450 },
@@ -105,6 +108,8 @@
     "primer": { "price": 480 },
 
     "door_internal_set": { "price": 7000 },
+    "joinery_board_sheet": { "price": 4200 },
+    "joinery_fittings_set": { "price": 1800 },
     "wardrobe_per_m": { "price": 8500 },
     "kitchen_cabinet_per_m": { "price": 12000 },
     "countertop_per_m": { "price": 8500 }
