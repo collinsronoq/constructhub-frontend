@@ -10,8 +10,9 @@ class ServicesFirstFixInput(BaseModel):
     Input for services first fix (electrical + plumbing rough-in).
     """
 
-    floor_area_sqm: float = Field(..., gt=0)
-    storeys: int = Field(1, ge=1)
+    # Compatibility-only fields. Shared resolved geometry is the authoritative source.
+    floor_area_sqm: float | None = Field(None, gt=0)
+    storeys: int | None = Field(None, ge=1)
 
     bathrooms: int = Field(1, ge=0)
     kitchens: int = Field(1, ge=0)

@@ -23,7 +23,8 @@ class RoofingInput(BaseModel):
     roof_pitch: Literal["low", "medium", "steep"] = "medium"
 
     building_footprint_sqm: Optional[float] = Field(None, gt=0)
-    storeys: int = Field(1, ge=1)
+    # Compatibility-only field. Shared resolved geometry remains the authoritative storey source.
+    storeys: int | None = Field(None, ge=1)
     include_overhangs: bool = True
 
 

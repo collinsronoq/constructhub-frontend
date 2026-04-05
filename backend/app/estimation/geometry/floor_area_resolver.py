@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from math import sqrt
 from typing import Dict, List
 
 from app.estimation.base_materials.loader import load_base_rooms
@@ -26,9 +27,11 @@ DEFAULT_SIZE_TIERS = {
 }
 
 DEFAULT_CIRCULATION_RATIO = 0.12
+DEFAULT_WALL_THICKNESS_M = 0.15
+DEFAULT_INTERNAL_PARTITION_FACTOR = 0.9
 
 
-def _load_room_catalog() -> tuple[Dict[str, float], Dict[str, float], float]:
+def _load_room_catalog() -> tuple[Dict[str, float], Dict[str, float], float, float, float]:
     base = load_base_rooms() or {}
     rooms = base.get("rooms", {}) if isinstance(base, dict) else {}
     tiers = base.get("room_size_tiers", {}) if isinstance(base, dict) else {}
@@ -55,7 +58,27 @@ def _load_room_catalog() -> tuple[Dict[str, float], Dict[str, float], float]:
     if not isinstance(circulation_ratio, (int, float)) or circulation_ratio <= 0:
         circulation_ratio = DEFAULT_CIRCULATION_RATIO
 
-    return merged_sizes, merged_tiers, float(circulation_ratio)
+    wall_thickness_m = planning.get("wall_thickness_m", DEFAULT_WALL_THICKNESS_M)
+    if not isinstance(wall_thickness_m, (int, float)) or wall_thickness_m <= 0:
+        wall_thickness_m = DEFAULT_WALL_THICKNESS_M
+
+    internal_partition_factor = planning.get(
+        "internal_partition_factor",
+        DEFAULT_INTERNAL_PARTITION_FACTOR,
+    )
+    if (
+        not isinstance(internal_partition_factor, (int, float))
+        or internal_partition_factor <= 0
+    ):
+        internal_partition_factor = DEFAULT_INTERNAL_PARTITION_FACTOR
+
+    return (
+        merged_sizes,
+        merged_tiers,
+        float(circulation_ratio),
+        float(wall_thickness_m),
+        float(internal_partition_factor),
+    )
 
 
 @dataclass(frozen=True)
@@ -72,6 +95,13 @@ class FloorAreaResolution:
     rooms: List[ResolvedRoom]
     base_room_area_sqm: float
     circulation_area_sqm: float
+    external_wall_area_sqm: float
+    internal_partition_area_sqm: float
+    total_wall_area_sqm: float
+    equivalent_external_perimeter_m: float
+    internal_partition_length_m: float
+    wall_thickness_m: float
+    internal_partition_factor: float
     total_floor_area_sqm: float
     scale_factor: float
     fits_land_constraints: bool
@@ -88,7 +118,13 @@ def resolve_floor_area_from_rooms(
     resolved_rooms: List[ResolvedRoom] = []
     base_area = 0.0
 
-    room_sizes, size_tiers, default_circulation = _load_room_catalog()
+    (
+        room_sizes,
+        size_tiers,
+        default_circulation,
+        wall_thickness_m,
+        internal_partition_factor,
+    ) = _load_room_catalog()
     size_multiplier = size_tiers.get(size_tier, size_tiers["standard"])
     circulation_ratio = default_circulation if circulation_ratio is None else circulation_ratio
     max_allowable_floor_area_sqm = max(float(max_allowable_floor_area_sqm or 0), 1.0)
@@ -114,6 +150,13 @@ def resolve_floor_area_from_rooms(
             rooms=[],
             base_room_area_sqm=0.0,
             circulation_area_sqm=0.0,
+            external_wall_area_sqm=0.0,
+            internal_partition_area_sqm=0.0,
+            total_wall_area_sqm=0.0,
+            equivalent_external_perimeter_m=0.0,
+            internal_partition_length_m=0.0,
+            wall_thickness_m=wall_thickness_m,
+            internal_partition_factor=internal_partition_factor,
             total_floor_area_sqm=0.0,
             scale_factor=1.0,
             fits_land_constraints=True,
@@ -124,12 +167,50 @@ def resolve_floor_area_from_rooms(
     raw_scale = max_allowable_floor_area_sqm / max(gross_area, 1.0)
     scale_factor = max(min(raw_scale, max_scale), min_scale)
 
-    adjusted_total = 0.0
+    def _compute_scaled_totals(scale: float) -> dict[str, float]:
+        adjusted_total_local = 0.0
+        room_perimeter_sum = 0.0
+        for room in resolved_rooms:
+            adjusted_size = room.base_size_sqm * scale
+            adjusted_total_local += adjusted_size * room.quantity
+            room_perimeter_sum += 4.0 * sqrt(max(adjusted_size, 0.0001)) * room.quantity
+
+        equivalent_external_perimeter = 4.0 * sqrt(max(adjusted_total_local, 1.0))
+        raw_internal_partition_length = max(
+            (room_perimeter_sum - equivalent_external_perimeter) / 2.0,
+            0.0,
+        )
+        internal_partition_length = raw_internal_partition_length * internal_partition_factor
+        external_wall_area = equivalent_external_perimeter * wall_thickness_m
+        internal_partition_area = internal_partition_length * wall_thickness_m
+        total_wall_area = external_wall_area + internal_partition_area
+        circulation_local = adjusted_total_local * circulation_ratio
+        total_floor_local = adjusted_total_local + circulation_local + total_wall_area
+
+        return {
+            "adjusted_total": adjusted_total_local,
+            "circulation_area": circulation_local,
+            "external_wall_area": external_wall_area,
+            "internal_partition_area": internal_partition_area,
+            "total_wall_area": total_wall_area,
+            "equivalent_external_perimeter": equivalent_external_perimeter,
+            "internal_partition_length": internal_partition_length,
+            "total_floor": total_floor_local,
+        }
+
+    metrics = _compute_scaled_totals(scale_factor)
+    for _ in range(6):
+        if metrics["total_floor"] <= max_allowable_floor_area_sqm or scale_factor <= min_scale:
+            break
+        correction = max_allowable_floor_area_sqm / max(metrics["total_floor"], 1.0)
+        scale_factor = max(min_scale, scale_factor * correction)
+        metrics = _compute_scaled_totals(scale_factor)
+
+    adjusted_total = metrics["adjusted_total"]
     adjusted_rooms: List[ResolvedRoom] = []
     for room in resolved_rooms:
         adjusted_size = round(room.base_size_sqm * scale_factor, 2)
         room_total = round(adjusted_size * room.quantity, 2)
-        adjusted_total += room_total
         adjusted_rooms.append(
             ResolvedRoom(
                 name=room.name,
@@ -140,14 +221,26 @@ def resolve_floor_area_from_rooms(
             )
         )
 
-    circulation_area = round(adjusted_total * circulation_ratio, 2)
-    final_total = round(adjusted_total + circulation_area, 2)
+    circulation_area = round(metrics["circulation_area"], 2)
+    external_wall_area = round(metrics["external_wall_area"], 2)
+    internal_partition_area = round(metrics["internal_partition_area"], 2)
+    total_wall_area = round(metrics["total_wall_area"], 2)
+    equivalent_external_perimeter = round(metrics["equivalent_external_perimeter"], 2)
+    internal_partition_length = round(metrics["internal_partition_length"], 2)
+    final_total = round(metrics["total_floor"], 2)
     fits = final_total <= max_allowable_floor_area_sqm
 
     return FloorAreaResolution(
         rooms=adjusted_rooms,
         base_room_area_sqm=round(base_area, 2),
         circulation_area_sqm=circulation_area,
+        external_wall_area_sqm=external_wall_area,
+        internal_partition_area_sqm=internal_partition_area,
+        total_wall_area_sqm=total_wall_area,
+        equivalent_external_perimeter_m=equivalent_external_perimeter,
+        internal_partition_length_m=internal_partition_length,
+        wall_thickness_m=round(wall_thickness_m, 3),
+        internal_partition_factor=round(internal_partition_factor, 3),
         total_floor_area_sqm=final_total,
         scale_factor=round(scale_factor, 2),
         fits_land_constraints=fits,
@@ -159,4 +252,3 @@ __all__ = [
     "ResolvedRoom",
     "resolve_floor_area_from_rooms",
 ]
-

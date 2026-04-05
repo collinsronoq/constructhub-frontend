@@ -135,6 +135,13 @@
     "sewer_pipe": { "price": 480 },
     "manhole": { "price": 2500 },
     "biodigester_unit": { "price": 95000 }
+  },
+
+  "external_works_equipment": {
+    "mini_excavator_day": { "price": 18000 },
+    "plate_compactor_day": { "price": 6500 },
+    "concrete_mixer_day": { "price": 4500 },
+    "fencing_tools_day": { "price": 2500 }
   }
 
 

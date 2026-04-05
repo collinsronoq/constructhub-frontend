@@ -45,6 +45,8 @@ def derive_finishes_geometry(
     wet_rooms = data.bathrooms + data.kitchens
     non_wet_rooms = max(room_count - wet_rooms, 1)
 
+    # surface area was already calculated in the global geometry
+
     # Shared perimeter and storeys anchor wall-area calculations.
     external_wall_gross_area = perimeter_m * wall_height_m * storeys
     external_openings_deduction = max(external_wall_gross_area * 0.16, room_count * 1.8)

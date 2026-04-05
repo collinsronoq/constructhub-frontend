@@ -1,4 +1,5 @@
 # app/ai/tools.py
+import asyncio
 from typing import Any, Optional
 
 from sqlalchemy import String, cast, or_, select
@@ -113,7 +114,8 @@ async def get_estimate_summary(project_id: str, *, db: AsyncSession, user_id: in
         est_record = None
 
     estimate_id = est_record.estimate_id if est_record else project_id
-    blob = load_estimation_blob(owner_id, estimate_id)
+    # File reads are synchronous in storage.py; run them off the event loop.
+    blob = await asyncio.to_thread(load_estimation_blob, owner_id, estimate_id)
     if not blob:
         return {"error": "Estimation not found", "estimate_id": estimate_id}
 

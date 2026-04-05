@@ -16,12 +16,12 @@ const Estimates = () => {
   const { estimates, loading, error } = useEstimations();
 
   const mapped = estimates.map((e) => ({
-    id: String((e as any).estimate_id || e.id),
-    projectName: (e as any).project_title || (e as any).project_name || "Project",
+    id: String(e.id),
+    projectName: e.project_title || e.project_name || "Project",
     category: "Residential",
-    estimatedCost: `KSh ${Number((e as any).total_cost || 0).toLocaleString()}`,
+    estimatedCost: `KSh ${Number(e.total_cost || 0).toLocaleString()}`,
     dateCreated: e.created_at ? new Date(e.created_at).toLocaleDateString() : "",
-    location: (e as any).location || "N/A",
+    location: e.location || "N/A",
   }));
 
   return (

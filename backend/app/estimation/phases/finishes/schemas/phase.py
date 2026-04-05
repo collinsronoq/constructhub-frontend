@@ -10,8 +10,9 @@ class FinishesInput(BaseModel):
     Input for finishes stage (internal and external finishes + joinery).
     """
 
-    floor_area_sqm: float = Field(..., gt=0)
-    storeys: int = Field(1, ge=1)
+    # Compatibility-only fields. Shared resolved geometry is the authoritative source.
+    floor_area_sqm: float | None = Field(None, gt=0)
+    storeys: int | None = Field(None, ge=1)
     wall_height_m: float = Field(3.0, gt=0)
 
     bedrooms: int = Field(3, ge=0)
@@ -138,4 +139,3 @@ __all__ = [
     "FinishesGeometryModel",
     "FinishesQuantityModel",
 ]
-

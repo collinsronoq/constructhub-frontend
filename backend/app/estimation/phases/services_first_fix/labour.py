@@ -97,12 +97,15 @@ def estimate_services_first_fix_labour(
     Transitional compatibility helper for legacy module callers.
     """
 
+    fallback_floor_area = max(float(data.floor_area_sqm or 1.0), 1.0)
+    fallback_storeys = max(1, int(data.storeys or 1))
+
     items = build_services_first_fix_labour_items(
         data=data,
         quantities=quantities,
         resolved_inputs=ServicesFirstFixResolvedInputs(
-            effective_floor_area_sqm=float(data.floor_area_sqm),
-            effective_storeys=max(1, int(data.storeys)),
+            effective_floor_area_sqm=fallback_floor_area,
+            effective_storeys=fallback_storeys,
             used_geometry_floor_area=False,
             used_geometry_storeys=False,
         ),

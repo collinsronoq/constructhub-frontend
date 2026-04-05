@@ -102,14 +102,14 @@ def _resolve_floor_area_source(
 
     declared_floor_area = _to_positive_float(payload.superstructure.declared_floor_area_sqm)
     room_program_area = _to_positive_float(floor_resolution.total_floor_area_sqm)
+    fallback_plot_area = (
+        _to_positive_float(payload.site_survey.plot_size_sqm)
+        or _to_positive_float(payload.superstructure.land_size_sqm)
+        or 1.0
+    )
     fallback_detail, fallback_area = _first_positive(
         [
-            ("foundation_floor_area_sqm", payload.foundation.floor_area_sqm),
-            ("services_first_fix_floor_area_sqm", payload.services_first_fix.floor_area_sqm),
-            (
-                "plot_area_ratio_0_40",
-                (_to_positive_float(payload.site_survey.plot_size_sqm) or 1.0) * 0.40,
-            ),
+            ("plot_area_ratio_0_40", fallback_plot_area * 0.40),
         ]
     )
 
@@ -170,7 +170,7 @@ def _room_program_summary(
 
 def resolve_building_geometry(payload: EstimationRequest) -> ResolvedGeometry:
     plot_area_sqm = _to_positive_float(payload.site_survey.plot_size_sqm) or 1.0
-    land_area_sqm = _to_positive_float(payload.superstructure.land_size_sqm) or plot_area_sqm
+    land_area_sqm = plot_area_sqm or _to_positive_float(payload.superstructure.land_size_sqm)
 
     land_result: LandFeasibilityResult = resolve_land_feasibility(
         land_size_sqm=land_area_sqm,

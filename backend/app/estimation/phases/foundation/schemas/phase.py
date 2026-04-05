@@ -5,7 +5,8 @@ from pydantic import BaseModel, Field
 
 class FoundationInput(BaseModel):
     foundation_type: Literal["strip", "raft"]
-    floor_area_sqm: float = Field(..., gt=0)
+    # Compatibility-only field. Shared resolved geometry is the authoritative area source.
+    floor_area_sqm: float | None = Field(None, gt=0)
     soil_type: Literal["soft", "medium", "rocky"] = "medium"
     quality_level: Literal["standard", "premium"] = "standard"
 

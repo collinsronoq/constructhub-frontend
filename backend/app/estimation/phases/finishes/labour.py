@@ -292,13 +292,16 @@ def estimate_finishes_labour(
     """
     Transitional compatibility helper for legacy module callers.
     """
+    fallback_storeys = max(1, int(data.storeys or 1))
+    fallback_floor_area = max(float(data.floor_area_sqm or 1.0), 1.0)
+
     items = build_finishes_labour_items(
         data=data,
         quantities=quantities,
         resolved_inputs=FinishesResolvedInputs(
-            effective_floor_area_sqm=float(data.floor_area_sqm),
-            effective_storeys=max(1, int(data.storeys)),
-            effective_plan_perimeter_m=max((float(data.floor_area_sqm) / max(int(data.storeys), 1)) ** 0.5 * 4.0, 4.0),
+            effective_floor_area_sqm=fallback_floor_area,
+            effective_storeys=fallback_storeys,
+            effective_plan_perimeter_m=max((fallback_floor_area / fallback_storeys) ** 0.5 * 4.0, 4.0),
             used_geometry_floor_area=False,
             used_geometry_storeys=False,
             used_geometry_perimeter=False,

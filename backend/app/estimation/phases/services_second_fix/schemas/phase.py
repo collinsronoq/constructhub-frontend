@@ -10,8 +10,9 @@ class ServicesSecondFixInput(BaseModel):
     Input for services second fix (fixtures and final fittings).
     """
 
-    floor_area_sqm: float = Field(..., gt=0)
-    storeys: int = Field(1, ge=1)
+    # Compatibility-only fields. Shared resolved geometry is the authoritative source.
+    floor_area_sqm: float | None = Field(None, gt=0)
+    storeys: int | None = Field(None, ge=1)
 
     bedrooms: int = Field(3, ge=0)
     bathrooms: int = Field(1, ge=0)
@@ -61,4 +62,3 @@ __all__ = [
     "ServicesSecondFixResolvedInputs",
     "ServicesSecondFixQuantityModel",
 ]
-

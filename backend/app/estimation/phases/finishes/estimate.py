@@ -21,13 +21,33 @@ from app.estimation.phases.finishes.schemas import (
 )
 
 
+def _compat_floor_area(value: float | None) -> float:
+    if value is None:
+        return 1.0
+    try:
+        resolved = float(value)
+    except (TypeError, ValueError):
+        return 1.0
+    return max(resolved, 1.0)
+
+
+def _compat_storeys(value: int | None) -> int:
+    if value is None:
+        return 1
+    try:
+        resolved = int(value)
+    except (TypeError, ValueError):
+        return 1
+    return max(resolved, 1)
+
+
 def _resolve_inputs(
     data: FinishesInput,
     geometry: ResolvedGeometry | None,
 ) -> FinishesResolvedInputs:
     if geometry is None:
-        effective_floor_area = float(data.floor_area_sqm)
-        effective_storeys = max(1, int(data.storeys))
+        effective_floor_area = _compat_floor_area(data.floor_area_sqm)
+        effective_storeys = _compat_storeys(data.storeys)
         footprint = max(effective_floor_area / effective_storeys, 1.0)
         perimeter = 4 * sqrt(footprint)
         return FinishesResolvedInputs(
@@ -48,8 +68,8 @@ def _resolve_inputs(
     use_geometry_storeys = geometry_storeys > 0
     use_geometry_perimeter = geometry_perimeter > 0
 
-    effective_floor_area = geometry_floor_area if use_geometry_floor_area else float(data.floor_area_sqm)
-    effective_storeys = geometry_storeys if use_geometry_storeys else int(data.storeys)
+    effective_floor_area = geometry_floor_area if use_geometry_floor_area else _compat_floor_area(data.floor_area_sqm)
+    effective_storeys = geometry_storeys if use_geometry_storeys else _compat_storeys(data.storeys)
     if use_geometry_perimeter:
         effective_perimeter = geometry_perimeter
     else:
@@ -134,9 +154,9 @@ def estimate_finishes(
         warnings.append("Shared geometry storeys unavailable; finishes.storeys fallback was used.")
     if not resolved_inputs.used_geometry_perimeter:
         warnings.append("Shared geometry perimeter unavailable; equivalent-square perimeter fallback was used.")
-    if geometry and abs(float(data.floor_area_sqm) - resolved_inputs.effective_floor_area_sqm) > 0.5:
+    if geometry and data.floor_area_sqm is not None and abs(float(data.floor_area_sqm) - resolved_inputs.effective_floor_area_sqm) > 0.5:
         warnings.append("finishes.floor_area_sqm differs from shared geometry floor area; shared geometry value was used.")
-    if geometry and int(data.storeys) != resolved_inputs.effective_storeys:
+    if geometry and data.storeys is not None and int(data.storeys) != resolved_inputs.effective_storeys:
         warnings.append("finishes.storeys differs from shared geometry storeys; shared geometry value was used.")
     if resolved_inputs.geometry_caps_applied:
         warnings.append(f"Shared geometry caps applied: {', '.join(resolved_inputs.geometry_caps_applied)}.")
@@ -200,4 +220,3 @@ def estimate_finishes(
             confidence="medium",
         ),
     )
-

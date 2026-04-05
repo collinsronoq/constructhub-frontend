@@ -3,6 +3,7 @@ import { fetchEstimationById } from "../../services/api/estimations";
 import { mockEstimationData } from "./useEstimationData";
 import type { EstimationBreakdown } from "./types";
 import { mapEstimationDetailToBreakdown } from "./estimationMapper";
+import type { EstimationDetail } from "../../services/api/estimationTypes";
 
 export function useEstimationById(id?: string, useMock?: boolean) {
   const [data, setData] = useState<EstimationBreakdown | null>(null);
@@ -31,13 +32,10 @@ export function useEstimationById(id?: string, useMock?: boolean) {
     }
 
     fetchEstimationById(id)
-      .then((payload) =>
+      .then((payload: EstimationDetail) =>
         setData(
-          mapEstimationDetailToBreakdown(payload as any, {
-            projectName:
-              (payload as any)?.project_title ||
-              (payload as any)?.project_name ||
-              (payload as any)?.project_details?.project_name,
+          mapEstimationDetailToBreakdown(payload, {
+            projectName: payload.project_details?.project_name,
           })
         )
       )

@@ -183,8 +183,8 @@ def quantify_finishes(
     resolved_inputs: FinishesResolvedInputs | None = None,
 ) -> FinishesQuantityModel:
     if resolved_inputs is None:
-        fallback_storeys = max(1, int(data.storeys))
-        fallback_floor_area = max(float(data.floor_area_sqm), 1.0)
+        fallback_storeys = max(1, int(data.storeys or 1))
+        fallback_floor_area = max(float(data.floor_area_sqm or 1.0), 1.0)
         fallback_footprint = max(fallback_floor_area / fallback_storeys, 1.0)
         resolved_inputs = FinishesResolvedInputs(
             effective_floor_area_sqm=fallback_floor_area,

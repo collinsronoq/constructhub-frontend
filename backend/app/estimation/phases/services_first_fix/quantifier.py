@@ -173,12 +173,14 @@ def quantify_services_first_fix(data: ServicesFirstFixInput) -> ServicesFirstFix
     """
     Transitional compatibility helper for older callers that don't pass shared geometry.
     """
+    fallback_floor_area = max(float(data.floor_area_sqm or 1.0), 1.0)
+    fallback_storeys = max(1, int(data.storeys or 1))
 
     return derive_services_first_fix_quantities(
         data=data,
         resolved_inputs=ServicesFirstFixResolvedInputs(
-            effective_floor_area_sqm=float(data.floor_area_sqm),
-            effective_storeys=max(1, int(data.storeys)),
+            effective_floor_area_sqm=fallback_floor_area,
+            effective_storeys=fallback_storeys,
             used_geometry_floor_area=False,
             used_geometry_storeys=False,
         ),

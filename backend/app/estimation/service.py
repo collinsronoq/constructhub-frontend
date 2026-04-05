@@ -9,7 +9,7 @@ from app.estimation.phases.roofing import estimate_roofing_phase
 from app.estimation.phases.services_first_fix import estimate_services_first_fix
 from app.estimation.phases.services_second_fix import estimate_services_second_fix
 from app.estimation.phases.finishes import estimate_finishes
-from app.estimation.phases.external_works.estimate_external_works import estimate_external_works
+from app.estimation.phases.external_works import estimate_external_works
 
 from app.estimation.schemas.aggregate import EstimationRequest
 from app.core.logging import setup_logger
@@ -100,7 +100,13 @@ async def generate_estimation(payload: EstimationRequest, db: AsyncSession, user
     # logger.info(f"\n\n finishes information:\n {phases[7]}")
 
     # logger.info("Starting estimation: external_works")
-    phases.append(estimate_external_works(payload.external_works, vendor_prices=vendor_prices))
+    phases.append(
+        estimate_external_works(
+            payload.external_works,
+            geometry=resolved_geometry,
+            vendor_prices=vendor_prices,
+        )
+    )
     # logger.info(f"\n\n external works information:\n {phases[8]}")
 
     material_total = sum(float(p.totals.materials or 0) for p in phases)

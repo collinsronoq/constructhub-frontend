@@ -8,6 +8,7 @@ import AIAssistantPanel from "../components/AIAssistantPanel"
 const DashboardLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isAIOpen, setAIOpen] = useState(false);
+  const [aiThreadId, setAiThreadId] = useState<string | null>(null);
   const [isLogged] = useState(true);
 
   return (
@@ -41,7 +42,11 @@ const DashboardLayout = () => {
         {/*  AI ASSISTANT PANEL */}
         {isAIOpen && (
           <div className="fixed right-0 top-16 bottom-0 w-96 bg-white dark:bg-gray-900 border-l border-gray-200 dark:border-gray-700 shadow-lg z-40">
-            <AIAssistantPanel onClose={() => setAIOpen(false)} />
+            <AIAssistantPanel
+              onClose={() => setAIOpen(false)}
+              persistedThreadId={aiThreadId}
+              onThreadIdChange={setAiThreadId}
+            />
           </div>
         )}
       </div>

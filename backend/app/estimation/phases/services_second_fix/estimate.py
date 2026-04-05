@@ -22,14 +22,34 @@ from app.estimation.phases.services_second_fix.schemas import (
 )
 
 
+def _compat_floor_area(value: float | None) -> float:
+    if value is None:
+        return 1.0
+    try:
+        resolved = float(value)
+    except (TypeError, ValueError):
+        return 1.0
+    return max(resolved, 1.0)
+
+
+def _compat_storeys(value: int | None) -> int:
+    if value is None:
+        return 1
+    try:
+        resolved = int(value)
+    except (TypeError, ValueError):
+        return 1
+    return max(resolved, 1)
+
+
 def _resolve_inputs(
     data: ServicesSecondFixInput,
     geometry: ResolvedGeometry | None,
 ) -> ServicesSecondFixResolvedInputs:
     if geometry is None:
         return ServicesSecondFixResolvedInputs(
-            effective_floor_area_sqm=float(data.floor_area_sqm),
-            effective_storeys=max(1, int(data.storeys)),
+            effective_floor_area_sqm=_compat_floor_area(data.floor_area_sqm),
+            effective_storeys=_compat_storeys(data.storeys),
             used_geometry_floor_area=False,
             used_geometry_storeys=False,
         )
@@ -41,8 +61,8 @@ def _resolve_inputs(
     use_geometry_floor_area = geometry_floor_area > 0
     use_geometry_storeys = geometry_storeys > 0
 
-    effective_floor_area = geometry_floor_area if use_geometry_floor_area else float(data.floor_area_sqm)
-    effective_storeys = geometry_storeys if use_geometry_storeys else int(data.storeys)
+    effective_floor_area = geometry_floor_area if use_geometry_floor_area else _compat_floor_area(data.floor_area_sqm)
+    effective_storeys = geometry_storeys if use_geometry_storeys else _compat_storeys(data.storeys)
 
     return ServicesSecondFixResolvedInputs(
         effective_floor_area_sqm=max(effective_floor_area, 1.0),
@@ -112,9 +132,9 @@ def estimate_services_second_fix(
         warnings.append("Shared geometry floor area unavailable; services_second_fix.floor_area_sqm fallback was used.")
     if not resolved_inputs.used_geometry_storeys:
         warnings.append("Shared geometry storeys unavailable; services_second_fix.storeys fallback was used.")
-    if geometry and abs(float(data.floor_area_sqm) - resolved_inputs.effective_floor_area_sqm) > 0.5:
+    if geometry and data.floor_area_sqm is not None and abs(float(data.floor_area_sqm) - resolved_inputs.effective_floor_area_sqm) > 0.5:
         warnings.append("services_second_fix.floor_area_sqm differs from shared geometry floor area; shared geometry value was used.")
-    if geometry and int(data.storeys) != resolved_inputs.effective_storeys:
+    if geometry and data.storeys is not None and int(data.storeys) != resolved_inputs.effective_storeys:
         warnings.append("services_second_fix.storeys differs from shared geometry storeys; shared geometry value was used.")
     if data.include_shower_mixers:
         warnings.append("Shower mixer quantities are applied to all bathrooms when the toggle is enabled.")
@@ -166,4 +186,3 @@ def estimate_services_second_fix(
             confidence="medium",
         ),
     )
-

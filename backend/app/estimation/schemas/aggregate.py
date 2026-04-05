@@ -9,7 +9,7 @@ from app.estimation.phases.roofing.schemas import RoofingInput
 from app.estimation.phases.services_first_fix.schemas import ServicesFirstFixInput
 from app.estimation.phases.services_second_fix.schemas import ServicesSecondFixInput
 from app.estimation.phases.finishes.schemas import FinishesInput
-from app.estimation.schemas.external import ExternalWorksInput
+from app.estimation.phases.external_works.schemas import ExternalWorksInput
 
 
 class EstimationRequest(BaseModel):
