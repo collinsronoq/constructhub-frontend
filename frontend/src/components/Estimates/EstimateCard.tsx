@@ -1,6 +1,4 @@
 import { Link } from "react-router-dom";
-import { useState } from "react";
-import { chat, createThread } from "../../services/api/ai";
 
 export interface EstimateCardProps {
   id: string;
@@ -9,6 +7,11 @@ export interface EstimateCardProps {
   estimatedCost: string;
   dateCreated: string;
   location: string;
+  onAskAiSummary?: (estimate: {
+    id: string;
+    projectName: string;
+    location: string;
+  }) => void;
 }
 
 const EstimateCard: React.FC<EstimateCardProps> = ({
@@ -18,29 +21,14 @@ const EstimateCard: React.FC<EstimateCardProps> = ({
   estimatedCost,
   dateCreated,
   location,
+  onAskAiSummary,
 }) => {
-  const [aiStatus, setAiStatus] = useState<string | null>(null);
-  const [aiLoading, setAiLoading] = useState(false);
-  const [aiError, setAiError] = useState<string | null>(null);
-
-  const handleAiSummary = async () => {
-    setAiLoading(true);
-    setAiError(null);
-    setAiStatus(null);
-    try {
-      const thread = await createThread({ project_id: id, title: `AI for ${projectName}` });
-      const resp = await chat({
-        thread_id: thread.thread_id,
-        message: "Summarize this estimate with key cost drivers and phase highlights.",
-        context: { project_id: id, location },
-        response_mode: "structured",
-      });
-      setAiStatus(resp.assistant?.text || "No response from AI.");
-    } catch (err: any) {
-      setAiError(err?.detail?.detail || err?.message || "AI request failed");
-    } finally {
-      setAiLoading(false);
-    }
+  const handleAiSummary = () => {
+    onAskAiSummary?.({
+      id,
+      projectName,
+      location,
+    });
   };
 
   return (
@@ -120,17 +108,10 @@ const EstimateCard: React.FC<EstimateCardProps> = ({
         </Link>
         <button
           onClick={handleAiSummary}
-          disabled={aiLoading}
           className="px-4 py-2 bg-emerald-600 text-white text-xs md:text-sm rounded-lg hover:bg-emerald-700 transition disabled:opacity-60 "
         >
-          {aiLoading ? "Asking AI..." : "Ask AI for Summary"}
+          Ask AI for Summary
         </button>
-        {aiError && <p className="text-xs text-red-600">{aiError}</p>}
-        {aiStatus && (
-          <div className="text-xs md:text-sm text-gray-800 text-center dark:text-gray-100 bg-white/60 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 rounded p-3">
-            {aiStatus}
-          </div>
-        )}
       </div>
     </div>
   );

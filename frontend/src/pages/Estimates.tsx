@@ -11,9 +11,12 @@
 
 import Estimations from "../components/Estimates/Estimates";
 import { useEstimations } from "../hooks/Estimator/useEstimations";
+import { useOutletContext } from "react-router-dom";
+import type { DashboardOutletContext } from "../layouts/DashboardLayout";
 
 const Estimates = () => {
   const { estimates, loading, error } = useEstimations();
+  const { onAskEstimateSummary } = useOutletContext<DashboardOutletContext>();
 
   const mapped = estimates.map((e) => ({
     id: String(e.id),
@@ -25,10 +28,10 @@ const Estimates = () => {
   }));
 
   return (
-    <div className="p-4">
+      <div className="p-4">
       {loading && <div className="text-gray-500 text-sm mb-2">Loading estimates...</div>}
       {error && <div className="text-red-500 text-sm mb-2">{error}</div>}
-      <Estimations estimates={mapped} />
+      <Estimations estimates={mapped} onAskEstimateSummary={onAskEstimateSummary} />
     </div>
   );
 };

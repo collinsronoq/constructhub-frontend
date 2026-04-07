@@ -4,12 +4,52 @@ import NavBar from "../components/Navbar"
 import SideBar from "../components/SideBar"
 import AIAssistantPanel from "../components/AIAssistantPanel"
 
+export interface EstimateSummaryAction {
+  id: string;
+  projectName: string;
+  location: string;
+}
+
+interface PendingAiAction {
+  requestKey: string;
+  message: string;
+  statusText?: string;
+  context?: {
+    project_id?: string | null;
+    location?: string | null;
+  };
+  threadProjectId?: string | null;
+  threadTitle?: string | null;
+}
+
+export interface DashboardOutletContext {
+  onToggleOpenAI: () => void;
+  onAskEstimateSummary: (estimate: EstimateSummaryAction) => void;
+}
+
 
 const DashboardLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isAIOpen, setAIOpen] = useState(false);
   const [aiThreadId, setAiThreadId] = useState<string | null>(null);
+  const [pendingAiAction, setPendingAiAction] = useState<PendingAiAction | null>(null);
   const [isLogged] = useState(true);
+
+  const handleAskEstimateSummary = (estimate: EstimateSummaryAction) => {
+    const requestKey = `${estimate.id}:${Date.now()}:${Math.random().toString(36).slice(2, 8)}`;
+    setPendingAiAction({
+      requestKey,
+      message: `Summarize estimate "${estimate.projectName}" with the highest cost contributor, notable cost drivers, phase highlights, and practical construction-planning observations.`,
+      statusText: "Summarizing estimate...",
+      context: {
+        project_id: estimate.id,
+        location: estimate.location || null,
+      },
+      threadProjectId: estimate.id,
+      threadTitle: `AI for ${estimate.projectName}`,
+    });
+    setAIOpen(true);
+  };
 
   return (
     <div className="min-h-screen bg-background-light dark:bg-background-dark text-gray-900 dark:text-gray-100 flex flex-col">
@@ -36,7 +76,12 @@ const DashboardLayout = () => {
             isAIOpen ? "md:mr-96" : ""
           }`}
         >
-          <Outlet context={{ onToggleOpenAI: ()=> setAIOpen(prev => !prev) }}/>
+          <Outlet
+            context={{
+              onToggleOpenAI: () => setAIOpen((prev) => !prev),
+              onAskEstimateSummary: handleAskEstimateSummary,
+            } satisfies DashboardOutletContext}
+          />
         </main>
 
         {/*  AI ASSISTANT PANEL */}
@@ -46,6 +91,10 @@ const DashboardLayout = () => {
               onClose={() => setAIOpen(false)}
               persistedThreadId={aiThreadId}
               onThreadIdChange={setAiThreadId}
+              pendingAction={pendingAiAction}
+              onActionConsumed={(requestKey) =>
+                setPendingAiAction((prev) => (prev?.requestKey === requestKey ? null : prev))
+              }
             />
           </div>
         )}

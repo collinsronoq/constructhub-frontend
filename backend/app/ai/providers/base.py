@@ -10,6 +10,7 @@ class LLMProvider(ABC):
         system_prompt: str,
         messages: list[dict[str, Any]],
         tools: list[dict[str, Any]] | None = None,
+        num_predict: int | None = None,
     ) -> dict[str, Any]:
         """
         Return a dict that includes:

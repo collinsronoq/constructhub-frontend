@@ -12,6 +12,10 @@ def _uuid() -> str:
     return str(uuid.uuid4())
 
 
+def _now_utc() -> datetime:
+    return datetime.now(timezone.utc)
+
+
 class AIThread(Base):
     __tablename__ = "ai_threads"
 
@@ -22,8 +26,8 @@ class AIThread(Base):
     title: Mapped[str] = mapped_column(String(200), default="AI Assistant")
     is_archived: Mapped[bool] = mapped_column(Boolean, default=False)
 
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now(timezone.utc))
-    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now(timezone.utc))
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_now_utc)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=_now_utc)
     last_message_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
     messages = relationship("AIMessage", back_populates="thread", cascade="all, delete-orphan")
@@ -39,7 +43,7 @@ class AIMessage(Base):
     text: Mapped[str | None] = mapped_column(Text, nullable=True)
     structured_json: Mapped[dict | None] = mapped_column(SQLiteJSON, nullable=True)
 
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now(timezone.utc))
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_now_utc)
 
     thread = relationship("AIThread", back_populates="messages")
     tool_calls = relationship("AIToolCall", back_populates="message", cascade="all, delete-orphan")
@@ -58,7 +62,7 @@ class AIToolCall(Base):
     status: Mapped[str] = mapped_column(String(20), default="ok")  # ok|error
     latency_ms: Mapped[int | None] = mapped_column(Integer, nullable=True)
 
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now(timezone.utc))
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_now_utc)
 
     message = relationship("AIMessage", back_populates="tool_calls")
 
@@ -76,4 +80,4 @@ class AIFeedback(Base):
     tags: Mapped[list[str] | None] = mapped_column(SQLiteJSON, nullable=True)
     comment: Mapped[str | None] = mapped_column(Text, nullable=True)
 
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now(timezone.utc))
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_now_utc)

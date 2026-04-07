@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import desc, select
+from sqlalchemy import desc, literal_column, select
 import json
 
 from app.ai.schemas.schemas import (
@@ -156,13 +156,29 @@ async def get_messages(thread_id: str, limit: int = 50, db: AsyncSession = Depen
     if not q.scalars().first():
         raise HTTPException(status_code=404, detail="Thread not found")
 
-    latest_q = await db.execute(
-        select(AIMessage)
-        .where(AIMessage.thread_id == thread_id)
-        .order_by(desc(AIMessage.created_at))
-        .limit(limit)
-    )
-    latest_msgs = list(reversed(latest_q.scalars().all()))
+    bind_getter = getattr(db, "get_bind", None)
+    bind = bind_getter() if callable(bind_getter) else getattr(db, "bind", None)
+    dialect_name = getattr(getattr(bind, "dialect", None), "name", "")
+
+    if dialect_name == "sqlite":
+        # Existing SQLite rows may share identical created_at values.
+        # Use rowid to preserve true insert order for latest-window fetches.
+        latest_q = await db.execute(
+            select(AIMessage)
+            .where(AIMessage.thread_id == thread_id)
+            .order_by(desc(literal_column("ai_messages.rowid")))
+            .limit(limit)
+        )
+        latest_msgs = list(reversed(latest_q.scalars().all()))
+    else:
+        latest_q = await db.execute(
+            select(AIMessage)
+            .where(AIMessage.thread_id == thread_id)
+            .order_by(desc(AIMessage.created_at))
+            .limit(limit)
+        )
+        latest_msgs = list(reversed(latest_q.scalars().all()))
+
     out = _to_user_facing_messages(latest_msgs)
     return {"thread_id": thread_id, "messages": out}
 

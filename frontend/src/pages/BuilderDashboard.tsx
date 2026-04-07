@@ -9,6 +9,7 @@ import { useEstimations } from "../hooks/Estimator/useEstimations";
 import { useRecommendations } from "../hooks/useRecommendations";
 import { useArticles } from "../hooks/Articles/useArticles";
 import { useAuth } from "../hooks/auth/useAuth";
+import type { DashboardOutletContext } from "../layouts/DashboardLayout";
 
 
 
@@ -17,7 +18,7 @@ const BuilderDashboard = () => {
   const { vendors, technicians, loading: recLoading, error: recError } = useRecommendations();
   const { featuredArticles } = useArticles();
   const {user} = useAuth();
-  const { onToggleOpenAI } = useOutletContext<{ onToggleOpenAI: () => void }>();
+  const { onToggleOpenAI, onAskEstimateSummary } = useOutletContext<DashboardOutletContext>();
 
   const mappedEstimates = estimates.map((e) => ({
     id: String(e.id),
@@ -34,7 +35,12 @@ const BuilderDashboard = () => {
       <WelcomeSection onOpenChat={ onToggleOpenAI } builderName={user?.name}/>
 
       {/* Estimation Summary */}
-      <RecentEstimations estimates={mappedEstimates.slice(0,3)} loading={estLoading} error={estError} />
+      <RecentEstimations
+        estimates={mappedEstimates.slice(0,3)}
+        loading={estLoading}
+        error={estError}
+        onAskEstimateSummary={onAskEstimateSummary}
+      />
 
       {/* AI Assistant Overview */}
       <AIAssistantWidget onOpenChat={ onToggleOpenAI } />

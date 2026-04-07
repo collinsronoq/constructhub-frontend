@@ -5,7 +5,8 @@ import type { EstimateCardProps } from "./EstimateCard"
 
 
 interface EstimationSummaryProps {
-  estimates: EstimateCardProps[] 
+  estimates: EstimateCardProps[];
+  onAskEstimateSummary?: (estimate: { id: string; projectName: string; location: string }) => void;
   
 }
 
@@ -13,7 +14,7 @@ interface EstimationSummaryProps {
 
 
 
-const Estimations: React.FC<EstimationSummaryProps> = ({ estimates }) => {
+const Estimations: React.FC<EstimationSummaryProps> = ({ estimates, onAskEstimateSummary }) => {
   return (
     <section className="p-6 bg-surface-light dark:bg-surface-dark rounded-xl shadow-sm relative">
       {/* Header */}
@@ -27,7 +28,7 @@ const Estimations: React.FC<EstimationSummaryProps> = ({ estimates }) => {
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 pb-8">
         {estimates.length > 0 ? (
           estimates.map((estimate) => (
-            <EstimateCard key={estimate.id} {...estimate}/>
+            <EstimateCard key={estimate.id} {...estimate} onAskAiSummary={onAskEstimateSummary} />
           ))
         ) : (
           <div className="col-span-full text-center text-gray-500 dark:text-gray-400">

@@ -62,6 +62,8 @@ def _build_phase_insights(breakdown: list[dict[str, Any]], total_cost: float | N
         phase_name = phase.get("phase_name") or phase.get("phase") or "phase"
         totals = phase.get("totals") or {}
         phase_total = float(totals.get("phase_total") or 0)
+        if phase_total <= 0:
+            continue
         share = phase_total / total_cost if total_cost else 0
 
         materials = phase.get("materials") or []
@@ -94,6 +96,7 @@ def _build_phase_insights(breakdown: list[dict[str, Any]], total_cost: float | N
             }
         )
 
+    insights.sort(key=lambda item: float(item.get("share_of_total") or 0), reverse=True)
     return insights
 
 

@@ -18,6 +18,7 @@ class OpenAIProvider(LLMProvider):
         system_prompt: str,
         messages: list[dict[str, Any]],
         tools: list[dict[str, Any]] | None = None,
+        num_predict: int | None = None,
     ) -> dict[str, Any]:
         raise NotImplementedError(
             "OpenAIProvider is not active in the current runtime. "

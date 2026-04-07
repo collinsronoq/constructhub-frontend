@@ -6,11 +6,18 @@ import { useNavigate } from "react-router-dom";
 interface EstimationSummaryProps {
   estimates: EstimateCardProps[];
   onViewAll?: () => void;
+  onAskEstimateSummary?: (estimate: { id: string; projectName: string; location: string }) => void;
   loading?: boolean;
   error?: string | null;
 }
 
-const RecentEstimations: React.FC<EstimationSummaryProps> = ({ estimates, onViewAll, loading, error }) => {
+const RecentEstimations: React.FC<EstimationSummaryProps> = ({
+  estimates,
+  onViewAll,
+  onAskEstimateSummary,
+  loading,
+  error,
+}) => {
   const navigate = useNavigate();
 
   const handleViewAll = () => {
@@ -35,7 +42,9 @@ const RecentEstimations: React.FC<EstimationSummaryProps> = ({ estimates, onView
 
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 pb-8">
         {estimates.length > 0 ? (
-          estimates.map((estimate) => <EstimateCard key={estimate.id} {...estimate} />)
+          estimates.map((estimate) => (
+            <EstimateCard key={estimate.id} {...estimate} onAskAiSummary={onAskEstimateSummary} />
+          ))
         ) : (
           <div className="col-span-full text-center text-gray-500 dark:text-gray-400">
             No estimates yet. Start your first estimation!

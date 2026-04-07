@@ -9,6 +9,10 @@ import httpx
 
 from app.ai.config import OllamaConfig
 from app.ai.providers.base import LLMProvider
+from app.core.logging import setup_logger
+
+
+logger = setup_logger("ai.provider.ollama")
 
 
 class OllamaProvider(LLMProvider):
@@ -25,6 +29,7 @@ class OllamaProvider(LLMProvider):
         self.timeout = cfg.timeout
         self.num_predict = cfg.num_predict
         self._client = client
+        self._logged_runtime_config = False
 
     def _get_client(self) -> httpx.AsyncClient:
         if self._client is None:
@@ -38,6 +43,7 @@ class OllamaProvider(LLMProvider):
         system_prompt: str,
         messages: list[dict[str, Any]],
         tools: list[dict[str, Any]] | None = None,
+        num_predict: int | None = None,
     ) -> dict[str, Any]:
         """
         tools is unused at the HTTP level for Ollama in this implementation.
@@ -52,8 +58,21 @@ class OllamaProvider(LLMProvider):
             "stream": False,
             "options": {"temperature": self.temperature},
         }
-        if self.num_predict:
-            payload["options"]["num_predict"] = self.num_predict
+        effective_num_predict = num_predict if num_predict is not None else self.num_predict
+        if effective_num_predict:
+            payload["options"]["num_predict"] = effective_num_predict
+
+        if not self._logged_runtime_config:
+            logger.info(
+                "Ollama provider active",
+                extra={
+                    "model": self.model,
+                    "base_url": self.base_url,
+                    "temperature": self.temperature,
+                    "num_predict": effective_num_predict,
+                },
+            )
+            self._logged_runtime_config = True
 
         client = self._get_client()
         r = await client.post(f"{self.base_url}/api/chat", json=payload)
@@ -81,6 +100,7 @@ class OllamaProvider(LLMProvider):
         *,
         system_prompt: str,
         messages: list[dict[str, Any]],
+        num_predict: int | None = None,
     ) -> AsyncIterator[str]:
         """
         Stream assistant text deltas from Ollama /api/chat (NDJSON stream).
@@ -92,8 +112,21 @@ class OllamaProvider(LLMProvider):
             "stream": True,
             "options": {"temperature": self.temperature},
         }
-        if self.num_predict:
-            payload["options"]["num_predict"] = self.num_predict
+        effective_num_predict = num_predict if num_predict is not None else self.num_predict
+        if effective_num_predict:
+            payload["options"]["num_predict"] = effective_num_predict
+
+        if not self._logged_runtime_config:
+            logger.info(
+                "Ollama provider active",
+                extra={
+                    "model": self.model,
+                    "base_url": self.base_url,
+                    "temperature": self.temperature,
+                    "num_predict": effective_num_predict,
+                },
+            )
+            self._logged_runtime_config = True
 
         client = self._get_client()
         async with client.stream("POST", f"{self.base_url}/api/chat", json=payload) as response:

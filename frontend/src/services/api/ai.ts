@@ -43,6 +43,11 @@ export interface ChatResponse {
     completion_tokens?: number;
     total_tokens?: number;
   };
+  timing?: {
+    first_chunk_ms?: number;
+    total_ms?: number;
+    grounded_total_ms?: number;
+  };
 }
 
 export interface ThreadMessage {
@@ -62,6 +67,7 @@ export interface ChatStreamHandlers {
   onChunk?: (delta: string) => void;
   onDone?: (response: ChatResponse & { mode?: string }) => void;
   onFallback?: (mode: string) => void;
+  onStatus?: (message: string, mode?: string) => void;
   onError?: (detail: string) => void;
 }
 
@@ -118,6 +124,8 @@ export async function chatStream(payload: ChatRequest, handlers: ChatStreamHandl
 
     if (currentEvent === "chunk") {
       handlers.onChunk?.(parsed?.delta || "");
+    } else if (currentEvent === "status") {
+      handlers.onStatus?.(parsed?.message || "Thinking...", parsed?.mode);
     } else if (currentEvent === "fallback") {
       handlers.onFallback?.(parsed?.mode || "non_stream_tool");
     } else if (currentEvent === "done") {

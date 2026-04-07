@@ -59,13 +59,13 @@ class _FakeProvider:
         self.calls = []
         self.stream_calls = []
 
-    async def generate(self, *, system_prompt, messages, tools=None):
+    async def generate(self, *, system_prompt, messages, tools=None, num_predict=None):
         self.calls.append({"system_prompt": system_prompt, "messages": messages, "tools": tools})
         if not self.responses:
             raise AssertionError("Provider called more times than expected")
         return self.responses.pop(0)
 
-    async def stream_generate(self, *, system_prompt, messages):
+    async def stream_generate(self, *, system_prompt, messages, num_predict=None):
         self.stream_calls.append({"system_prompt": system_prompt, "messages": messages})
         for chunk in self.stream_chunks:
             yield chunk
@@ -120,11 +120,7 @@ class ServiceOllamaTests(unittest.IsolatedAsyncioTestCase):
                 {
                     "assistant_text": '{"type":"tool_call","tool_name":"rough_cost_estimate","args":{"bedrooms":3}}',
                     "usage": {},
-                },
-                {
-                    "assistant_text": '{"type":"final","text":"Estimated total is about KES 100.","confidence":0.8,"citations":[],"cards":[],"next_actions":[]}',
-                    "usage": {},
-                },
+                }
             ]
         )
         saved_messages = []
@@ -157,8 +153,8 @@ class ServiceOllamaTests(unittest.IsolatedAsyncioTestCase):
 
         assistant_entries = [m for m in saved_messages if m.role == "assistant"]
         self.assertEqual(len(assistant_entries), 1)
-        self.assertEqual(assistant_entries[0].text, "Estimated total is about KES 100.")
-        self.assertEqual(assistant_payload.text, "Estimated total is about KES 100.")
+        self.assertIn("rough cost range", assistant_entries[0].text.lower())
+        self.assertIn("kes 100", assistant_payload.text.lower())
         self.assertTrue(all(not ((m.text or "").strip().startswith("{")) for m in assistant_entries))
 
         tool_entries = [m for m in saved_messages if m.role == "tool"]
@@ -299,19 +295,11 @@ class ServiceOllamaTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(assistant_payload.text, "Recovered response.")
         self.assertEqual(len(provider.calls), 2)
 
-    async def test_repeated_tool_call_is_guarded_and_stops(self):
+    async def test_grounded_tool_result_is_synthesized_without_second_llm_call(self):
         thread = SimpleNamespace(id="thread-4b", user_id=1, project_id="thread-project-123", last_message_at=None, updated_at=None)
         db = _FakeDB(thread)
         provider = _FakeProvider(
             [
-                {
-                    "assistant_text": '{"type":"tool_call","tool_name":"get_estimate_summary","args":{"project_id":"thread-project-123"}}',
-                    "usage": {},
-                },
-                {
-                    "assistant_text": '{"type":"tool_call","tool_name":"get_estimate_summary","args":{"project_id":"thread-project-123"}}',
-                    "usage": {},
-                },
                 {
                     "assistant_text": '{"type":"tool_call","tool_name":"get_estimate_summary","args":{"project_id":"thread-project-123"}}',
                     "usage": {},
@@ -347,8 +335,9 @@ class ServiceOllamaTests(unittest.IsolatedAsyncioTestCase):
                 db, user_id=1, payload=ChatRequest(thread_id="thread-4b", message="Summarize my estimate")
             )
 
-        self.assertIn("could not finalize the grounded answer", assistant_payload.text.lower())
+        self.assertIn("estimate summary", assistant_payload.text.lower())
         self.assertEqual(run_tool_mock.await_count, 1)
+        self.assertEqual(len(provider.calls), 1)
 
     async def test_stream_chat_events_falls_back_to_non_stream_for_grounded_requests(self):
         thread = SimpleNamespace(id="thread-5", user_id=1, project_id="proj-1", last_message_at=None, updated_at=None)
@@ -370,10 +359,13 @@ class ServiceOllamaTests(unittest.IsolatedAsyncioTestCase):
             async for evt in service_ollama.stream_chat_events(db, user_id=1, payload=payload):
                 events.append(evt)
 
+        self.assertTrue(any(e.get("event") == "status" for e in events))
         self.assertTrue(any(e.get("event") == "fallback" for e in events))
         done = [e for e in events if e.get("event") == "done"]
         self.assertEqual(len(done), 1)
         self.assertEqual(done[0]["data"].get("mode"), "non_stream_tool")
+        self.assertIn("timing", done[0]["data"])
+        self.assertIn("grounded_total_ms", done[0]["data"]["timing"])
 
     async def test_stream_chat_events_emits_chunks_for_non_grounded_requests(self):
         thread = SimpleNamespace(id="thread-6", user_id=1, project_id=None, last_message_at=None, updated_at=None)
@@ -411,6 +403,8 @@ class ServiceOllamaTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(done), 1)
         self.assertEqual(done[0]["data"].get("mode"), "stream_text")
         self.assertEqual(done[0]["data"]["assistant"]["text"], "Hello")
+        self.assertIn("timing", done[0]["data"])
+        self.assertIn("total_ms", done[0]["data"]["timing"])
 
     async def test_stream_chat_events_general_question_still_streams_with_thread_project(self):
         thread = SimpleNamespace(id="thread-7", user_id=1, project_id="proj-1", last_message_at=None, updated_at=None)
@@ -459,6 +453,74 @@ class ServiceOllamaTests(unittest.IsolatedAsyncioTestCase):
         thread = SimpleNamespace(project_id="proj-9")
         payload = ChatRequest(thread_id="thread-9", message="What is plaster ratio?")
         self.assertFalse(service_ollama._requires_grounded_tool(payload, thread))
+
+    def test_tool_synthesis_surfaces_material_price_and_vendor(self):
+        synthesized = service_ollama._synthesize_tool_result(
+            "search_material_listings",
+            {"material": "cement", "location": "Nairobi"},
+            {
+                "query": {"material": "cement", "location": "Nairobi"},
+                "results": [
+                    {
+                        "id": "item-1",
+                        "name": "Cement 50kg",
+                        "price": 780,
+                        "unit": "bag",
+                        "vendor": {"id": "vendor-1", "name": "BuildMart", "location": "Nairobi"},
+                    }
+                ],
+            },
+        )
+
+        self.assertIsNotNone(synthesized)
+        self.assertIn("cement 50kg", synthesized.text.lower())
+        self.assertIn("kes 780", synthesized.text.lower())
+        self.assertTrue(any(c.id == "vendor-1" for c in synthesized.citations))
+
+    def test_estimate_summary_synthesis_hides_internal_id_and_adds_interpretation(self):
+        estimate_id = "16e1d353-1ca0-4966-af48-cf41ef925632"
+        synthesized = service_ollama._synthesize_tool_result(
+            "get_estimate_summary",
+            {"project_id": estimate_id},
+            {
+                "estimate_id": estimate_id,
+                "summary": {
+                    "total_cost": 6657781.0,
+                    "material_cost": 5163528.0,
+                    "labour_cost": 618301.0,
+                    "other_cost": 875952.0,
+                    "phases_count": 9,
+                },
+                "project_details": {"project_name": "Bungalow Home", "location": "Nakuru"},
+                "phase_insights": [
+                    {
+                        "phase": "finishes",
+                        "share_of_total": 0.35,
+                        "note": "Finishes dominate cost and should be reviewed item by item.",
+                        "top_materials": [{"name": "Main Floor Finish", "total": 562500.0}],
+                        "top_labour": [{"name": "Tiler", "total": 30000.0}],
+                    },
+                    {
+                        "phase": "external_works",
+                        "share_of_total": 0.17,
+                        "note": "External works are meaningful due to walling and concrete.",
+                        "top_materials": [{"name": "Wall Blocks", "total": 245980.0}],
+                        "top_labour": [{"name": "Mason (Wall)", "total": 30000.0}],
+                    },
+                ],
+            },
+        )
+
+        self.assertIsNotNone(synthesized)
+        self.assertNotIn(estimate_id, synthesized.text)
+        self.assertIn("estimate summary", synthesized.text.lower())
+        self.assertIn("what stands out", synthesized.text.lower())
+        self.assertIn("planning notes", synthesized.text.lower())
+        self.assertIn("limitation note", synthesized.text.lower())
+        self.assertIn("kes 6,657,781", synthesized.text.lower())
+        self.assertTrue(any(c.id == "Current project estimate data" for c in synthesized.citations))
+        self.assertTrue(any("Review full estimate" == a.label for a in synthesized.next_actions))
+        self.assertTrue(any("Inspect cost breakdown" == a.label for a in synthesized.next_actions))
 
 
 if __name__ == "__main__":
