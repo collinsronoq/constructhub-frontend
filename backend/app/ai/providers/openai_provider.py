@@ -9,7 +9,7 @@ from app.ai.providers.base import LLMProvider
 class OpenAIProvider(LLMProvider):
     """
     Legacy placeholder kept for future migration work.
-    OpenAI is not an active runtime provider in the current Ollama-first path.
+    OpenAI is not an active runtime provider, get money first then i will subscribe
     """
 
     async def generate(

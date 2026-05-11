@@ -1,4 +1,5 @@
 export type UserRole = "builder" | "vendor" | "technician" | "admin";
+export type TechnicianAvailability = "Available" | "Busy" | "Away";
 
 export interface User {
   id: number;
@@ -62,7 +63,7 @@ export interface TechnicianProfile {
   profile_image_url?: string | null;
   contact?: { phone?: string; email?: string } | null;
   verified: boolean;
-  availability?: string | null;
+  availability?: TechnicianAvailability | null;
   average_rating: number;
 }
 
@@ -76,7 +77,7 @@ export interface TechnicianProfileCreate {
   short_description?: string | null;
   profile_image_url?: string | null;
   contact?: { phone?: string; email?: string } | null;
-  availability?: string | null;
+  availability?: TechnicianAvailability | null;
 }
 
 export interface TechnicianProfileUpdate extends Partial<TechnicianProfileCreate> {}

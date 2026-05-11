@@ -46,6 +46,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           <Route path="/admin/articles" element={<AdminArticlesPage />} />
           <Route path="/vendor/profile" element={<VendorProfile />} />
           <Route path="/technician/profile" element = {<TechnicianProfile />} />
+          <Route path="/technicians/:technicianId/profile" element={<TechnicianProfile />} />
           
           {/* <Route path="/settings" element={<div>Settings Page</div>} /> */}
         </Route>

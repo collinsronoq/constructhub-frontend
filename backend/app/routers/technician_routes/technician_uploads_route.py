@@ -5,17 +5,14 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
-from app.auth.dependencies import get_current_user, role_required
+from app.auth.dependencies import role_required
 from app.models.technician import TechnicianProfile
 from app.models.user import User
-from app.schemas.media_schema import ImageUploadResponse
-from app.schemas.media_schema import CertificationUploadResponse
-from app.schemas.technician_schema import TechnicianCertificationResponse
-from app.schemas.technician_certification_schema import (
-    TechnicianCertificationCreate,
+from app.schemas.media_schema import CertificationUploadResponse, ImageUploadResponse
+from app.schemas.technician_schema import (
     TechnicianCertificationResponse,
+    TechnicianCertificationUpdate,
 )
-from app.schemas.technician_schema import TechnicianCertificationUpdate
 from app.models.technician_certification import TechnicianCertification
 
 from app.utils.file_upload import (
@@ -133,7 +130,8 @@ async def upload_certification(
         ) from exc
 
 
-@router.patch("/{cert_id}", response_model=TechnicianCertificationResponse)
+@router.patch("/certifications/{cert_id}", response_model=TechnicianCertificationResponse)
+@router.patch("/{cert_id}", response_model=TechnicianCertificationResponse, include_in_schema=False)
 async def update_certification(
     cert_id: int,
     payload: TechnicianCertificationUpdate,
@@ -175,7 +173,8 @@ async def update_certification(
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Unexpected error") from exc
 
 
-@router.delete("/{cert_id}", status_code=204)
+@router.delete("/certifications/{cert_id}", status_code=204)
+@router.delete("/{cert_id}", status_code=204, include_in_schema=False)
 async def delete_certification(
     cert_id: int,
     db: AsyncSession = Depends(get_db),

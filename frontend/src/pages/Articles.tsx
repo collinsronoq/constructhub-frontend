@@ -32,12 +32,12 @@ const ArticlesPage: React.FC = () => {
   }, [articles, category, sortBy]);
 
   return (
-    <section className="p-6 bg-surface-light dark:bg-surface-dark rounded-xl shadow-sm my-2 space-y-6">
+    <section className="p-2 md:p-6 bg-surface-light dark:bg-surface-dark rounded-xl shadow-sm my-2 space-y-6">
       <div className="bg-background-light dark:bg-background-dark p-6 rounded-xl">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h2 className="text-xl md:text-4xl font-semibold text-gray-900 dark:text-gray-100">Learning Tips & Articles</h2>
-            <p className="text-md md:text-4xl text-gray-600 dark:text-gray-400 mt-2">Practical construction articles to guide you in your projects.</p>
+            <h2 className="text-lg md:text-4xl font-semibold text-gray-900 dark:text-gray-100">Learning Tips & Articles</h2>
+            <p className="text-base md:text-4xl text-gray-600 dark:text-gray-400 mt-2">Practical construction articles to guide you in your projects.</p>
           </div>
           {user?.role === "admin" && (
             <button
@@ -56,7 +56,7 @@ const ArticlesPage: React.FC = () => {
         {/* Featured */}
         {featuredArticles.length > 0 && (
           <div className="mt-6">
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">Featured Articles</h3>
+            <h3 className="text-base md:text-lg font-semibold text-gray-800 dark:text-gray-200">Featured Articles</h3>
             <span className="pb-2"><FeaturedArticlesCarousel items={featuredArticles} /></span>
             
           </div>

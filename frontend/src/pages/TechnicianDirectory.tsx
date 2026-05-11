@@ -21,19 +21,22 @@ const TechnicianDirectory: React.FC = () => {
   /** 🧠 Filter and search technicians */
   const filteredTechnicians = useMemo(() => {
     return technicians.filter((tech) => {
+      const specialization = (tech.specialization || "").toLowerCase();
+      const skills = tech.skills || [];
+      const location = (tech.location || "").toLowerCase();
+      const search = searchQuery.toLowerCase();
+
       const matchesSearch =
-        tech.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        tech.specialization.toLowerCase().includes(searchQuery.toLowerCase());
+        tech.name.toLowerCase().includes(search) ||
+        specialization.includes(search);
 
       const matchesSkill =
         selectedSkill === "All" ||
-        tech.skills.some((s) =>
-          s.toLowerCase().includes(selectedSkill.toLowerCase())
-        );
+        skills.some((s) => s.toLowerCase().includes(selectedSkill.toLowerCase()));
 
       const matchesLocation =
         selectedLocation === "All" ||
-        tech.location.toLowerCase().includes(selectedLocation.toLowerCase());
+        location.includes(selectedLocation.toLowerCase());
 
       const matchesVerification = !showVerifiedOnly || tech.verified;
 
@@ -41,9 +44,8 @@ const TechnicianDirectory: React.FC = () => {
     });
   }, [technicians, searchQuery, selectedSkill, selectedLocation, showVerifiedOnly]);
   
-  const handleViewProfile = (id: string) => {
-    // navigate to profile (pass id via state or param as your routes expect)
-    navigate("/technician/profile", { state: { id } });
+  const handleViewProfile = (id: string | number) => {
+    navigate(`/technicians/${Number(id)}/profile`);
   };
 
   return (
@@ -86,7 +88,19 @@ const TechnicianDirectory: React.FC = () => {
       {!loading && filteredTechnicians.length > 0 ? (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {filteredTechnicians.map((tech) => (
-            <TechnicianCard key={tech.id} {...tech} onViewProfile={handleViewProfile}/>
+            <TechnicianCard
+              key={tech.id}
+              id={tech.id}
+              name={tech.name}
+              specialization={tech.specialization || "General Technician"}
+              location={tech.location || "Location not provided"}
+              experience="Not provided"
+              rating={tech.rating ?? 0}
+              verified={tech.verified}
+              imageUrl={tech.profile_image_url || undefined}
+              contact={undefined}
+              onViewProfile={handleViewProfile}
+            />
           ))}
         </div>
       ) : (

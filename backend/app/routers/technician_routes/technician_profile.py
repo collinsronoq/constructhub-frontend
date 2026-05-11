@@ -11,6 +11,7 @@ from app.schemas.technician_schema import (
     TechnicianProfilePublic,
     TechnicianVerificationRequest,
 )
+from app.schemas.enums import Availability
 from app.auth.dependencies import get_current_user, role_required
 from app.models.user import User
 from app.core.logging import setup_logger
@@ -44,7 +45,7 @@ async def create_profile(
             short_description=payload.short_description,
             contact=payload.contact.model_dump() if payload.contact else None,
             profile_image_url=payload.profile_image_url,
-            availability="Available"
+            availability=(payload.availability.value if payload.availability else Availability.available.value),
         )
 
         db.add(profile)
@@ -77,6 +78,8 @@ async def update_profile(
             raise HTTPException(status_code=404, detail="Profile not found")
 
         for field, value in payload.model_dump(exclude_unset=True).items():
+            if field == "availability" and isinstance(value, Availability):
+                value = value.value
             setattr(profile, field, value)
 
         await db.commit()

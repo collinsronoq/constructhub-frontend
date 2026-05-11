@@ -2,16 +2,16 @@ import React from "react";
 
 
 export interface TechnicianCardProps {
-  id: string;
+  id: string | number;
   name: string;
   specialization: string;
   location: string;
-  experience: string;
+  experience?: string;
   rating: number;
-  contact: string;
+  contact?: string;
   verified: boolean;
   imageUrl?: string;
-  onViewProfile?: (id: string) => void;
+  onViewProfile?: (id: string | number) => void;
 }
 
 const TechnicianCard: React.FC<TechnicianCardProps> = ({
@@ -26,6 +26,9 @@ const TechnicianCard: React.FC<TechnicianCardProps> = ({
   imageUrl,
   onViewProfile,
 }) => {
+  const experienceText = experience || "Not provided";
+  const contactText = contact || "Not provided";
+
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-transform relative transform hover:scale-[1.02] flex flex-col justify-between overflow-hidden">
       {/* verification badge */}
@@ -70,9 +73,9 @@ const TechnicianCard: React.FC<TechnicianCardProps> = ({
         {/* Details */}
         <div className="text-xs md:text-sm space-y-2 text-gray-600 dark:text-gray-300">
           <p>📍 Location: <span className="font-medium">{location}</span></p>
-          <p>🧰 Experience: <span className="font-medium">{experience}</span></p>
+          <p>🧰 Experience: <span className="font-medium">{experienceText}</span></p>
           <p>⭐ Rating: <span className="font-medium">{rating.toFixed(1)}</span></p>
-          <p>☎ Contact: <span className="font-medium">{contact}</span></p>
+          <p>☎ Contact: <span className="font-medium">{contactText}</span></p>
         </div>
       </div>
 

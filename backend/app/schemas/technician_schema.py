@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Field, ConfigDict, EmailStr
-from typing import List, Optional, Dict
-from datetime import datetime
+from typing import List, Optional
+
+from app.schemas.enums import Availability
 
 
 
@@ -21,6 +22,7 @@ class TechnicianProfileCreate(BaseModel):
     years_experience: Optional[int] = None
     bio: Optional[str] = None
     short_description: Optional[str] = None
+    availability: Optional[Availability] = Availability.available
     contact: Optional[TechnicianContact] = None   # {"phone": "...", "email": "..."}
     profile_image_url: Optional[str] = None
 
@@ -37,7 +39,7 @@ class TechnicianProfileUpdate(BaseModel):
     years_experience: Optional[int] = None
     bio: Optional[str] = None
     short_description: Optional[str] = None
-    availability: Optional[str] = None
+    availability: Optional[Availability] = None
     contact: Optional[TechnicianContact] = None
     profile_image_url: Optional[str] = None
 
@@ -46,15 +48,19 @@ class TechnicianProfileUpdate(BaseModel):
 
 class TechnicianProfilePublic(BaseModel):
     id: int
+    user_id: int
     name: str
+    location: Optional[str]
     specialization: Optional[str]
     skills: Optional[List[str]]
     years_experience: Optional[int]
-    location: Optional[str]
+    bio: Optional[str]
+    short_description: Optional[str]
     profile_image_url: Optional[str]
+    contact: Optional[TechnicianContact] = None
     verified: bool
+    availability: Optional[Availability]
     average_rating: float
-    availability: Optional[str]
 
     class Config:
         from_attributes = True
@@ -75,7 +81,7 @@ class TechnicianProfileResponse(BaseModel):
     profile_image_url: Optional[str]
     contact: Optional[TechnicianContact] = None
     verified: bool
-    availability: Optional[str]
+    availability: Optional[Availability]
     average_rating: float
 
     class Config:

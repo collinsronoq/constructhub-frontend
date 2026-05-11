@@ -68,8 +68,9 @@ export async function apiFetch<T>(path: string, options: RequestOptions = {}): P
     error.status = res.status;
     error.detail = detail;
 
-    // If unauthorized/expired, clear token and redirect to login
-    if (auth && (res.status === 401 || res.status === 403)) {
+    // If unauthorized/expired, clear token and redirect to login.
+    // Do not log out on 403; that can be a valid role/permission response.
+    if (auth && res.status === 401) {
       const path = window.location.pathname;
       const onAuthPage = path.startsWith("/login") || path.startsWith("/signup");
       setAccessToken(null);

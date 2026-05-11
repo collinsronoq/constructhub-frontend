@@ -27,7 +27,7 @@ const ArticleFilters: React.FC<Props> = ({ category, onCategoryChange, sortBy, o
   const sorts = ["Most Recent", "Most Popular", "Alphabetical"];
   return (
     <div className="flex flex-wrap gap-3 items-center">
-      <select value={category} onChange={(e) => onCategoryChange(e.target.value)} className="px-3 py-2 border rounded-lg bg-white dark:bg-gray-900">
+      <select value={category} onChange={(e) => onCategoryChange(e.target.value)} className="px-3 py-2 text-sm md:text-base min-w-10 border rounded-lg bg-white dark:bg-gray-900">
         <option value="All">All Categories</option>
         {categories.map((c) => (
           <option key={c} value={c}>
@@ -36,9 +36,9 @@ const ArticleFilters: React.FC<Props> = ({ category, onCategoryChange, sortBy, o
         ))}
       </select>
 
-      <select value={sortBy} onChange={(e) => onSortChange(e.target.value)} className="px-3 py-2 border rounded-lg bg-white dark:bg-gray-900">
+      <select value={sortBy} onChange={(e) => onSortChange(e.target.value)} className="px-3 py-2 text-sm md:text-base border rounded-lg bg-white dark:bg-gray-900">
         {sorts.map((s) => (
-          <option key={s} value={s}>
+          <option key={s} value={s} text-sm md:text-base>
             {s}
           </option>
         ))}

@@ -11,8 +11,6 @@ interface NavBarProps{
 const NavBar = ({ sidebarOpen, setSidebarOpen, isLogged }: NavBarProps) => {
   const [isDark, setIsDark ] = useState<boolean>(false);
 
-  
-
   useEffect(() => {
     setIsDark(document.documentElement.classList.toggle("dark"));
   }, []);
@@ -22,7 +20,6 @@ const NavBar = ({ sidebarOpen, setSidebarOpen, isLogged }: NavBarProps) => {
     setIsDark(!isDark)
   }
 
-  
   
   return(
     

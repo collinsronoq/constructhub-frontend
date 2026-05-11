@@ -1,5 +1,6 @@
 import React from "react";
 import { Edit, Plus, Phone, Mail } from "lucide-react";
+import type { TechnicianAvailability } from "../../services/api/types";
 
 interface TechnicianHeaderProps {
   name: string;
@@ -10,12 +11,12 @@ interface TechnicianHeaderProps {
   contact?: string;
   email?: string;
   verified?: boolean;
-  availability?: string;
+  availability?: TechnicianAvailability;
   imageUrl?: string;
   isTechnicianView?: boolean; // true if logged-in user is the technician
   onEditProfile?: () => void;
   onVerify?: () => void;
-  onChangeAvailability?: (status: string) => void;
+  onChangeAvailability?: (status: TechnicianAvailability) => void;
   onUploadImage?: () => void;
 }
 
@@ -140,7 +141,7 @@ const TechnicianHeader: React.FC<TechnicianHeaderProps> = ({
                 <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Availability</label>
                 <select
                   value={availability}
-                  onChange={(e) => onChangeAvailability?.(e.target.value)}
+                  onChange={(e) => onChangeAvailability?.(e.target.value as TechnicianAvailability)}
                   className="w-full rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option>Available</option>
@@ -166,4 +167,3 @@ const TechnicianHeader: React.FC<TechnicianHeaderProps> = ({
 };
 
 export default TechnicianHeader;
-

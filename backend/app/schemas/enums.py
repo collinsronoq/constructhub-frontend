@@ -8,6 +8,6 @@ class UserRole(str, Enum):
     admin = "admin"
 
 class Availability(str, Enum):
-    open = "Open"
-    closed = "Closed"
-    by_appointment = "By Appointment"
+    available = "Available"
+    busy = "Busy"
+    away = "Away"

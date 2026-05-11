@@ -18,7 +18,7 @@ const VendorDirectory: React.FC = () => {
   const [showVerifiedOnly, setShowVerifiedOnly] = useState(false);
 
   const handleViewVendor = (vendorId: string) => {
-    navigate("/vendor/profile", { state: { id: vendorId } });
+    navigate(`/vendors/${Number(vendorId)}/profile`);
   };
 
   const filteredVendors = useMemo(() => {

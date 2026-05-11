@@ -20,6 +20,18 @@ import {
   Paintbrush,
   ShieldCheck,
 } from "lucide-react";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 
 import type { EstimationBreakdown } from "../../hooks/Estimator/types";
 import { getPhaseDescription } from "./phaseDescriptions";
@@ -53,6 +65,13 @@ function isNonEmptyObject(value: Record<string, unknown>): boolean {
 function formatItemCount(count: number): string {
   return `${count} ${count === 1 ? "item" : "items"}`;
 }
+
+function formatPercentage(value: number, total: number): string {
+  if (!total) return "0.0%";
+  return `${((value / total) * 100).toFixed(1)}%`;
+}
+
+const contributorPalette = ["#2563eb", "#10b981", "#f59e0b", "#64748b"];
 
 function EmptyState({ label }: { label: string }) {
   return <div className="text-xs text-gray-500 dark:text-gray-400">{label}</div>;
@@ -146,6 +165,54 @@ export default function EstimatorBreakdown({ data, onBackToSummary }: BreakdownP
     }),
     []
   );
+
+  const contributorTotals = useMemo(() => {
+    const derivedTotals = data.phases.reduce(
+      (acc, phase) => ({
+        materials: acc.materials + phase.totals.materials,
+        labour: acc.labour + phase.totals.labour,
+        equipment: acc.equipment + phase.totals.equipment,
+        other: acc.other + phase.totals.other,
+        total: acc.total + phase.subtotal,
+      }),
+      { materials: 0, labour: 0, equipment: 0, other: 0, total: 0 }
+    );
+
+    const materials = data.materialCost || derivedTotals.materials;
+    const labour = data.labourCost || derivedTotals.labour;
+    const equipment = data.equipmentCost || derivedTotals.equipment;
+    const other = data.otherCost || derivedTotals.other;
+    const total =
+      data.totalCost || (materials + labour + equipment + other) || derivedTotals.total;
+
+    return { materials, labour, equipment, other, total };
+  }, [data]);
+
+  const costCompositionData = useMemo(
+    () =>
+      [
+        { name: "Materials", value: contributorTotals.materials },
+        { name: "Labour", value: contributorTotals.labour },
+        { name: "Equipment", value: contributorTotals.equipment },
+        { name: "Others", value: contributorTotals.other },
+      ]
+        .filter((entry) => entry.value > 0)
+        .map((entry, index) => ({ ...entry, color: contributorPalette[index % contributorPalette.length] })),
+    [contributorTotals]
+  );
+
+  const phaseTotalsData = useMemo(
+    () =>
+      data.phases
+        .map((phase) => ({
+          name: phase.phaseName,
+          total: phase.subtotal,
+        }))
+        .filter((entry) => entry.total > 0),
+    [data.phases]
+  );
+
+  const phaseChartHeight = Math.max(280, phaseTotalsData.length * 44);
 
   const onTogglePhase = (id: string) => {
     setExpandedPhases((prev) =>
@@ -242,6 +309,115 @@ export default function EstimatorBreakdown({ data, onBackToSummary }: BreakdownP
             {formatCurrency(data.otherCost)}
           </div>
         </div>
+      </div>
+
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+        <section className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Cost Composition</h3>
+            <span className="text-xs text-gray-500 dark:text-gray-400">
+              {formatCurrency(contributorTotals.total)}
+            </span>
+          </div>
+
+          {costCompositionData.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={costCompositionData}
+                      dataKey="value"
+                      nameKey="name"
+                      innerRadius={58}
+                      outerRadius={90}
+                      paddingAngle={2}
+                    >
+                      {costCompositionData.map((entry) => (
+                        <Cell key={entry.name} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      formatter={(value: number | string) => formatCurrency(Number(value))}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+
+              <ul className="space-y-2">
+                {costCompositionData.map((entry) => (
+                  <li
+                    key={entry.name}
+                    className="flex items-center justify-between gap-3 rounded border border-gray-200 dark:border-gray-700 px-3 py-2"
+                  >
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span
+                        className="inline-block h-2.5 w-2.5 rounded-full shrink-0"
+                        style={{ backgroundColor: entry.color }}
+                      />
+                      <span className="text-xs text-gray-700 dark:text-gray-300">{entry.name}</span>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-xs font-semibold text-gray-900 dark:text-gray-100">
+                        {formatCurrency(entry.value)}
+                      </div>
+                      <div className="text-[11px] text-gray-500 dark:text-gray-400">
+                        {formatPercentage(entry.value, contributorTotals.total)}
+                      </div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : (
+            <EmptyState label="No contributor totals available for charting." />
+          )}
+        </section>
+
+        <section className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+              Phase Cost Breakdown
+            </h3>
+            <span className="text-xs text-gray-500 dark:text-gray-400">
+              {formatItemCount(phaseTotalsData.length)}
+            </span>
+          </div>
+
+          {phaseTotalsData.length > 0 ? (
+            <div style={{ height: phaseChartHeight }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  layout="vertical"
+                  data={phaseTotalsData}
+                  margin={{ top: 8, right: 16, left: 8, bottom: 8 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.2} />
+                  <XAxis
+                    type="number"
+                    tickFormatter={(value) => `KSh ${Number(value).toLocaleString()}`}
+                    className="text-xs"
+                  />
+                  <YAxis
+                    type="category"
+                    dataKey="name"
+                    width={120}
+                    className="text-xs"
+                    tickFormatter={(value) =>
+                      String(value).length > 20 ? `${String(value).slice(0, 20)}...` : String(value)
+                    }
+                  />
+                  <Tooltip
+                    formatter={(value: number | string) => formatCurrency(Number(value))}
+                  />
+                  <Bar dataKey="total" fill="#2563eb" radius={[0, 6, 6, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          ) : (
+            <EmptyState label="No phase totals available for charting." />
+          )}
+        </section>
       </div>
 
       <div className="space-y-4">

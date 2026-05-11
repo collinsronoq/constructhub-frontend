@@ -10,24 +10,40 @@ import { useTechnicianCertifications } from "../hooks/Technician/useTechnicianCe
 import { uploadTechnicianProfileImage } from "../services/api/technicianUploads";
 import { useTechnicianReviews } from "../hooks/Technician/useTechnicianReviews";
 import { useLocation, useParams } from "react-router-dom";
+import type { TechnicianAvailability } from "../services/api/types";
+
+type TechnicianFormState = {
+  name: string;
+  specialization: string;
+  location: string;
+  years_experience: string;
+  bio: string;
+  short_description: string;
+  skills: string;
+  phone: string;
+  email: string;
+  availability: TechnicianAvailability;
+};
 
 const TechnicianProfile = () => {
   const { user } = useAuth();
   const userId = user?.id;
+  const isTechnicianUser = user?.role === "technician";
   const location = useLocation() as any;
   const { technicianId: technicianIdParam } = useParams();
   const viewProfileId = technicianIdParam ? Number(technicianIdParam) : location.state?.id;
+  const ownerUserId = isTechnicianUser && !viewProfileId ? userId : undefined;
 
-  const { profile, loading, error, createProfile, updateProfile, refresh } = useTechnicianProfile(userId, viewProfileId);
+  const { profile, loading, error, createProfile, updateProfile, refresh } = useTechnicianProfile(ownerUserId, viewProfileId);
   const { certs, updateCertification, deleteCertification, loading: certLoading } =
-    useTechnicianCertifications(userId);
+    useTechnicianCertifications(ownerUserId);
   const { reviews } = useTechnicianReviews(viewProfileId || userId);
 
   const [isVerifyModalOpen, setIsVerifyModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   // form state
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<TechnicianFormState>({
     name: "",
     specialization: "",
     location: "",
@@ -99,6 +115,10 @@ const TechnicianProfile = () => {
     return <div className="p-6">Please log in to view profiles.</div>;
   }
 
+  if (!viewProfileId && !isTechnicianUser) {
+    return <div className="p-6">Open a technician profile from the directory to view details.</div>;
+  }
+
   return (
     <section className="p-6 bg-surface-light dark:bg-surface-dark rounded-xl shadow-md space-y-6">
       {loading && <p>Loading profile...</p>}
@@ -117,7 +137,7 @@ const TechnicianProfile = () => {
           email={emailText || undefined}
           verified={profile.verified}
           imageUrl={profile.profile_image_url || undefined}
-          isTechnicianView
+          isTechnicianView={isOwner}
           onChangeAvailability={async (status) => {
             await updateProfile({ availability: status });
             await refresh();
@@ -128,7 +148,7 @@ const TechnicianProfile = () => {
       )}
 
       {/* Quick actions */}
-      <div className="flex flex-wrap gap-3 items-center">
+      {isOwner && <div className="flex flex-wrap gap-3 items-center">
         <button
           onClick={() => setIsEditModalOpen(true)}
           className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium"
@@ -151,7 +171,7 @@ const TechnicianProfile = () => {
             if (file) handleProfileImageUpload(file);
           }}
         />
-      </div>
+      </div>}
 
       {/* Verification prompt (owner only) */}
       {profile && !profile.verified && isOwner && (
@@ -289,7 +309,9 @@ const TechnicianProfile = () => {
                   <select
                     className="w-full rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     value={form.availability}
-                    onChange={(e) => setForm({ ...form, availability: e.target.value })}
+                    onChange={(e) =>
+                      setForm({ ...form, availability: e.target.value as TechnicianAvailability })
+                    }
                   >
                     <option>Available</option>
                     <option>Busy</option>

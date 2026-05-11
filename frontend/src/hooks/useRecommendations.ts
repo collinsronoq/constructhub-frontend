@@ -21,7 +21,7 @@ export function useRecommendations(useMock?: boolean) {
       if (shouldUseMock) {
         setData({ vendors: [], technicians: [] });
       } else {
-        const res = await apiFetch<RecommendationsResponse>("/recommendations", { method: "GET", auth: false });
+        const res = await apiFetch<RecommendationsResponse>("/recommendations", { method: "GET" });
         setData(res);
       }
     } catch (err: any) {

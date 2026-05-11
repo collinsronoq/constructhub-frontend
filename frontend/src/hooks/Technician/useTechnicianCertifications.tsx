@@ -9,6 +9,12 @@ export function useTechnicianCertifications(userId?: number) {
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
+    if (!userId) {
+      setCerts([]);
+      setError(null);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
@@ -19,7 +25,7 @@ export function useTechnicianCertifications(userId?: number) {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [userId]);
 
   const add = useCallback(
     async (options: { file?: File; title?: string; issuer?: string; fileUrl?: string }) => {
@@ -40,7 +46,7 @@ export function useTechnicianCertifications(userId?: number) {
         setLoading(false);
       }
     },
-    [userId]
+    [load, userId]
   );
 
   const edit = useCallback(async (certId: number, payload: { title?: string; issuer?: string }) => {
